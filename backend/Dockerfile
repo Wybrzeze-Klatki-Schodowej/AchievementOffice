@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY ["AchievementOffice.sln", "./"]
+COPY ["AchievementOffice.slnx", "./"]
 COPY ["AchievementOffice/AchievementOffice.csproj", "AchievementOffice/"]
 
 RUN dotnet restore
