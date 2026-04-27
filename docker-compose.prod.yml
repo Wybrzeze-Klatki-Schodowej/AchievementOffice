@@ -1,0 +1,40 @@
+name: AchievementOffice-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: achievementoffice_db_prod
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=achievement_office
+    volumes:
+      - db_data_prod:/var/lib/postgresql/data
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: achievementoffice_backend_prod
+    restart: always
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Database=achievement_office;Username=user;Password=postgres
+      
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: achievementoffice_frontend_prod
+    restart: always
+    ports: 
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data_prod:
