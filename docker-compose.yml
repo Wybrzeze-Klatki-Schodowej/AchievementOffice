@@ -15,19 +15,18 @@ services:
   backend:
     build: 
       context: ./backend
-      dockerfile: Dockerfile.dev
     ports: 
       - "8080:8080"
     depends_on:
       - db
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Database=achievement_office;Username=user;Password=postgres
     volumes:
       - ./backend:/app
   frontend:
     build: 
       context: ./frontend
-      dockerfile: Dockerfile.dev
     ports: 
       - "5173:5173"
     volumes:

@@ -13,12 +13,11 @@ An office praise system, where employees can share their achievements, confirm o
 ```bash
 git clone https://github.com/Wybrzeze-Klatki-Schodowej/AchievementOffice
 ```
-2.1 Build and run the environment for development
+2. Build and run the environment for development
 ```bash
-docker compose -f docker-compose.dev.yml up --build
+docker compose up -d --build
 ```
-2.2 Build and run the environment for production
-```bash
-docker compose -f docker-compose.prod.yml up --build -d
-```
-3. Open browser with url address: http://localhost:5173 for development container or http://localhost for production
+
+3. Open your browser
+   + Frontend: http://localhost:5173
+   + Backend: http://localhost:8080
