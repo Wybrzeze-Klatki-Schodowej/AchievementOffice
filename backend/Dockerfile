@@ -1,16 +1,8 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+
 WORKDIR /app
 
-COPY ["AchievementOffice.slnx", "./"]
-COPY ["AchievementOffice/AchievementOffice.csproj", "AchievementOffice/"]
+COPY AchievementOffice/*.csproj ./AchievementOffice/
+RUN dotnet restore ./AchievementOffice/AchievementOffice.csproj
 
-RUN dotnet restore
-COPY . .
-RUN dotnet publish "AchievementOffice/AchievementOffice.csproj" -c Release -o out
-
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
-WORKDIR /app
-
-COPY --from=build /app/out .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "AchievementOffice.dll"]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "AchievementOffice/AchievementOffice.csproj", "--urls", "http://0.0.0.0:8080"]

@@ -13,11 +13,14 @@ An office praise system, where employees can share their achievements, confirm o
 ```bash
 git clone https://github.com/Wybrzeze-Klatki-Schodowej/AchievementOffice
 ```
-2. Build and run the environment
+2. Build and run the environment for development
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
-3. Open browser with url address: http://localhost:5173
+
+3. Open your browser
+   + Frontend: http://localhost:5173
+   + Backend: http://localhost:8080
 
 ## Definition of Done
 
