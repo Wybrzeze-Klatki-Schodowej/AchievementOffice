@@ -22,6 +22,15 @@ docker compose up -d --build
    + Frontend: http://localhost:5173
    + Backend: http://localhost:8080
 
+## How to migrate database
+Execute in order those commands.
+```bash
+docker exec -it backend /bin/bash
+cd AchievementOffice
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
 ## Definition of Done
 
 1. Meets the requirements defined in Jira.
