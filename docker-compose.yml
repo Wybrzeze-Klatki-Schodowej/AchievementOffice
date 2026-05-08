@@ -25,6 +25,8 @@ services:
       - DOTNET_WATCH_NON_INTERACTIVE=true
     volumes:
       - ./backend:/app
+      - /app/AchievementOffice/bin
+      - /app/AchievementOffice/obj
   frontend:
     build: 
       context: ./frontend
