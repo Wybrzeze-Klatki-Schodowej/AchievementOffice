@@ -22,6 +22,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Database=achievement_office;Username=user;Password=postgres
+      - DOTNET_WATCH_NON_INTERACTIVE=true
     volumes:
       - ./backend:/app
   frontend:
