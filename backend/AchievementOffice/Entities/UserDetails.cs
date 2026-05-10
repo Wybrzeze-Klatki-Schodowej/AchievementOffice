@@ -8,6 +8,6 @@
         public required string Lastname { get; set; }
         public required string JobTitle { get; set; }
         public string? Bio { get; set; }
-        public string? Avatar { get; set; }
+        public string? AvatarUrl { get; set; }
     }
 }

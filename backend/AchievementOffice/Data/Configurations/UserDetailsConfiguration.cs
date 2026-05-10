@@ -38,7 +38,7 @@ namespace AchievementOffice.Data.Configurations
             builder.Property(userD => userD.Bio)
                 .HasColumnName("profile_bio");
 
-            builder.Property(userD => userD.Avatar)
+            builder.Property(userD => userD.AvatarUrl)
                 .HasColumnName("avatar_url")
                 .HasMaxLength(255);
 

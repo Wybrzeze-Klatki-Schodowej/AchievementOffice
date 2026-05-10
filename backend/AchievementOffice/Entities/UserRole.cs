@@ -5,6 +5,6 @@
         public Guid Id { get; set; }
         public required string Name { get; set; }
 
-        public ICollection<User> Users { get; set; } = new HashSet<User>();
+        public ICollection<User> Users { get; } = new HashSet<User>();
     }
 }
