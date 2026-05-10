@@ -12,7 +12,9 @@ namespace AchievementOffice.Data.Configurations
 
             builder.HasKey(user => user.Id);
 
-            builder.Property(user => user.Id).HasColumnName("user_id");
+            builder.Property(user => user.Id)
+                .HasColumnName("user_id")
+                .HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(user => user.Login)
                 .HasColumnName("login")
@@ -62,10 +64,25 @@ namespace AchievementOffice.Data.Configurations
                 .HasColumnName("deleted_at");
 
             builder.Property(u => u.CreatedAt)
-                .HasColumnName("created_at");
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             builder.Property(u => u.UpdatedAt)
-                .HasColumnName("updated_at");
+                .HasColumnName("updated_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            builder.HasData(
+                new User
+                {
+                    Id = Guid.Parse("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                    Login = "admin_test",
+                    Email = "admin@example.com",
+                    Password = "nihjcbweiij12",
+                    UserRoleId = Guid.Parse("fb279f32-7235-4306-8968-380f76953e6b"),
+                    CreatedAt = new DateTime(2026, 05, 10, 0, 0, 0, DateTimeKind.Utc),
+                    UpdatedAt = new DateTime(2026, 05, 10, 0, 0, 0, DateTimeKind.Utc)
+                }
+            );
         }
     }
 }

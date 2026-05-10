@@ -2,7 +2,8 @@
 {
     public class User
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
+        public UserDetails UserDetails { get; set; } = null!;
         public required string Login { get; set; }
         public required string Password { get; set; }
         public string? LastPassword { get; set; }
@@ -12,7 +13,7 @@
         public UserRole UserRole { get; set; } = null!;
         public bool IsActive { get; set; } = true;
         public DateTime? DeletedAt { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

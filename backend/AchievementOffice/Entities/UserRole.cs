@@ -2,7 +2,7 @@
 {
     public class UserRole
     { 
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public required string Name { get; set; }
 
         public ICollection<User> Users { get; set; } = new HashSet<User>();

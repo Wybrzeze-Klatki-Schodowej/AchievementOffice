@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260510143447_UserTable")]
-    partial class UserTable
+    [Migration("20260510163901_InitialData")]
+    partial class InitialData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,11 +30,14 @@ namespace AchievementOffice.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnName("user_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
@@ -73,8 +76,10 @@ namespace AchievementOffice.Migrations
                         .HasColumnName("password_hash");
 
                     b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("UserRoleId")
                         .HasColumnType("uuid")
@@ -93,6 +98,66 @@ namespace AchievementOffice.Migrations
                     b.HasIndex("UserRoleId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                            CreatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@example.com",
+                            IsActive = true,
+                            Login = "admin_test",
+                            Password = "nihjcbweiij12",
+                            UpdatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UserRoleId = new Guid("fb279f32-7235-4306-8968-380f76953e6b")
+                        });
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Avatar")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("avatar_url");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text")
+                        .HasColumnName("profile_bio");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("firstname");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("job_title");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("lastname");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserDetails", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                            Firstname = "Jan",
+                            JobTitle = "Admin",
+                            Lastname = "Kowalski"
+                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
@@ -100,7 +165,8 @@ namespace AchievementOffice.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("user_role_id");
+                        .HasColumnName("user_role_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -111,6 +177,18 @@ namespace AchievementOffice.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserRole", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("fb279f32-7235-4306-8968-380f76953e6b"),
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("7a610998-3843-4315-9923-92f7634f1981"),
+                            Name = "User"
+                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -123,6 +201,24 @@ namespace AchievementOffice.Migrations
                         .HasConstraintName("fk_users_roles");
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithOne("UserDetails")
+                        .HasForeignKey("AchievementOffice.Entities.UserDetails", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_details_user");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.User", b =>
+                {
+                    b.Navigation("UserDetails")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
