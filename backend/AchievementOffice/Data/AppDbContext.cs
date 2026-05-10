@@ -6,7 +6,7 @@ namespace AchievementOffice.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<UserRole> UserRoles { get; set; }
+       public DbSet<UserRole> UserRoles => Set<UserRole>();
         public DbSet<User> Users { get; set; }
 
         public DbSet<UserDetails> UserDetails { get; set; }
