@@ -25,9 +25,9 @@ docker compose up -d --build
 ## How to migrate database
 Execute in order those commands.
 ```bash
-docker exec -it backend /bin/bash
+docker compose exec backend /bin/bash
 cd AchievementOffice
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add <name_of_migration>
 dotnet ef database update
 ```
 
