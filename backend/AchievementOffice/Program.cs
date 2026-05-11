@@ -1,4 +1,5 @@
 using AchievementOffice.Extensions;
+using AchievementOffice.Features.Achievements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.SetupDatabase(builder.Configuration);
+
+builder.Services.AddScoped<IAchievementService, AchievementService>();
 
 var app = builder.Build();
 
