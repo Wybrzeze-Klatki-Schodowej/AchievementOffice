@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AchievementOffice.Features.Achievements;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/achievements")]
 public class AchievementController : ControllerBase
 {
     private readonly IAchievementService _achievementService;
@@ -17,14 +17,51 @@ public class AchievementController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<AchievementResponseDto>>> GetAll()
     {
-        var achievements = await _achievementService.GetAllAchievementsAsync();
+        var achievements = await _achievementService.GetAllAsync();
         return Ok(achievements);
     }
 
     [HttpPost]
     public async Task<ActionResult<AchievementResponseDto>> Create(CreateAchievementDto dto)
     {
-        var achievement = await _achievementService.CreateAchievementAsync(dto);
+        var achievement = await _achievementService.CreateAsync(dto);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = achievement.AchievementId },
+            achievement);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<AchievementResponseDto>> GetById(Guid id)
+    {
+        var achievement = await _achievementService.GetByIdAsync(id);
+
+        if (achievement == null)
+            return NotFound();
+
         return Ok(achievement);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<AchievementResponseDto>> Update(Guid id, UpdateAchievementDto dto)
+    {
+        var achievement = await _achievementService.UpdateAsync(id, dto);
+
+        if (achievement == null)
+            return NotFound();
+
+        return Ok(achievement);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var deleted = await _achievementService.DeleteAsync(id);
+
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
     }
 }

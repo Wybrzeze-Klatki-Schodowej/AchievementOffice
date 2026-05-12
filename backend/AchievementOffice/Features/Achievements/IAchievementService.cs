@@ -4,7 +4,13 @@ namespace AchievementOffice.Features.Achievements;
 
 public interface IAchievementService
 {
-    Task<AchievementResponseDto> CreateAchievementAsync(CreateAchievementDto createDto);
+    Task<AchievementResponseDto> CreateAsync(CreateAchievementDto createDto);
 
-    Task<List<AchievementResponseDto>> GetAllAchievementsAsync();
+    Task<List<AchievementResponseDto>> GetAllAsync();
+
+    Task<AchievementResponseDto?> GetByIdAsync(Guid id);
+
+    Task<AchievementResponseDto?> UpdateAsync(Guid id, UpdateAchievementDto dto);
+
+    Task<bool> DeleteAsync(Guid id);
 }
