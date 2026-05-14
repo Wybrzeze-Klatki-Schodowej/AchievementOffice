@@ -9,15 +9,17 @@ namespace AchievementOffice.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
+        private readonly ITokenService _tokenService;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
 
         public async Task<LoginResult> LoginAsync(LoginRequest request)
         {
-            var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Login == request.Login);
+            var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Login == request.Login);
 
             if (user == null)
                 return new LoginResult() { IsSuccesful = false };
@@ -27,9 +29,12 @@ namespace AchievementOffice.Services
             if (!isPasswordValid)
                 return new LoginResult() { IsSuccesful = false };
 
-            string jwtToken = "TOKEN"; // TODO: Generate token
+            var token = _tokenService.GenerateToken(user);
 
-            return new LoginResult() { IsSuccesful = true, Token = jwtToken };
+            if (string.IsNullOrEmpty(token))
+                return new LoginResult() { IsSuccesful = false };
+
+            return new LoginResult() { IsSuccesful = true, Token = token };
         }
 
         public async Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request)

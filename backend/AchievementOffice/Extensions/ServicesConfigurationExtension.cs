@@ -8,6 +8,8 @@ namespace AchievementOffice.Extensions
         {
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<ITokenService, TokenService>();
+
             return services;
         }
     }
