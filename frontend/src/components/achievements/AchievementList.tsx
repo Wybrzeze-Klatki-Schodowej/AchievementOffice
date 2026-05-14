@@ -5,6 +5,7 @@ import {
 } from "../../api/achievementApi";
 import type { Achievement } from "../../types/achievement";
 import AchievementCard from "./AchievementCard";
+import AchievementModal from "./AchievementModal";
 
 interface Props {
     refreshTrigger: number;
@@ -15,6 +16,9 @@ export default function AchievementList({
 }: Props) {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedAchievement, setSelectedAchievement] = useState<Achievement | undefined>();
 
     const loadAchievements = async () => {
         try {
@@ -45,6 +49,12 @@ export default function AchievementList({
         }
     };
 
+    const handleEdit = (achievement: Achievement) => {
+        setSelectedAchievement(achievement);
+
+        setIsEditModalOpen(true);
+    };
+
     if (loading) {
         return <p>Loading achievements...</p>;
     }
@@ -53,12 +63,28 @@ export default function AchievementList({
         <div>
             <h2>Achievements</h2>
 
+            <AchievementModal 
+                open={isEditModalOpen}
+                achievement={selectedAchievement}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+
+                    setSelectedAchievement(undefined);
+                }}
+                onAchievementCreated={loadAchievements}
+            />
+
             {achievements.length === 0 && <p>No achievements yet.</p>}
 
             {achievements.map((achievement) => (
                 <div key={achievement.achievementId}>
                     <AchievementCard achievement={achievement} />
 
+                    <button 
+                        onClick={() => handleEdit(achievement)}
+                    >
+                        Edit
+                    </button>
                     <button 
                         onClick={() => handleDelete(achievement.achievementId)}
                     >

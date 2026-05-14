@@ -1,42 +1,61 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
 import {
     createAchievement,
+    updateAchievement,
     type CreateAchievementDto,
 } from "../../api/achievementApi";
+import type { Achievement } from "../../types/achievement";
 
 interface Props {
     onAchievementCreated: () => void;
+    achievement?: Achievement;
 }
 
 export default function AchievementForm({
     onAchievementCreated,
+    achievement,
 }: Props) {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [title, setTitle] = useState(
+        achievement?.title ?? ""
+    );
+    const [description, setDescription] = useState(
+        achievement?.description ?? ""
+    );
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
 
         try {
             setLoading(true);
 
-            const dto: CreateAchievementDto = {
-                userId: "11111111-1111-1111-1111-111111111111",
-                title,
-                description
-            };
+            if (achievement) {
+                await updateAchievement(
+                    achievement.achievementId, 
+                    {
+                        title,
+                        description
+                    }
+                );
+            } else {
+                const dto: CreateAchievementDto = {
+                    userId: "11111111-1111-1111-1111-111111111111",
+                    title,
+                    description
+                };
 
-            await createAchievement(dto);
+                await createAchievement(dto);
+            }
+
+            onAchievementCreated();
 
             setTitle("");
             setDescription("");
-
-            onAchievementCreated();
         } catch (error) {
             console.error(error);
-            alert("Failed to create achievement");
+            alert("Operation failed");
         } finally {
             setLoading(false);
         }
@@ -44,7 +63,7 @@ export default function AchievementForm({
 
     return (
         <form onSubmit={handleSubmit}>
-            <h2>Add achievement</h2>
+            <h2>{achievement ? "Edit achievement" : "Add achievement"}</h2>
 
             <div>
                 <input 
@@ -65,7 +84,7 @@ export default function AchievementForm({
             </div>
 
             <button type="submit" disabled={loading}>
-                {loading ? "Adding..." : "Add achievement"}
+                {loading ? achievement ? "Saving..." : "Adding..." : achievement ? "Save changes" : "Add achievement"}
             </button>
         </form>
     );

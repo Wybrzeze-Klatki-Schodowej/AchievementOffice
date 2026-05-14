@@ -1,16 +1,20 @@
 import AchievementForm from "./AchievementForm";
+import type { Achievement } from "../../types/achievement";
 import "./AchievementModal.css";
 
 interface Props {
     open: boolean;
     onClose: () => void;
     onAchievementCreated: () => void;
+
+    achievement?: Achievement;
 }
 
 export default function AchievementModal({
     open,
     onClose,
     onAchievementCreated,
+    achievement,
 }: Props) {
     if (!open) return null;
 
@@ -25,6 +29,7 @@ export default function AchievementModal({
                 </button>
 
                 <AchievementForm 
+                    achievement={achievement}
                     onAchievementCreated={() => {
                         onAchievementCreated();
                         onClose();

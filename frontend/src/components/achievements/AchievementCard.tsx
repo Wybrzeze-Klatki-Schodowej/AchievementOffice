@@ -20,6 +20,8 @@ export default function AchievementCard({ achievement }: Props) {
 
             <small>
                 Created: {new Date(achievement.createdAt).toLocaleString()}
+                <br />
+                Updated: {new Date(achievement.updatedAt).toLocaleString()}
             </small>
         </div>
     );

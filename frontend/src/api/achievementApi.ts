@@ -8,6 +8,11 @@ export interface CreateAchievementDto {
     description?: string;
 }
 
+export interface UpdateAchievementDto {
+    title: string;
+    description?: string;
+}
+
 export const getAchievements = async (): Promise<Achievement[]> => {
     const response = await fetch(API_URL);
 
@@ -35,6 +40,26 @@ export const createAchievement = async (
 
     return response.json();
 };
+
+export async function updateAchievement(
+    id: string,
+    dto: UpdateAchievementDto
+) {
+    const response = await fetch(
+        `${API_URL}/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dto),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to update achievement");
+    }
+}
 
 export const deleteAchievement = async (
     id: string
