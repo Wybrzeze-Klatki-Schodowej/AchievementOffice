@@ -9,6 +9,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSecurityConfiguration(builder.Configuration);
+builder.Services.AddApplicationServices();
+
 builder.Services.SetupDatabase(builder.Configuration);
 
 var app = builder.Build();
@@ -22,6 +25,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("ReactPolicy");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
