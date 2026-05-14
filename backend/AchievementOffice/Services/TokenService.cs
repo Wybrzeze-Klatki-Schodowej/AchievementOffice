@@ -1,4 +1,6 @@
-﻿using AchievementOffice.Entities;
+﻿using AchievementOffice.Configuration;
+using AchievementOffice.Entities;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -8,20 +10,16 @@ namespace AchievementOffice.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _configuration;
+        private readonly JwtConfiguration _configuration;
 
-        public TokenService(IConfiguration configuration)
+        public TokenService(IOptions<JwtConfiguration> _jwtOptions)
         {
-            _configuration = configuration;
+            _configuration = _jwtOptions.Value;
         }
 
         public string GenerateToken(User user)
         {
-            var issuer = _configuration["JwtConf:Issuer"];
-            var audience = _configuration["JwtConf:Audience"];
-            var signingKey = _configuration["JwtConf:SigningKey"];
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.SigningKey!));
             var signCred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
@@ -35,7 +33,7 @@ namespace AchievementOffice.Services
                 new Claim("JobTitle", user.UserDetails.JobTitle)
             };
 
-            var token = new JwtSecurityToken(issuer, audience, claims, null, DateTime.Now.AddHours(1), signCred);
+            var token = new JwtSecurityToken(_configuration.Issuer, _configuration.Audience, claims, null, DateTime.Now.AddHours(1), signCred);
             var tokenStr = new JwtSecurityTokenHandler().WriteToken(token);
 
             return tokenStr;
