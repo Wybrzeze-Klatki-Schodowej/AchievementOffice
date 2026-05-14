@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.ConfigureAppConfiguration(builder.Configuration);
 builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AchievementOffice.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -8,22 +10,13 @@ namespace AchievementOffice.Extensions
     {
         public static IServiceCollection AddSecurityConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            var frontUrl = configuration["CorseSettings:FrontUrl"];
+            var corsConfiguration = configuration.GetSection(CorsConfiguration.SectionName).Get<CorsConfiguration>();
+            var jwtConfiguration = configuration.GetSection(JwtConfiguration.SectionName).Get<JwtConfiguration>();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("ReactPolicy", policy =>
-                {
-                    policy.WithOrigins(frontUrl!)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-            });
+            if (corsConfiguration == null) throw new InvalidOperationException("CORS configuration is missing.");
+            if (jwtConfiguration == null) throw new InvalidOperationException("JWT configuration is missing.");
 
-            var issuer = configuration["JwtConf:Issuer"];
-            var audience = configuration["JwtConf:Audience"];
-            var signingKey = configuration["JwtConf:SigningKey"];
+            services.AddCors(options => AddReactPolicy(options, corsConfiguration.FrontUrl));
 
             services.AddAuthentication(opt =>
             {
@@ -31,32 +24,52 @@ namespace AchievementOffice.Extensions
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey!))
-                };
-
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        if (context.Request.Cookies.ContainsKey("X-jwt-token"))
-                        {
-                            context.Token = context.Request.Cookies["X-jwt-token"];
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
+                options.TokenValidationParameters = GetValidationParameters(jwtConfiguration!);
+                options.Events = GetJwtBearerEvents();
             });
 
             return services;
+        }
+
+        private static void AddReactPolicy(CorsOptions options, string frontUrl)
+        {
+            options.AddPolicy("ReactPolicy", policy =>
+            {
+                policy.WithOrigins(frontUrl)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        }
+
+        private static TokenValidationParameters GetValidationParameters(JwtConfiguration jwtConfiguration)
+        {
+            return new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtConfiguration.Issuer,
+                ValidAudience = jwtConfiguration.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.SigningKey))
+            };
+        }
+
+        private static JwtBearerEvents GetJwtBearerEvents()
+        {
+            return new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    if (context.Request.Cookies.ContainsKey("X-jwt-token"))
+                    {
+                        context.Token = context.Request.Cookies["X-jwt-token"];
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
         }
     }
 }
