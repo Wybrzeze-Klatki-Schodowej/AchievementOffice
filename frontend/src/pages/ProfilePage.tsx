@@ -1,31 +1,28 @@
-import { useState } from "react";
-import AchievementForm from "../components/achievements/AchievementForm";
 import AchievementList from "../components/achievements/AchievementList";
+import { useOutletContext } from "react-router-dom";
+
+interface OutletContext {
+    refreshTrigger: number;
+}
 
 export default function ProfilePage() {
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-    const handleAchievementCreated = () => {
-        setRefreshTrigger((prev) => prev + 1);
-    };
+    const { refreshTrigger } = useOutletContext<OutletContext>();
 
     return (
-        <div
-            style={{
-                maxWidth: "700px",
-                margin: "0 auto",
-                padding: "24px",
-            }}
-        >
-            <h1>User profile</h1>
+        <div>
+            <div
+                style={{
+                    maxWidth: "700px",
+                    margin: "0 auto",
+                    padding: "24px",
+                }}
+            >
+                <h1>User profile</h1>
 
-            <AchievementForm 
-                onAchievementCreated={handleAchievementCreated}
-            />
-
-            <hr style={{ margin: "24px 0" }} />
-
-            <AchievementList refreshTrigger={refreshTrigger} />
+                <AchievementList 
+                    refreshTrigger={refreshTrigger}
+                />
+            </div>
         </div>
     );
 }
