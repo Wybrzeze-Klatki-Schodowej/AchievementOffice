@@ -9,10 +9,12 @@ namespace AchievementOffice.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService userService, ITokenService tokenService)
         {
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost("login")]
@@ -22,6 +24,15 @@ namespace AchievementOffice.Controllers
 
             if (!result.IsSuccesful)
                 return Unauthorized(new { Message = "Invalid username or password" });
+
+            var opts = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.Now.AddHours(1)
+            };
+            Response.Cookies.Append("X-jwt-token", result.Token! , opts);
 
             return Ok();
         }
