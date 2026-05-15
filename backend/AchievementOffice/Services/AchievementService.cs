@@ -95,4 +95,39 @@ public class AchievementService : IAchievementService
             UpdatedAt = achievement.UpdatedAt
         };
     }
+
+    public async Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto)
+    {
+        var approve = new AchievementApprove
+        {
+            AchievementApproveId = Guid.NewGuid(),
+            AchievementId = dto.AchievementId,
+            UserId = userId,
+            IsApproved = dto.IsApproved,
+            ApprovedAt = DateTime.UtcNow
+        };
+        _context.AchievementApproves.Add( approve );
+        await _context.SaveChangesAsync();
+        return MapApproveToDto( approve );
+    }
+
+    public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .ToListAsync();
+        return approvals.Select( MapApproveToDto ).ToList();
+    }
+
+    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve)
+    {
+        return new AchievementApproveResponseDto
+        {
+            AchievementApproveId = approve.AchievementApproveId,
+            AchievementId = approve.AchievementId,
+            UserId = approve.UserId,
+            IsApproved = approve.IsApproved,
+            ApprovedAt = approve.ApprovedAt
+        };
+    }
 }

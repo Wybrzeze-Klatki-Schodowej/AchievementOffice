@@ -11,6 +11,7 @@ namespace AchievementOffice.Data
         }
 
         public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<AchievementApprove> AchievementApproves { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
