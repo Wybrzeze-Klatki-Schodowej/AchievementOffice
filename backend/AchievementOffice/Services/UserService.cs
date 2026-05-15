@@ -21,19 +21,19 @@ namespace AchievementOffice.Services
             var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Login == request.Login);
 
             if (user == null)
-                return new LoginResult() { IsSuccesful = false };
+                return new LoginResult() { IsSuccessful = false };
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
 
             if (!isPasswordValid)
-                return new LoginResult() { IsSuccesful = false };
+                return new LoginResult() { IsSuccessful = false };
 
             var token = _tokenService.GenerateToken(user);
 
             if (string.IsNullOrEmpty(token))
-                return new LoginResult() { IsSuccesful = false };
+                return new LoginResult() { IsSuccessful = false };
 
-            return new LoginResult() { IsSuccesful = true, Token = token };
+            return new LoginResult() { IsSuccessful = true, Token = token };
         }
 
         public async Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request)
