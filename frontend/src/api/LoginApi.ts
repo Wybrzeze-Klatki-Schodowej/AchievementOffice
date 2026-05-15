@@ -22,3 +22,19 @@ export async function login(data: LoginDTO): Promise<void> {
         throw new Error(errMessage.message || "Login failed");
     }
 }
+
+export async function checkAuth(): Promise<boolean> {
+    try {
+        const res = await fetch(API_URL + "/me", {
+        method: "GET",
+        credentials: "include"
+        });
+
+        if (!res.ok) return false;
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        return false;
+    }
+}
