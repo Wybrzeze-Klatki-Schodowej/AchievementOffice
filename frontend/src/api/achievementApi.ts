@@ -1,4 +1,4 @@
-import type { Achievement } from "../types/achievement";
+import type { Achievement, AchievementApprove } from "../types/achievement";
 
 const API_URL = "http://localhost:8080/api/achievements";
 
@@ -71,4 +71,21 @@ export const deleteAchievement = async (
     if (!response.ok) {
         throw new Error("Failed to delete achievement");
     }
+};
+
+export const approveAchievement = async (
+    achievementId: string,
+    isApproved: boolean
+): Promise<AchievementApprove> => {
+    const response = await fetch(`${API_URL}/${achievementId}/approve`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ achievementId, isApproved }),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to approve achievement");
+    }
+    return response.json();
 };
