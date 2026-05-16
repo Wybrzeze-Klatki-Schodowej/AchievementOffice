@@ -5,7 +5,7 @@ namespace AchievementOffice.Features.Achievements;
 
 public class AchievementApproveConfiguration : IEntityTypeConfiguration<AchievementApprove>
 {
-    public void Configure(EntityTypeBuilder<Achievement> builder)
+    public void Configure(EntityTypeBuilder<AchievementApprove> builder)
     {
         builder.ToTable("AchievementApprove");
 
