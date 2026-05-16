@@ -13,6 +13,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
   backend:
+    container_name: backend
     build: 
       context: ./backend
     ports: 
@@ -27,7 +28,9 @@ services:
       - ./backend:/app
       - /app/AchievementOffice/bin
       - /app/AchievementOffice/obj
+      - ./uploads/avatars:/app/AchievementOffice/wwwroot/avatars
   frontend:
+    container_name: frontend
     build: 
       context: ./frontend
     ports: 
@@ -37,6 +40,12 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8082:8080"
 
 volumes:
   db_data:

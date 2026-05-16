@@ -1,4 +1,5 @@
-﻿using AchievementOffice.Data;
+﻿using AchievementOffice.Configuration;
+using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -8,22 +9,27 @@ namespace AchievementOffice.Extensions
     {
         public static IServiceCollection SetupDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            var connnectionString = BuildConnectionString(configuration);
+            var dbSettings = configuration.GetSection(DatabaseConfiguration.SectionName).Get<DatabaseConfiguration>();
 
-            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connnectionString));
+            if (dbSettings == null) 
+                throw new InvalidOperationException($"{DatabaseConfiguration.SectionName} is missing from appsettings");
+
+            var connectionString = BuildConnectionString(dbSettings);
+
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
             return services;
         }
 
-        private static string BuildConnectionString(IConfiguration configuration)
+        private static string BuildConnectionString(DatabaseConfiguration dbConfiguration)
         {
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder
             {
-                Port = configuration.GetValue<int>("DatabaseSettings:Port", 5432),
-                Host = configuration.GetValue<string>("DatabaseSettings:Host") ?? throw new ArgumentNullException("Host is missing"),
-                Database = configuration.GetValue<string>("DatabaseSettings:Database") ?? throw new ArgumentNullException("Database is missing"),
-                Username = configuration.GetValue<string>("DatabaseSettings:Username") ?? throw new ArgumentNullException("User is missing"),
-                Password = configuration.GetValue<string>("DatabaseSettings:Password") ?? throw new ArgumentNullException("Password is missing")
+                Port = dbConfiguration.Port,
+                Host = dbConfiguration.Host,
+                Database = dbConfiguration.Database,
+                Username = dbConfiguration.Username,
+                Password = dbConfiguration.Password
             };
 
             return connectionStringBuilder.ConnectionString;
