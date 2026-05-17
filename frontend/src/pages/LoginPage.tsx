@@ -3,6 +3,7 @@ import LoginForm from '../components/login/LoginForm';
 import { useState } from 'react';
 import {type LoginDTO, login } from '../api/LoginApi';
 import { useNavigate } from 'react-router-dom';
+import './LoginPage.css';
 
 interface LoginPageProps {
     onLogin: () => void;
@@ -29,9 +30,14 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     }
 
     return (
-        <div>
-            {error && <div style={{color: 'red', marginBottom: '1rem'}} className="error-message">{error}</div>}
-            <LoginForm isLoading={isLoading} onSubmit={handleSubmit}></LoginForm>
+        <div className='login-page'>
+            <div className='text-container'>
+                <h1 className='top-left-text'>Share your success</h1>
+            </div>
+            <div className='form-container'>
+                <h2 className='login-title'>Login</h2>
+                <LoginForm isLoading={isLoading} onSubmit={handleSubmit} error={error}></LoginForm>
+            </div>
         </div>
     );
 }

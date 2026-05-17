@@ -1,13 +1,15 @@
 import React from 'react';
 import { useState } from 'react';
 import type { LoginDTO } from '../../api/LoginApi';
+import './LoginForm.css';
 
 interface LoadingProps {
     isLoading: boolean;
     onSubmit: (data: LoginDTO) => void;
+    error: string | null;
 }
 
-export default function LoginForm({ isLoading, onSubmit }: LoadingProps) {
+export default function LoginForm({ isLoading, onSubmit, error }: LoadingProps) {
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
 
@@ -15,21 +17,15 @@ export default function LoginForm({ isLoading, onSubmit }: LoadingProps) {
         e.preventDefault();
         onSubmit({login, password});
 
-        setLogin('');
         setPassword('');
     }
 
     return (
         <form onSubmit={handleSubmit}>
-            <div>
-                <label>Login</label>
-                <input type="text" value={login} onChange={(e) => setLogin(e.target.value)} required></input>
-            </div>
-            <div>
-                <label>Password:</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required></input>
-            </div>
-            <button type="submit" disabled={isLoading}>Login</button>
+            <input type="text" placeholder='Login' value={login} onChange={(e) => setLogin(e.target.value)} required></input>
+            <input type="password" placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required></input>
+            {error && <div style={{color: 'red', marginBottom: '1rem'}} className="error-message">{error}</div>}
+            <button className="login-button" type="submit" disabled={isLoading}>Login</button>
         </form>
     );
 }
