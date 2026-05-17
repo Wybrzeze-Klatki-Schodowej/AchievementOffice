@@ -14,3 +14,8 @@ export interface AchievementApprove {
     isApproved: boolean;
     approvedAt: string;
 }
+
+export interface AchievementApprovalSummary {
+    approved: number;
+    denied: number;
+}

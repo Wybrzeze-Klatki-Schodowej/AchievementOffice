@@ -17,4 +17,6 @@ public interface IAchievementService
     Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto);
 
     Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId);
+
+    Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId);
 }

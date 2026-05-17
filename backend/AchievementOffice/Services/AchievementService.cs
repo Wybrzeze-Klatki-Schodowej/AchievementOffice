@@ -98,6 +98,14 @@ public class AchievementService : IAchievementService
 
     public async Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto)
     {
+        var existing = await _context.AchievementApproves
+        .FirstOrDefaultAsync(a => a.AchievementId == dto.AchievementId
+                                && a.UserId == userId
+                                && a.DeletedAt == null);
+
+        if (existing != null)
+            throw new InvalidOperationException("User already voted on this achievement");
+
         var approve = new AchievementApprove
         {
             AchievementApproveId = Guid.NewGuid(),
@@ -128,6 +136,18 @@ public class AchievementService : IAchievementService
             UserId = approve.UserId,
             IsApproved = approve.IsApproved,
             ApprovedAt = approve.ApprovedAt
+        };
+    }
+
+    public async Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .ToListAsync();
+        return new AchievementApprovalSummaryDto
+        {
+            Approved = approvals.Count( a => a.IsApproved ),
+            Denied = approvals.Count( a => !a.IsApproved )
         };
     }
 }

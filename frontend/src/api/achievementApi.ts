@@ -1,4 +1,4 @@
-import type { Achievement, AchievementApprove } from "../types/achievement";
+import type { Achievement, AchievementApprove, AchievementApprovalSummary } from "../types/achievement";
 
 const API_URL = "http://localhost:8080/api/achievements";
 
@@ -86,6 +86,16 @@ export const approveAchievement = async (
     });
     if (!response.ok) {
         throw new Error("Failed to approve achievement");
+    }
+    return response.json();
+};
+
+export const getApprovalSummary = async (
+    achievementId: string
+): Promise<AchievementApprovalSummary> => {
+    const response = await fetch(`${API_URL}/${achievementId}/approvals/summary`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch approval summary");
     }
     return response.json();
 };

@@ -1,6 +1,6 @@
-import type { Achievement } from "../../types/achievement";
-import { approveAchievement } from "../../api/achievementApi";
-import { useState } from "react";
+import type { Achievement, AchievementApprovalSummary } from "../../types/achievement";
+import { approveAchievement, getApprovalSummary } from "../../api/achievementApi";
+import { useState, useEffect } from "react";
 
 interface Props {
     achievement: Achievement;
@@ -10,6 +10,13 @@ interface Props {
 export default function AchievementCard({ achievement, currentUserId }: Props) {
     const [vote, setVote] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(false);
+    const [summary, setSummary] = useState<AchievementApprovalSummary>({ approved: 0, denied: 0 });
+
+    useEffect(() => {
+        getApprovalSummary(achievement.achievementId)
+            .then(setSummary)
+            .catch(console.error);
+    }, [achievement.achievementId]);
 
     const isOwner = achievement.userId === currentUserId;
 
@@ -43,6 +50,11 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
                 <br />
                 Updated: {new Date(achievement.updatedAt).toLocaleString()}
             </small>
+
+            <div style={{ marginTop: "8px", fontSize: "14px" }}>
+                 {summary.approved} approves &nbsp;  {summary.denied} denies
+            </div>
+
             {!isOwner && (
                 <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
                     <button
