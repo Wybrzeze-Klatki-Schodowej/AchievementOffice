@@ -49,9 +49,11 @@ namespace AchievementOffice.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<Boolean> IsLogged()
+        public ActionResult<Boolean> IsLogged()
         {
-            return User.Identity?.IsAuthenticated ?? false;
+            if (!User.Identity.IsAuthenticated) return Ok(false);
+
+            return Ok(true);
         }
 
     }
