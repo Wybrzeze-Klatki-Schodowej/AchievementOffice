@@ -48,13 +48,12 @@ namespace AchievementOffice.Controllers
             return Ok();
         }
 
-        [HttpGet("me")]
-        public ActionResult<Boolean> IsLogged()
+        [HttpGet("is-logged")]
+        public ActionResult<bool> IsLogged()
         {
-            if (!User.Identity.IsAuthenticated) return Ok(false);
+            if (User.Identity?.IsAuthenticated != true) return Ok(false);
 
             return Ok(true);
         }
-
     }
 }

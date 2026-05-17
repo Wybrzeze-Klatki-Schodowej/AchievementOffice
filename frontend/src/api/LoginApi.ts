@@ -25,7 +25,7 @@ export async function login(data: LoginDTO): Promise<void> {
 
 export async function checkAuth(): Promise<boolean> {
     try {
-        const res = await fetch(API_URL + "/me", {
+        const res = await fetch(API_URL + "/is-logged", {
         method: "GET",
         credentials: "include"
         });
