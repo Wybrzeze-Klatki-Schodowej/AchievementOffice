@@ -14,6 +14,9 @@ namespace AchievementOffice.Data
         {
         }
 
+        public DbSet<Achievement> Achievements => Set<Achievement>();
+        public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

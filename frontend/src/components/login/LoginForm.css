@@ -18,6 +18,9 @@ input {
 }
 
 .login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 2em;
     border-radius: 2em;
     font-size: 1rem;

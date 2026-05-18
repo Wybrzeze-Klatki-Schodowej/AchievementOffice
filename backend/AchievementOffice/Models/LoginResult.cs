@@ -2,7 +2,7 @@
 {
     public class LoginResult
     {
-        public bool IsSuccesful { get; set; }
+        public bool IsSuccessful { get; set; }
         public string? Token {  get; set; }
     }
 }

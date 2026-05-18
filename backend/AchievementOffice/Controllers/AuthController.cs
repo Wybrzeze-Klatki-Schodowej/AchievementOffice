@@ -9,12 +9,10 @@ namespace AchievementOffice.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ITokenService _tokenService;
 
-        public AuthController(IUserService userService, ITokenService tokenService)
+        public AuthController(IUserService userService)
         {
             _userService = userService;
-            _tokenService = tokenService;
         }
 
         [HttpPost("login")]
@@ -22,7 +20,7 @@ namespace AchievementOffice.Controllers
         {
             var result = await _userService.LoginAsync(request);
 
-            if (!result.IsSuccesful)
+            if (!result.IsSuccessful)
                 return Unauthorized(new { Message = "Invalid username or password" });
 
             var opts = new CookieOptions

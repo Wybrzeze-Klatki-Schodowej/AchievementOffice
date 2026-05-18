@@ -5,6 +5,7 @@ import './App.css';
 import LoginPage from './pages/LoginPage';
 import { useEffect, useState } from 'react';
 import { checkAuth } from './api/LoginApi';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -23,11 +24,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage onLogin={() => checkLoggedIn()} />}/>
         <Route path="/" element={ isLoggedIn ? <AppLayout /> : <LoginPage onLogin={() => checkLoggedIn()} />}>
-          {/* <Route path="/" element={<LoginPage />}/> */}
+          <Route path="/" element={<ProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
 }
 
-export default App
+export default App;

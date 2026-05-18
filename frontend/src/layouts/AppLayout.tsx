@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
+import AchievementModal from "../components/achievements/AchievementModal";
 
 export default function AppLayout() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +16,12 @@ export default function AppLayout() {
                 onAddAchievementClick={() =>
                     setIsModalOpen(true)
                 }
+            />
+
+            <AchievementModal 
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAchievementCreated={handleAchievementCreated}
             />
 
             <Outlet 
