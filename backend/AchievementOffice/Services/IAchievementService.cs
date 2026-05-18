@@ -13,4 +13,10 @@ public interface IAchievementService
     Task<AchievementResponseDto?> UpdateAsync(Guid id, UpdateAchievementDto dto);
 
     Task<bool> DeleteAsync(Guid id);
+
+    Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto);
+
+    Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId);
+
+    Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId);
 }
