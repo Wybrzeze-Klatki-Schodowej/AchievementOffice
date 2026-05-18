@@ -72,4 +72,33 @@ public class AchievementController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost( "{id:guid}/approve" )]
+    public async Task<ActionResult<AchievementApproveResponseDto>> Approve(Guid id, CreateAchievementApproveDto dto)
+    {
+        try
+        {
+            var userId = Guid.Parse("00000000-0000-0000-0000-000000000101"); // pozniej z jwt, na razie hardcode
+            var approve = await _achievementService.ApproveAsync(userId, dto);
+            return Ok(approve);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+    [HttpGet( "{id:guid}/approvals" )]
+    public async Task<ActionResult<List<AchievementApproveResponseDto>>> GetApprovals(Guid id)
+    {
+        var approvals = await _achievementService.GetApprovalsAsync( id );
+        return Ok( approvals );
+    }
+
+    [HttpGet("{id:guid}/approvals/summary" )]
+    public async Task<ActionResult<AchievementApprovalSummaryDto>> GetApprovalSummary(Guid id)
+    {
+        var summary = await _achievementService.GetApprovalSummaryAsync( id );
+        return Ok( summary );
+    }
 }

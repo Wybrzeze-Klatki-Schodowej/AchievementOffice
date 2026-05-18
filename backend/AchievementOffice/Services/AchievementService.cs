@@ -98,4 +98,59 @@ public class AchievementService : IAchievementService
             UpdatedAt = achievement.UpdatedAt
         };
     }
+
+    public async Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto)
+    {
+        var existing = await _context.AchievementApproves
+        .FirstOrDefaultAsync(a => a.AchievementId == dto.AchievementId
+                                && a.UserId == userId
+                                && a.DeletedAt == null);
+
+        if (existing != null)
+            throw new InvalidOperationException("User already voted on this achievement");
+
+        var approve = new AchievementApprove
+        {
+            AchievementApproveId = Guid.NewGuid(),
+            AchievementId = dto.AchievementId,
+            UserId = userId,
+            IsApproved = dto.IsApproved,
+            ApprovedAt = DateTime.UtcNow
+        };
+        _context.AchievementApproves.Add( approve );
+        await _context.SaveChangesAsync();
+        return MapApproveToDto( approve );
+    }
+
+    public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .ToListAsync();
+        return approvals.Select( MapApproveToDto ).ToList();
+    }
+
+    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve)
+    {
+        return new AchievementApproveResponseDto
+        {
+            AchievementApproveId = approve.AchievementApproveId,
+            AchievementId = approve.AchievementId,
+            UserId = approve.UserId,
+            IsApproved = approve.IsApproved,
+            ApprovedAt = approve.ApprovedAt
+        };
+    }
+
+    public async Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .ToListAsync();
+        return new AchievementApprovalSummaryDto
+        {
+            Approved = approvals.Count( a => a.IsApproved ),
+            Denied = approvals.Count( a => !a.IsApproved )
+        };
+    }
 }

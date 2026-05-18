@@ -6,3 +6,16 @@ export interface Achievement {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface AchievementApprove {
+    achievementApproveId: string;
+    achievementId: string;
+    userId: string;
+    isApproved: boolean;
+    approvedAt: string;
+}
+
+export interface AchievementApprovalSummary {
+    approved: number;
+    denied: number;
+}
