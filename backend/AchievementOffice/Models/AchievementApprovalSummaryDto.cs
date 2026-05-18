@@ -1,4 +1,4 @@
-namespace AchievementOffice.Features.Achievements.DTOs;
+namespace AchievementOffice.Models;
 
 public class AchievementApprovalSummaryDto
 {

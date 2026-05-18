@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AchievementOffice.Features.Achievements;
+namespace AchievementOffice.Data.Configurations;
 
 public class AchievementApproveConfiguration : IEntityTypeConfiguration<AchievementApprove>
 {
