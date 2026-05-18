@@ -1,0 +1,29 @@
+.navbar {
+    height: 70px;
+    background: #1e293b;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;  
+}
+
+.navbar-left h2 {
+    color: white;
+    margin: 0;
+}
+
+.navbar-right {
+    display: flex;
+    gap: 12px;
+}
+
+.navbar button {
+    background: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}

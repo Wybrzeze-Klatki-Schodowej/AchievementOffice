@@ -46,5 +46,12 @@ namespace AchievementOffice.Controllers
             return Ok();
         }
 
+        [HttpGet("is-logged")]
+        public ActionResult<bool> IsLogged()
+        {
+            if (User.Identity?.IsAuthenticated != true) return Ok(false);
+
+            return Ok(true);
+        }
     }
 }
