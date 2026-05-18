@@ -10,6 +10,8 @@ namespace AchievementOffice.Extensions
 
             services.AddScoped<ITokenService, TokenService>();
 
+            services.AddScoped<IAchievementService, AchievementService>();
+
             return services;
         }
     }

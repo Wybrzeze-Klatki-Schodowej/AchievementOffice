@@ -16,20 +16,6 @@ builder.Services.AddApplicationServices();
 
 builder.Services.SetupDatabase(builder.Configuration);
 
-builder.Services.AddScoped<IAchievementService, AchievementService>();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin();
-        });
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
