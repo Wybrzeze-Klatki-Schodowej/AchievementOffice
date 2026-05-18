@@ -10,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.ConfigureAppConfiguration(builder.Configuration);
+builder.Services.AddSecurityConfiguration(builder.Configuration);
+builder.Services.AddApplicationServices();
+
 builder.Services.SetupDatabase(builder.Configuration);
 
 builder.Services.AddScoped<IAchievementService, AchievementService>();
@@ -37,10 +41,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend");
+app.UseCors("ReactPolicy");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.Run();
