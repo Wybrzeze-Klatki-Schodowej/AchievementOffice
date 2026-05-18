@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AchievementOffice.Features.Achievements;
+namespace AchievementOffice.Data.Configurations;
 
 public class AchievementConfiguration : IEntityTypeConfiguration<Achievement>
 {
@@ -29,6 +29,7 @@ public class AchievementConfiguration : IEntityTypeConfiguration<Achievement>
 
         builder.Property(a => a.CreatedAt)
             .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
 
         builder.Property(a => a.UpdatedAt)

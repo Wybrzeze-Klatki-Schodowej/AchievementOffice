@@ -1,16 +1,17 @@
-using AchievementOffice.Features.Achievements.DTOs;
+using AchievementOffice.Common;
+using AchievementOffice.Models;
 
-namespace AchievementOffice.Features.Achievements;
+namespace AchievementOffice.Services;
 
 public interface IAchievementService
 {
-    Task<AchievementResponseDto> CreateAsync(CreateAchievementDto createDto);
+    Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest createDto);
 
-    Task<List<AchievementResponseDto>> GetAllAsync();
+    Task<Result<List<AchievementResponse>>> GetAllAsync();
 
-    Task<AchievementResponseDto?> GetByIdAsync(Guid id);
+    Task<Result<AchievementResponse>> GetByIdAsync(Guid id);
 
-    Task<AchievementResponseDto?> UpdateAsync(Guid id, UpdateAchievementDto dto);
+    Task<Result<AchievementResponse>> UpdateAsync(Guid id, UpdateAchievementRequest dto);
 
-    Task<bool> DeleteAsync(Guid id);
+    Task<Result<bool>> DeleteAsync(Guid id);
 }

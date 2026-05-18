@@ -1,9 +1,9 @@
-using System.Runtime.CompilerServices;
 using AchievementOffice.Data;
-using AchievementOffice.Features.Achievements.DTOs;
+using AchievementOffice.Common;
+using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AchievementOffice.Features.Achievements;
+namespace AchievementOffice.Services;
 
 public class AchievementService : IAchievementService
 {
@@ -14,7 +14,7 @@ public class AchievementService : IAchievementService
         _context = context;
     }
 
-    public async Task<AchievementResponseDto> CreateAsync(CreateAchievementDto dto)
+    public async Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest dto)
     {
         var achievement = new Achievement
         {
@@ -30,35 +30,38 @@ public class AchievementService : IAchievementService
 
         await _context.SaveChangesAsync();
 
-        return MapToDto(achievement);
+        return Result<AchievementResponse>.Success(MapToDto(achievement));
     }
 
-    public async Task<List<AchievementResponseDto>> GetAllAsync()
+    public async Task<Result<List<AchievementResponse>>> GetAllAsync()
     {
         var achievements = await _context.Achievements
             .Where(a => a.DeletedAt == null)
             .ToListAsync();
-        return achievements.Select(MapToDto).ToList();
+
+        var result = achievements.Select(MapToDto).ToList();
+
+        return Result<List<AchievementResponse>>.Success(result);
     }
 
-    public async Task<AchievementResponseDto?> GetByIdAsync(Guid id)
+    public async Task<Result<AchievementResponse>> GetByIdAsync(Guid id)
     {
         var achievement = await _context.Achievements
             .FirstOrDefaultAsync(a => a.AchievementId == id && a.DeletedAt == null);
 
         if (achievement == null)
-            return null;
+            return Result<AchievementResponse>.Fail("Achievement not found.");
 
-        return MapToDto(achievement);
+        return Result<AchievementResponse>.Success(MapToDto(achievement));
     }
 
-    public async Task<AchievementResponseDto?> UpdateAsync(Guid id, UpdateAchievementDto dto)
+    public async Task<Result<AchievementResponse>> UpdateAsync(Guid id, UpdateAchievementRequest dto)
     {
         var achievement = await _context.Achievements
             .FirstOrDefaultAsync(a => a.AchievementId == id && a.DeletedAt == null);
 
         if (achievement == null)
-            return null;
+            return Result<AchievementResponse>.Fail("Achievement not found.");
 
         achievement.Title = dto.Title;
         achievement.Description = dto.Description;
@@ -66,26 +69,26 @@ public class AchievementService : IAchievementService
 
         await _context.SaveChangesAsync();
 
-        return MapToDto(achievement);
+        return Result<AchievementResponse>.Success(MapToDto(achievement));
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<Result<bool>> DeleteAsync(Guid id)
     {
         var achievement = await _context.Achievements
             .FirstOrDefaultAsync(a => a.AchievementId == id && a.DeletedAt == null);
 
         if (achievement == null)
-            return false;
+            return Result<bool>.Fail("Achievement not found.");
 
         achievement.DeletedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
-        return true;
+        return Result<bool>.Success(true);
     }
 
-    private static AchievementResponseDto MapToDto(Achievement achievement)
+    private static AchievementResponse MapToDto(Achievement achievement)
     {
-        return new AchievementResponseDto
+        return new AchievementResponse
         {
             AchievementId = achievement.AchievementId,
             UserId = achievement.UserId,

@@ -1,6 +1,6 @@
-namespace AchievementOffice.Features.Achievements.DTOs;
+namespace AchievementOffice.Models;
 
-public class AchievementResponseDto
+public class AchievementResponse
 {
     public Guid AchievementId { get; set; }
 

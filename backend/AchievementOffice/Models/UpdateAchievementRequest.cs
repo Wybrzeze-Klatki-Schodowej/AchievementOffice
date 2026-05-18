@@ -1,6 +1,6 @@
-namespace AchievementOffice.Features.Achievements.DTOs;
+namespace AchievementOffice.Models;
 
-public class UpdateAchievementDto
+public class UpdateAchievementRequest
 {
     public string Title { get; set; } = string.Empty;
 

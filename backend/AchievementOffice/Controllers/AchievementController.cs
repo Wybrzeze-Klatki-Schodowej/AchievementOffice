@@ -1,7 +1,8 @@
-using AchievementOffice.Features.Achievements.DTOs;
+using AchievementOffice.Models;
+using AchievementOffice.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AchievementOffice.Features.Achievements;
+namespace AchievementOffice.Controllers;
 
 [ApiController]
 [Route("api/achievements")]
@@ -15,43 +16,50 @@ public class AchievementController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<AchievementResponseDto>>> GetAll()
+    public async Task<ActionResult<List<AchievementResponse>>> GetAll()
     {
         var achievements = await _achievementService.GetAllAsync();
-        return Ok(achievements);
+
+        if (!achievements.IsSuccess)
+            return BadRequest(new {message = achievements.ErrorMessage});
+
+        return Ok(achievements.Value);
     }
 
     [HttpPost]
-    public async Task<ActionResult<AchievementResponseDto>> Create(CreateAchievementDto dto)
+    public async Task<ActionResult<AchievementResponse>> Create(CreateAchievementRequest dto)
     {
         var achievement = await _achievementService.CreateAsync(dto);
 
+        if (!achievement.IsSuccess)
+            return BadRequest(new { message = achievement.ErrorMessage });
+
         return CreatedAtAction(
             nameof(GetById),
-            new { id = achievement.AchievementId },
-            achievement);
+            new { id = achievement.Value!.AchievementId },
+            achievement.Value);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<AchievementResponseDto>> GetById(Guid id)
+    public async Task<ActionResult<AchievementResponse>> GetById(Guid id)
     {
         var achievement = await _achievementService.GetByIdAsync(id);
 
-        if (achievement == null)
-            return NotFound();
+        if (!achievement.IsSuccess)
+            return NotFound(new { message = achievement.ErrorMessage });
 
-        return Ok(achievement);
+        return Ok(achievement.Value);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<AchievementResponseDto>> Update(Guid id, UpdateAchievementDto dto)
+    public async Task<ActionResult<AchievementResponse>> Update(Guid id, UpdateAchievementRequest dto)
     {
         var achievement = await _achievementService.UpdateAsync(id, dto);
 
-        if (achievement == null)
-            return NotFound();
+        if (!achievement.IsSuccess)
+            return NotFound(new { message = achievement.ErrorMessage });
 
-        return Ok(achievement);
+        return Ok(achievement.Value);
     }
 
     [HttpDelete("{id:guid}")]
@@ -59,8 +67,8 @@ public class AchievementController : ControllerBase
     {
         var deleted = await _achievementService.DeleteAsync(id);
 
-        if (!deleted)
-            return NotFound();
+        if (!deleted.IsSuccess)
+            return NotFound(new { message = deleted.ErrorMessage });
 
         return NoContent();
     }

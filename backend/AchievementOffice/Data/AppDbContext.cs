@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using AchievementOffice.Features.Achievements;
 
 namespace AchievementOffice.Data
 {
@@ -10,7 +9,7 @@ namespace AchievementOffice.Data
         {
         }
 
-        public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<Achievement> Achievements => Set<Achievement>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

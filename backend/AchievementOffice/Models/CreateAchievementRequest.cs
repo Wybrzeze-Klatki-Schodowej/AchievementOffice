@@ -1,6 +1,6 @@
 namespace AchievementOffice.Features.Achievements.DTOs;
 
-public class CreateAchievementDto
+public class CreateAchievementRequest
 {
     public Guid UserId { get; set; }
 
