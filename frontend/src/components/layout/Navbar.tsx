@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { logout } from "../../api/LoginApi";
 import { getCurrentUser } from "../../api/LoginApi";
