@@ -6,7 +6,10 @@ import {
 import type { Achievement } from "../../types/achievement";
 import AchievementCard from "./AchievementCard";
 import AchievementModal from "./AchievementModal";
+<<<<<<< HEAD
 import { getCurrentUser } from "../../api/LoginApi";
+=======
+>>>>>>> main
 
 interface Props {
     refreshTrigger: number;
@@ -17,7 +20,10 @@ export default function AchievementList({
 }: Props) {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+=======
+>>>>>>> main
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedAchievement, setSelectedAchievement] = useState<Achievement | undefined>();
@@ -38,10 +44,13 @@ export default function AchievementList({
 
     useEffect(() => {
         loadAchievements();
+<<<<<<< HEAD
 
         getCurrentUser()
             .then((user) => setCurrentUserId(user.userId))
             .catch((error) => console.error("Failed to fetch current user:", error));
+=======
+>>>>>>> main
     }, [refreshTrigger]);
 
     const handleDelete = async (id: string) => {
@@ -84,10 +93,14 @@ export default function AchievementList({
 
             {achievements.map((achievement) => (
                 <div key={achievement.achievementId}>
+<<<<<<< HEAD
                     <AchievementCard 
                         achievement={achievement} 
                         currentUserId={currentUserId}
                     />
+=======
+                    <AchievementCard achievement={achievement} />
+>>>>>>> main
 
                     <button 
                         onClick={() => handleEdit(achievement)}

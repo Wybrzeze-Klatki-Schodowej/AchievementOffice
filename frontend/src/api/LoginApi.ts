@@ -37,6 +37,7 @@ export async function checkAuth(): Promise<boolean> {
     } catch (err) {
         return false;
     }
+<<<<<<< HEAD
 }
 
 export async function logout(): Promise<void> {
@@ -62,4 +63,6 @@ export const getCurrentUser = async() => {
     }
 
     return res.json();
+=======
+>>>>>>> main
 }
