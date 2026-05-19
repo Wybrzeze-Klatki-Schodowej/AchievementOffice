@@ -22,9 +22,18 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage onLogin={() => checkLoggedIn()} />}/>
-        <Route path="/" element={ isLoggedIn ? <AppLayout /> : <LoginPage onLogin={() => checkLoggedIn()} />}>
-          <Route path="/" element={<ProfilePage />} />
+        <Route 
+          path="/login" 
+          element={<LoginPage onLogin={() => checkLoggedIn()} />}
+        />
+        <Route 
+          path="/" 
+          element={ isLoggedIn ? <AppLayout /> : <LoginPage onLogin={() => checkLoggedIn()} />}
+        >
+          <Route 
+            path="/users/:userId" 
+            element={<ProfilePage />} 
+          />
         </Route>
       </Routes>
     </BrowserRouter>

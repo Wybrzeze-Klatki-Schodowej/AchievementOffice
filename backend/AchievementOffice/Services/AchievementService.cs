@@ -14,12 +14,14 @@ public class AchievementService : IAchievementService
         _context = context;
     }
 
-    public async Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest dto)
+    public async Task<Result<AchievementResponse>> CreateAsync(
+        CreateAchievementRequest dto, 
+        Guid userId)
     {
         var achievement = new Achievement
         {
             AchievementId = Guid.NewGuid(),
-            UserId = dto.UserId,
+            UserId = userId,
             Title = dto.Title,
             Description = dto.Description,
             CreatedAt = DateTime.UtcNow,
@@ -152,5 +154,14 @@ public class AchievementService : IAchievementService
             Approved = approvals.Count( a => a.IsApproved ),
             Denied = approvals.Count( a => !a.IsApproved )
         };
+    }
+
+    public async Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId)
+    {
+        var achievements = await _context.Achievements
+            .Where(a => a.UserId == userId && a.DeletedAt == null)
+            .ToListAsync();
+
+        return achievements.Select(MapToDto).ToList();
     }
 }

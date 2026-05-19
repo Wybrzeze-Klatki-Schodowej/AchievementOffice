@@ -7,13 +7,16 @@ import type { Achievement } from "../../types/achievement";
 import AchievementCard from "./AchievementCard";
 import AchievementModal from "./AchievementModal";
 import { getCurrentUser } from "../../api/LoginApi";
+import { getUserAchievements } from "../../api/UserApi";
 
 interface Props {
+    userId?: string;
     refreshTrigger: number;
 }
 
 export default function AchievementList({
     refreshTrigger,
+    userId
 }: Props) {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,7 +29,9 @@ export default function AchievementList({
         try {
             setLoading(true);
 
-            const data = await getAchievements();
+            const data = userId
+                ? await getUserAchievements(userId)
+                : await getAchievements();
 
             setAchievements(data);
         } catch (error) {
@@ -42,7 +47,7 @@ export default function AchievementList({
         getCurrentUser()
             .then((user) => setCurrentUserId(user.userId))
             .catch((error) => console.error("Failed to fetch current user:", error));
-    }, [refreshTrigger]);
+    }, [refreshTrigger, userId]);
 
     const handleDelete = async (id: string) => {
         try {

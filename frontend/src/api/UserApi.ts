@@ -19,3 +19,20 @@ export async function getUserProfile(
 
     return res.json();
 }
+
+export async function getUserAchievements(
+    userId: string
+) {
+    const res = await fetch(
+        `${API_URL}/${userId}/achievements`,
+        {
+            credentials: "include"
+        }
+    );
+
+    if (!res.ok) {
+        throw new Error(`Error fetching user achievements: ${res.status}`);
+    }
+
+    return res.json();
+}

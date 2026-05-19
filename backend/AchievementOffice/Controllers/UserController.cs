@@ -10,10 +10,14 @@ namespace AchievementOffice.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IAchievementService _achievementService;
 
-        public UserController(IUserService userService)
+        public UserController(
+            IUserService userService,
+            IAchievementService achievementService)
         {
             _userService = userService;
+            _achievementService = achievementService;
         }
 
         [HttpGet("{userId}")]
@@ -34,6 +38,13 @@ namespace AchievementOffice.Controllers
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
+        }
+
+        [HttpGet("{userId:guid}/achievements")]
+        public async Task<IActionResult> GetUserAchievements(Guid userId)
+        {
+            var achievements = await _achievementService.GetByUserIdAsync(userId);
+            return Ok(achievements);
         }
     }
 }

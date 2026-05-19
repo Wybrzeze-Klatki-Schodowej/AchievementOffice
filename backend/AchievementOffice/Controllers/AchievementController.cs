@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AchievementOffice.Controllers;
@@ -26,10 +28,16 @@ public class AchievementController : ControllerBase
         return Ok(achievements.Value);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<AchievementResponse>> Create(CreateAchievementRequest dto)
     {
-        var achievement = await _achievementService.CreateAsync(dto);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if(!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { message = "Invalid user ID in token." });
+
+        var achievement = await _achievementService.CreateAsync(dto, userId);
 
         if (!achievement.IsSuccess)
             return BadRequest(new { message = achievement.ErrorMessage });
@@ -78,7 +86,11 @@ public class AchievementController : ControllerBase
     {
         try
         {
-            var userId = Guid.Parse("00000000-0000-0000-0000-000000000101"); // pozniej z jwt, na razie hardcode
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
+            
             var approve = await _achievementService.ApproveAsync(userId, dto);
             return Ok(approve);
         }
