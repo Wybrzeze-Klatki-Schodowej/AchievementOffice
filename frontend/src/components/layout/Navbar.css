@@ -27,3 +27,8 @@
     border-radius: 8px;
     cursor: pointer;
 }
+
+.navbar .logout-button {
+    background: #000000;
+    color: white;
+}
