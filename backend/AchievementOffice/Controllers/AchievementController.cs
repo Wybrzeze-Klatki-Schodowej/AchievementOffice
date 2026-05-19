@@ -1,5 +1,8 @@
+using System.Security.Claims;
+using AchievementOffice.Common;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AchievementOffice.Controllers;
@@ -26,6 +29,7 @@ public class AchievementController : ControllerBase
         return Ok(achievements.Value);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<AchievementResponse>> Create(CreateAchievementRequest dto)
     {
@@ -51,24 +55,36 @@ public class AchievementController : ControllerBase
         return Ok(achievement.Value);
     }
 
+    [Authorize]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<AchievementResponse>> Update(Guid id, UpdateAchievementRequest dto)
     {
-        var achievement = await _achievementService.UpdateAsync(id, dto);
+        var updated = await _achievementService.UpdateAsync(id, dto);
 
-        if (!achievement.IsSuccess)
-            return NotFound(new { message = achievement.ErrorMessage });
+        if (!updated.IsSuccess)
+            return updated.ErrorMessage switch
+            {
+                "Not found" => NotFound(),
+                "Forbidden" => Forbid(),
+                _ => BadRequest(new { message = updated.ErrorMessage })
+            };
 
-        return Ok(achievement.Value);
+        return Ok(updated.Value);
     }
 
+    [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
-    {
+    {       
         var deleted = await _achievementService.DeleteAsync(id);
 
         if (!deleted.IsSuccess)
-            return NotFound(new { message = deleted.ErrorMessage });
+            return deleted.ErrorMessage switch
+            {
+                "Not found" => NotFound(),
+                "Forbidden" => Forbid(),
+                _ => BadRequest(new { message = deleted.ErrorMessage })
+            };
 
         return NoContent();
     }
@@ -78,8 +94,14 @@ public class AchievementController : ControllerBase
     {
         try
         {
-            var userId = Guid.Parse("11111111-2222-3333-4444-555555555555"); // pozniej z jwt, na razie hardcode
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
+            
             var approve = await _achievementService.ApproveAsync(id, userId, dto);
+
             return Ok(approve);
         }
         catch (InvalidOperationException ex)

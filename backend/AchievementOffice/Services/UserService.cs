@@ -74,5 +74,53 @@ namespace AchievementOffice.Services
 
             return new UserRegistrationResult() { IsSuccessful = true };
         }
+
+        public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
+        {
+            return await _context.Users
+                .Include(u => u.UserDetails)
+                .Include(u => u.UserRole)
+                .Where(u => u.Id == userId)
+                .Select(u => new UserProfileResponse
+                {
+                    UserId = u.Id,
+                    Login = u.Login,
+                    Email = u.Email,
+                    FirstName = u.UserDetails.Firstname,
+                    LastName = u.UserDetails.Lastname,
+                    JobTitle = u.UserDetails.JobTitle,
+                    Bio = u.UserDetails.Bio,
+                    AvatarUrl = u.UserDetails.AvatarUrl,
+                    Role = u.UserRole.Name,
+                    CreatedAt = u.CreatedAt,
+                    UpdatedAt = u.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<UserProfileResponse>> GetAllUsersAsync()
+        {
+            var users = await _context.Users
+                .Include(u => u.UserDetails)
+                .Include(u => u.UserRole)
+                .Where(u => u.DeletedAt == null)
+                .Select(u => new UserProfileResponse
+                {
+                    UserId = u.Id,
+                    Login = u.Login,
+                    Email = u.Email,
+                    FirstName = u.UserDetails.Firstname,
+                    LastName = u.UserDetails.Lastname,
+                    JobTitle = u.UserDetails.JobTitle,
+                    Bio = u.UserDetails.Bio,
+                    AvatarUrl = u.UserDetails.AvatarUrl,
+                    Role = u.UserRole.Name,
+                    CreatedAt = u.CreatedAt,
+                    UpdatedAt = u.UpdatedAt
+                })
+                .ToListAsync();
+
+            return users;
+        }
     }
 }

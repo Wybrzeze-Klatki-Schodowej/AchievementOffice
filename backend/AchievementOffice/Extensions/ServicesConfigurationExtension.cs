@@ -6,6 +6,8 @@ namespace AchievementOffice.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+
             services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<ITokenService, TokenService>();

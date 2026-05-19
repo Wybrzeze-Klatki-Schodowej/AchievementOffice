@@ -7,17 +7,21 @@ import type { Achievement } from "../../types/achievement";
 import AchievementCard from "./AchievementCard";
 import AchievementModal from "./AchievementModal";
 import { getCurrentUser } from "../../api/LoginApi";
+import { getUserAchievements } from "../../api/UserApi";
 
 interface Props {
+    userId?: string;
     refreshTrigger: number;
 }
 
 export default function AchievementList({
     refreshTrigger,
+    userId
 }: Props) {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedAchievement, setSelectedAchievement] = useState<Achievement | undefined>();
@@ -26,7 +30,9 @@ export default function AchievementList({
         try {
             setLoading(true);
 
-            const data = await getAchievements();
+            const data = userId
+                ? await getUserAchievements(userId)
+                : await getAchievements();
 
             setAchievements(data);
         } catch (error) {
@@ -40,9 +46,12 @@ export default function AchievementList({
         loadAchievements();
 
         getCurrentUser()
-            .then((user) => setCurrentUserId(user.userId))
+            .then((user) => {
+                setCurrentUserId(user.userId);
+                setCurrentUserRole(user.role);
+            })
             .catch((error) => console.error("Failed to fetch current user:", error));
-    }, [refreshTrigger]);
+    }, [refreshTrigger, userId]);
 
     const handleDelete = async (id: string) => {
         try {
@@ -87,18 +96,10 @@ export default function AchievementList({
                     <AchievementCard 
                         achievement={achievement} 
                         currentUserId={currentUserId}
+                        currentUserRole={currentUserRole}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
                     />
-
-                    <button 
-                        onClick={() => handleEdit(achievement)}
-                    >
-                        Edit
-                    </button>
-                    <button 
-                        onClick={() => handleDelete(achievement.achievementId)}
-                    >
-                        Delete
-                    </button>
                 </div>
             ))}
         </div>
