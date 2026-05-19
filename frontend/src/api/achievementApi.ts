@@ -52,6 +52,7 @@ export async function updateAchievement(
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(dto),
         }
     );
@@ -66,6 +67,7 @@ export const deleteAchievement = async (
 ): Promise<void> => {
     const response = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        credentials: "include",
     });
 
     if (!response.ok) {

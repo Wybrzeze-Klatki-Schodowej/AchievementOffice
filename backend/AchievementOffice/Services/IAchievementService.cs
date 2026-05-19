@@ -5,7 +5,7 @@ namespace AchievementOffice.Services;
 
 public interface IAchievementService
 {
-    Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest createDto, Guid userId);
+    Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest createDto);
 
     Task<Result<List<AchievementResponse>>> GetAllAsync();
 

@@ -32,7 +32,7 @@ function App() {
         >
           <Route 
             path="/users/:userId" 
-            element={<ProfilePage />} 
+            element={ isLoggedIn ? <ProfilePage /> : <LoginPage onLogin={() => checkLoggedIn()} />} 
           />
         </Route>
       </Routes>

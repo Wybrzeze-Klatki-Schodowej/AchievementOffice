@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AchievementOffice.Common;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -32,12 +33,7 @@ public class AchievementController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AchievementResponse>> Create(CreateAchievementRequest dto)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if(!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized(new { message = "Invalid user ID in token." });
-
-        var achievement = await _achievementService.CreateAsync(dto, userId);
+        var achievement = await _achievementService.CreateAsync(dto);
 
         if (!achievement.IsSuccess)
             return BadRequest(new { message = achievement.ErrorMessage });
@@ -63,21 +59,15 @@ public class AchievementController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<AchievementResponse>> Update(Guid id, UpdateAchievementRequest dto)
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-        var achievement = await _achievementService.GetByIdAsync(id);
-
-        if (!achievement.IsSuccess)
-            return NotFound(new { message = achievement.ErrorMessage });
-
-        var isOwner = achievement.Value!.UserId.ToString() == userIdClaim;
-        var isAdmin = userRole == "Admin";
-
-        if (!isOwner && !isAdmin)
-            return Forbid();
-
         var updated = await _achievementService.UpdateAsync(id, dto);
+
+        if (!updated.IsSuccess)
+            return updated.ErrorMessage switch
+            {
+                "Not found" => NotFound(),
+                "Forbidden" => Forbid(),
+                _ => BadRequest(new { message = updated.ErrorMessage })
+            };
 
         return Ok(updated.Value);
     }
@@ -85,25 +75,16 @@ public class AchievementController : ControllerBase
     [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-        var achievement = await _achievementService.GetByIdAsync(id);
-
-        if (!achievement.IsSuccess)
-            return NotFound(new { message = achievement.ErrorMessage });
-
-        var isOwner = achievement.Value!.UserId.ToString() == userIdClaim;
-        var isAdmin = userRole == "Admin";
-
-        if (!isOwner && !isAdmin)
-            return Forbid();
-            
+    {       
         var deleted = await _achievementService.DeleteAsync(id);
 
         if (!deleted.IsSuccess)
-            return NotFound(new { message = deleted.ErrorMessage });
+            return deleted.ErrorMessage switch
+            {
+                "Not found" => NotFound(),
+                "Forbidden" => Forbid(),
+                _ => BadRequest(new { message = deleted.ErrorMessage })
+            };
 
         return NoContent();
     }
