@@ -20,4 +20,6 @@ public interface IAchievementService
     Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId);
 
     Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId);
+
+    Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId);
 }
