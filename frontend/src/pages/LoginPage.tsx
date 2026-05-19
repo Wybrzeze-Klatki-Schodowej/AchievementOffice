@@ -1,4 +1,3 @@
-import React from 'react';
 import LoginForm from '../components/login/LoginForm';
 import { useState } from 'react';
 import {type LoginDTO, login } from '../api/LoginApi';

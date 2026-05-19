@@ -15,7 +15,7 @@ export default function LoginForm({ isLoading, onSubmit, error }: LoadingProps) 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit({login, password});
+        onSubmit({Login: login, Password: password});
 
         setPassword('');
     }
