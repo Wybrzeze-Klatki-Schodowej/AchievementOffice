@@ -78,8 +78,8 @@ public class AchievementController : ControllerBase
     {
         try
         {
-            var userId = Guid.Parse("00000000-0000-0000-0000-000000000101"); // pozniej z jwt, na razie hardcode
-            var approve = await _achievementService.ApproveAsync(userId, dto);
+            var userId = Guid.Parse("11111111-2222-3333-4444-555555555555"); // pozniej z jwt, na razie hardcode
+            var approve = await _achievementService.ApproveAsync(id, userId, dto);
             return Ok(approve);
         }
         catch (InvalidOperationException ex)

@@ -15,7 +15,7 @@ public interface IAchievementService
 
     Task<Result<bool>> DeleteAsync(Guid id);
 
-    Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto);
+    Task<AchievementApproveResponseDto> ApproveAsync(Guid achievementId, Guid userId, CreateAchievementApproveDto dto);
 
     Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId);
 

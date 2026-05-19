@@ -12,20 +12,28 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState<AchievementApprovalSummary>({ approved: 0, denied: 0 });
 
-    useEffect(() => {
+    const fetchSummary = () => {
         getApprovalSummary(achievement.achievementId)
             .then(setSummary)
             .catch(console.error);
+    };
+
+    useEffect(() => {
+        fetchSummary();
     }, [achievement.achievementId]);
 
     const isOwner = achievement.userId === currentUserId;
 
     const handleVote = async (isApproved: boolean) => {
-        if (loading || vote !== null) return;
+        if (loading) return;
         setLoading(true);
         try {
+            const isUnvoting = vote === isApproved;
+
             await approveAchievement(achievement.achievementId, isApproved);
-            setVote(isApproved);
+
+            setVote(isUnvoting ? null : isApproved);
+            fetchSummary();
         } catch (e) {
             console.error(e);
         } finally {
@@ -59,7 +67,7 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
                 <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
                     <button
                         onClick={() => handleVote(true)}
-                        disabled={loading || vote !== null}
+                        disabled={loading}
                         style={{
                             background: vote === true ? "green" : "#eee",
                             color: vote === true ? "white" : "black",
@@ -72,7 +80,7 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
                         Approve                    </button>
                     <button
                         onClick={() => handleVote(false)}
-                        disabled={loading || vote !== null}
+                        disabled={loading}
                         style={{
                             background: vote === false ? "red" : "#eee",
                             color: vote === false ? "white" : "black",
