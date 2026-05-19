@@ -5,9 +5,12 @@ import { useState, useEffect } from "react";
 interface Props {
     achievement: Achievement;
     currentUserId: string | null;
+    currentUserRole?: string | null;
+    onEdit?: (achievement: Achievement) => void;
+    onDelete?: (id: string) => void;
 }
 
-export default function AchievementCard({ achievement, currentUserId }: Props) {
+export default function AchievementCard({ achievement, currentUserId, currentUserRole, onEdit, onDelete }: Props) {
     const [vote, setVote] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState<AchievementApprovalSummary>({ approved: 0, denied: 0 });
@@ -19,6 +22,9 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
     }, [achievement.achievementId]);
 
     const isOwner = achievement.userId === currentUserId;
+    const isAdmin = currentUserRole === "Admin";
+
+    const canEdit = isOwner || isAdmin;
 
     const handleVote = async (isApproved: boolean) => {
         if (loading || vote !== null) return;
@@ -83,6 +89,16 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
                         }}
                     >
                         Deny
+                    </button>
+                </div>
+            )}
+            {canEdit && (
+                <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+                    <button onClick={() => onEdit?.(achievement)}>
+                        Edit
+                    </button>
+                    <button onClick={() => onDelete?.(achievement.achievementId)}>
+                        Delete
                     </button>
                 </div>
             )}

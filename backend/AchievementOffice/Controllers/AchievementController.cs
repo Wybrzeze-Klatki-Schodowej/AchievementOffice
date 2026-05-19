@@ -59,20 +59,47 @@ public class AchievementController : ControllerBase
         return Ok(achievement.Value);
     }
 
+    [Authorize]
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<AchievementResponse>> Update(Guid id, UpdateAchievementRequest dto)
     {
-        var achievement = await _achievementService.UpdateAsync(id, dto);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+        var achievement = await _achievementService.GetByIdAsync(id);
 
         if (!achievement.IsSuccess)
             return NotFound(new { message = achievement.ErrorMessage });
 
-        return Ok(achievement.Value);
+        var isOwner = achievement.Value!.UserId.ToString() == userIdClaim;
+        var isAdmin = userRole == "Admin";
+
+        if (!isOwner && !isAdmin)
+            return Forbid();
+
+        var updated = await _achievementService.UpdateAsync(id, dto);
+
+        return Ok(updated.Value);
     }
 
+    [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+        var achievement = await _achievementService.GetByIdAsync(id);
+
+        if (!achievement.IsSuccess)
+            return NotFound(new { message = achievement.ErrorMessage });
+
+        var isOwner = achievement.Value!.UserId.ToString() == userIdClaim;
+        var isAdmin = userRole == "Admin";
+
+        if (!isOwner && !isAdmin)
+            return Forbid();
+            
         var deleted = await _achievementService.DeleteAsync(id);
 
         if (!deleted.IsSuccess)

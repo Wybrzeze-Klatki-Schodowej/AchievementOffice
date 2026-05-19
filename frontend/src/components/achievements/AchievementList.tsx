@@ -21,6 +21,7 @@ export default function AchievementList({
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedAchievement, setSelectedAchievement] = useState<Achievement | undefined>();
@@ -45,7 +46,10 @@ export default function AchievementList({
         loadAchievements();
 
         getCurrentUser()
-            .then((user) => setCurrentUserId(user.userId))
+            .then((user) => {
+                setCurrentUserId(user.userId);
+                setCurrentUserRole(user.role);
+            })
             .catch((error) => console.error("Failed to fetch current user:", error));
     }, [refreshTrigger, userId]);
 
@@ -92,18 +96,10 @@ export default function AchievementList({
                     <AchievementCard 
                         achievement={achievement} 
                         currentUserId={currentUserId}
+                        currentUserRole={currentUserRole}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
                     />
-
-                    <button 
-                        onClick={() => handleEdit(achievement)}
-                    >
-                        Edit
-                    </button>
-                    <button 
-                        onClick={() => handleDelete(achievement.achievementId)}
-                    >
-                        Delete
-                    </button>
                 </div>
             ))}
         </div>
