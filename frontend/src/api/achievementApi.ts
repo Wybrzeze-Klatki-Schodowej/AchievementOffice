@@ -84,6 +84,7 @@ export const approveAchievement = async (
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ achievementId, isApproved }),
     });
     if (!response.ok) {
