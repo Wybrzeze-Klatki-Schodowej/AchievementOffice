@@ -1,5 +1,6 @@
 ﻿using AchievementOffice.Models;
 using AchievementOffice.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AchievementOffice.Controllers
@@ -32,6 +33,19 @@ namespace AchievementOffice.Controllers
             };
             Response.Cookies.Append("X-jwt-token", result.Token! , opts);
 
+            return Ok();
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            var opts = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Strict,
+            };
+            Response.Cookies.Delete("X-jwt-token", opts);
             return Ok();
         }
 
