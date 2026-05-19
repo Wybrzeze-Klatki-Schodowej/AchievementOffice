@@ -1,6 +1,6 @@
 import type { Achievement, AchievementApprovalSummary } from "../../types/achievement";
 import { approveAchievement, getApprovalSummary } from "../../api/achievementApi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface Props {
     achievement: Achievement;
@@ -12,15 +12,15 @@ export default function AchievementCard({ achievement, currentUserId }: Props) {
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState<AchievementApprovalSummary>({ approved: 0, denied: 0 });
 
-    const fetchSummary = () => {
+    const fetchSummary = useCallback(() => {
         getApprovalSummary(achievement.achievementId)
             .then(setSummary)
             .catch(console.error);
-    };
+    }, [achievement.achievementId]);
 
     useEffect(() => {
         fetchSummary();
-    }, [achievement.achievementId]);
+    }, [fetchSummary]);
 
     const isOwner = achievement.userId === currentUserId;
 

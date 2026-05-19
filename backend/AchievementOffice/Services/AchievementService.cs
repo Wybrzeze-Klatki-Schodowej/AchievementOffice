@@ -103,7 +103,7 @@ public class AchievementService : IAchievementService
     public async Task<AchievementApproveResponseDto> ApproveAsync(Guid achievementId, Guid userId, CreateAchievementApproveDto dto)
     {
         var existing = await _context.AchievementApproves
-        .FirstOrDefaultAsync(a => a.AchievementId == dto.AchievementId
+        .FirstOrDefaultAsync(a => a.AchievementId == achievementId
                                 && a.UserId == userId);
 
         if (existing != null)
@@ -145,7 +145,7 @@ public class AchievementService : IAchievementService
         var approve = new AchievementApprove
         {
             AchievementApproveId = Guid.NewGuid(),
-            AchievementId = dto.AchievementId,
+            AchievementId = achievementId,
             UserId = userId,
             IsApproved = dto.IsApproved,
             ApprovedAt = DateTime.UtcNow
