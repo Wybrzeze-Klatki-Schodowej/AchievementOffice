@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
 
+    public DbSet<Shoutout> Shoutouts => Set<Shoutout>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

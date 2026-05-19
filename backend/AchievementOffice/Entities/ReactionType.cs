@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AchievementOffice.Entities
 {
     public enum ReactionType
