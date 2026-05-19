@@ -1,0 +1,39 @@
+using AchievementOffice.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AchievementOffice.Controllers
+{
+    [ApiController]
+    [Route("api/users")]
+    [Authorize]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUser(
+            Guid userId)
+        {
+            var user = await _userService.GetUserProfileAsync(userId);
+        
+        
+        if (user == null)
+                return NotFound(new { Message = "User not found" });
+
+            return Ok(user);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsersAsync()
+        {
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
+        }
+    }
+}
