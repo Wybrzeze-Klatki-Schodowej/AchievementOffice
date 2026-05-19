@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
 import "./Navbar.css";
-<<<<<<< HEAD
 import { logout } from "../../api/LoginApi";
-=======
->>>>>>> main
 
 interface Props {
     onAddAchievementClick?: () => void;
@@ -26,11 +23,8 @@ export default function Navbar({
                 <button onClick={onAddAchievementClick}>
                     Add achievement
                 </button>
-<<<<<<< HEAD
 
                 <button className="logout-button" onClick={() => logout()}>Logout</button>
-=======
->>>>>>> main
             </div>
         </nav>
     );

@@ -4,11 +4,7 @@ import { useState, useEffect } from "react";
 
 interface Props {
     achievement: Achievement;
-<<<<<<< HEAD
     currentUserId: string | null;
-=======
-    currentUserId: string;
->>>>>>> main
 }
 
 export default function AchievementCard({ achievement, currentUserId }: Props) {
