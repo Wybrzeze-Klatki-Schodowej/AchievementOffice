@@ -28,7 +28,7 @@ export default function LoginForm({ isLoading, onSubmit, error }: LoadingProps) 
             {error && <div style={{color: 'red', marginBottom: '1rem'}} className="error-message">{error}</div>}
             <button className="login-button" type="submit" disabled={isLoading}>Login</button>
             <div style={{marginTop: '1rem', fontSize: '0.9rem'}}>
-                Nie masz konta? <Link to="/register">Zarejestruj się</Link>
+                Don't have an account? <Link to="/register">Register</Link>
             </div>
         </form>
     );

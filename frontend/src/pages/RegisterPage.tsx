@@ -16,7 +16,7 @@ export default function RegisterPage() {
             
             navigate('/login');
         } catch (err: any) {
-            setError(err.message || 'Błąd połączenia z serwerem.');
+            setError(err.message || 'Error connecting to server');
         } finally {
             setIsLoading(false);
         }

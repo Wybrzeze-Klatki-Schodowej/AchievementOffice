@@ -32,22 +32,22 @@ export default function RegisterForm({ isLoading, onSubmit, error }: RegisterFor
 
     return (
         <form onSubmit={handleSubmit}>
-            <h2>Rejestracja</h2>
+            <h2>Register</h2>
             <input type="email" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="text" placeholder='Nazwa użytkownika' value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <input type="password" placeholder='Hasło (min. 8 znaków)' value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
-            <input type="text" placeholder='Imię' value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
-            <input type="text" placeholder='Nazwisko' value={lastname} onChange={(e) => setLastname(e.target.value)} required />
-            <input type="text" placeholder='Stanowisko' value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required />
+            <input type="text" placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <input type="password" placeholder='Password (min. 8 characters)' value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
+            <input type="text" placeholder='First Name' value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
+            <input type="text" placeholder='Last Name' value={lastname} onChange={(e) => setLastname(e.target.value)} required />
+            <input type="text" placeholder='Job Title' value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required />
             
             {error && <div style={{color: 'red', margin: '1rem 0'}} className="error-message">{error}</div>}
             
             <button className="login-button" type="submit" disabled={isLoading}>
-                {isLoading ? 'Ładowanie...' : 'Zarejestruj'}
+                {isLoading ? 'Loading...' : 'Register'}
             </button>
 
             <div style={{marginTop: '1rem', fontSize: '0.9rem'}}>
-                Masz już konto? <Link to="/login">Zaloguj się</Link>
+                Already have an account? <Link to="/login">Login</Link>
             </div>
         </form>
     );
