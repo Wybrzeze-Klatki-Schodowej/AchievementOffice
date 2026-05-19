@@ -1,7 +1,9 @@
 ﻿using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AchievementOffice.Controllers
 {
@@ -66,6 +68,24 @@ namespace AchievementOffice.Controllers
             if (User.Identity?.IsAuthenticated != true) return Ok(false);
 
             return Ok(true);
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var login = User.FindFirstValue(ClaimTypes.Name);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var role = User.FindFirstValue(ClaimTypes.Role);
+
+            return Ok(new
+            {
+                userId,
+                login,
+                email,
+                role
+            });
         }
     }
 }

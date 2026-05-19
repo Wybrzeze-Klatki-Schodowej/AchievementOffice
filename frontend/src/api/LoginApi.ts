@@ -51,3 +51,15 @@ export async function logout(): Promise<void> {
         console.error("Error occurred while logging out:", err);
     }
 }
+
+export const getCurrentUser = async() => {
+    const res = await fetch(API_URL + "/me", {
+        credentials: "include"
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch current user");
+    }
+
+    return res.json();
+}
