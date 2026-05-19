@@ -3,7 +3,6 @@ import type { Achievement, AchievementApprove, AchievementApprovalSummary } from
 const API_URL = "http://localhost:8080/api/achievements";
 
 export interface CreateAchievementDto {
-    userId: string;
     title: string;
     description?: string;
 }
@@ -31,6 +30,7 @@ export const createAchievement = async (
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(dto),
     });
 
@@ -52,6 +52,7 @@ export async function updateAchievement(
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(dto),
         }
     );
@@ -66,6 +67,7 @@ export const deleteAchievement = async (
 ): Promise<void> => {
     const response = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        credentials: "include",
     });
 
     if (!response.ok) {

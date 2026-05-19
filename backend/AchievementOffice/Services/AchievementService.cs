@@ -2,24 +2,29 @@ using AchievementOffice.Data;
 using AchievementOffice.Common;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace AchievementOffice.Services;
 
 public class AchievementService : IAchievementService
 {
     private readonly AppDbContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AchievementService(AppDbContext context)
+    public AchievementService(AppDbContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<Result<AchievementResponse>> CreateAsync(CreateAchievementRequest dto)
+    public async Task<Result<AchievementResponse>> CreateAsync(
+        CreateAchievementRequest dto
+    )
     {
         var achievement = new Achievement
         {
             AchievementId = Guid.NewGuid(),
-            UserId = dto.UserId,
+            UserId = GetUserId(),
             Title = dto.Title,
             Description = dto.Description,
             CreatedAt = DateTime.UtcNow,
@@ -63,6 +68,15 @@ public class AchievementService : IAchievementService
         if (achievement == null)
             return Result<AchievementResponse>.Fail("Achievement not found.");
 
+        var userId = GetUserId();
+        var role = GetRole();
+
+        var isOwner = achievement.UserId == userId;
+        var isAdmin = role == "Admin";
+
+        if (!isOwner && !isAdmin)
+            return Result<AchievementResponse>.Fail("Forbidden");
+
         achievement.Title = dto.Title;
         achievement.Description = dto.Description;
         achievement.UpdatedAt = DateTime.UtcNow;
@@ -79,11 +93,38 @@ public class AchievementService : IAchievementService
 
         if (achievement == null)
             return Result<bool>.Fail("Achievement not found.");
+        
+        var userId = GetUserId();
+        var role = GetRole();
+
+        var isOwner = achievement.UserId == userId;
+        var isAdmin = role == "Admin";
+
+        if (!isOwner && !isAdmin)
+            return Result<bool>.Fail("Forbidden");
 
         achievement.DeletedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         return Result<bool>.Success(true);
+    }
+
+    private Guid GetUserId()
+    {
+        var context = _httpContextAccessor.HttpContext;
+
+        if (context == null)
+            return Guid.Empty;
+
+        var claim = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        return Guid.TryParse(claim, out var id) ? id : Guid.Empty;
+    }
+
+    private string? GetRole()
+    {
+        return _httpContextAccessor.HttpContext?
+            .User.FindFirstValue(ClaimTypes.Role);
     }
 
     private static AchievementResponse MapToDto(Achievement achievement)
@@ -152,5 +193,14 @@ public class AchievementService : IAchievementService
             Approved = approvals.Count( a => a.IsApproved ),
             Denied = approvals.Count( a => !a.IsApproved )
         };
+    }
+
+    public async Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId)
+    {
+        var achievements = await _context.Achievements
+            .Where(a => a.UserId == userId && a.DeletedAt == null)
+            .ToListAsync();
+
+        return achievements.Select(MapToDto).ToList();
     }
 }

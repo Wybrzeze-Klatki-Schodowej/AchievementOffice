@@ -1,5 +1,9 @@
 import AchievementList from "../components/achievements/AchievementList";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import type { UserProfile } from "../types/user";
+import { getUserProfile } from "../api/UserApi";
+import "./ProfilePage.css";
 
 interface OutletContext {
     refreshTrigger: number;
@@ -7,22 +11,59 @@ interface OutletContext {
 
 export default function ProfilePage() {
     const { refreshTrigger } = useOutletContext<OutletContext>();
+    const { userId } = useParams();
+
+    const [user, setUser] = useState<UserProfile>();
+
+    useEffect(() => {
+
+        if (!userId) {
+            return;
+        }
+
+        getUserProfile(userId)
+            .then(setUser);
+    }, [userId]);
+
+    if (!user) {
+        return <p>Loading...</p>;
+    }
 
     return (
-        <div>
-            <div
-                style={{
-                    maxWidth: "700px",
-                    margin: "0 auto",
-                    padding: "24px",
-                }}
-            >
-                <h1>User profile</h1>
+        <div className="profile-container">
+            <div className="profile-card">
+                <div className="profile-header">
+                    <div>
+                        <h1 className="profile-name">
+                            {user.firstName}
+                            {" "}
+                            {user.lastName}
+                        </h1>
+                    <div className="profile-username">
+                        @{user.login}
+                    </div>
+                </div>
+            </div>
 
-                <AchievementList 
-                    refreshTrigger={refreshTrigger}
-                />
+            <div className="profile-meta">
+                <div><b>Email:</b> {user.email}</div>
+                <div><b>Job Title:</b> {user.jobTitle}</div>
+                <div><b>Bio:</b> {user.bio}</div>
+                <div>
+                    <b>User since:</b>{" "}
+                    {new Date(user.createdAt).toLocaleDateString()}
+                </div>
             </div>
         </div>
+
+        <div className="profile-card">
+
+            <AchievementList
+                userId={userId!}
+                refreshTrigger={refreshTrigger}
+            />
+
+        </div>
+    </div>
     );
 }

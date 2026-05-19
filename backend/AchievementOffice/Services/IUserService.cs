@@ -7,5 +7,9 @@ namespace AchievementOffice.Services
     {
         Task<LoginResult> LoginAsync(LoginRequest request);
         Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
+
+        Task<UserProfileResponse?> GetUserProfileAsync(Guid userId);
+
+        Task<List<UserProfileResponse>> GetAllUsersAsync();
     }
 }
