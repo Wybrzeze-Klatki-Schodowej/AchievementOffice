@@ -213,4 +213,29 @@ public class AchievementServiceTests
         Assert.Single( result );
         Assert.Equal( "To delete", result[0].Title );
     }
+    public async Task GetAllAsync_ReturnsOnlyNonDeleted()
+    {
+        // Arrange
+        var context = CreateInMemoryContext();
+        var service = new AchievementService( context );
+
+        var achievementToStay = await service.CreateAsync( new CreateAchievementDto
+        {
+            UserId = Guid.NewGuid(),
+            Title = "Active"
+        } );
+        var achievementToDelete = await service.CreateAsync( new CreateAchievementDto
+        {
+            UserId = Guid.NewGuid(),
+            Title = "Deleted"
+        } );
+        await service.DeleteAsync( achievementToDelete.AchievementId );
+
+        // Act
+        var result = await service.GetAllAsync();
+
+        // Assert
+        Assert.Single( result );
+        Assert.Equal( "Active", result[0].Title );
+    }
 }
