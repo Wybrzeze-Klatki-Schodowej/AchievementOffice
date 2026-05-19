@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import type { LoginDTO } from '../../api/LoginApi';
+import { Link } from 'react-router-dom';
 import './LoginForm.css';
 
 interface LoadingProps {
@@ -26,6 +27,9 @@ export default function LoginForm({ isLoading, onSubmit, error }: LoadingProps) 
             <input type="password" placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required></input>
             {error && <div style={{color: 'red', marginBottom: '1rem'}} className="error-message">{error}</div>}
             <button className="login-button" type="submit" disabled={isLoading}>Login</button>
+            <div style={{marginTop: '1rem', fontSize: '0.9rem'}}>
+                Don't have an account? <Link to="/register">Register</Link>
+            </div>
         </form>
     );
 }

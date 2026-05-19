@@ -3,6 +3,7 @@ import AppLayout from "./layouts/AppLayout";
 // import LoginPage from "./pages/LoginPage";
 import './App.css';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import { useEffect, useState } from 'react';
 import { checkAuth } from './api/LoginApi';
 import ProfilePage from './pages/ProfilePage';
@@ -25,6 +26,10 @@ function App() {
         <Route 
           path="/login" 
           element={<LoginPage onLogin={() => checkLoggedIn()} />}
+        />
+        <Route 
+          path="/register" 
+          element={<RegisterPage />} 
         />
         <Route 
           path="/" 
