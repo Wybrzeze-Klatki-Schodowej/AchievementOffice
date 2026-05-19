@@ -14,6 +14,8 @@ builder.Services.ConfigureAppConfiguration(builder.Configuration);
 builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 
+builder.Services.AddScoped<IShoutoutService, ShoutoutService>();
+
 builder.Services.SetupDatabase(builder.Configuration);
 
 var app = builder.Build();

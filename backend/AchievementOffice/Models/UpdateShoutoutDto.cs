@@ -1,10 +1,7 @@
 namespace AchievementOffice.Models
 {
-    public class CreateShoutoutDto
+    public class UpdateShoutoutDto
     {
-        public Guid SenderId { get; set; }
-        public Guid ReceiverId { get; set; }
-
         public string Title { get; set; } = string.Empty;
 
         public string? Description { get; set; }

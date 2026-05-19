@@ -3,6 +3,7 @@ using System;
 using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516123626_ShoutoutsCreation")]
+    partial class ShoutoutsCreation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,80 +25,6 @@ namespace AchievementOffice.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Achievement", b =>
-                {
-                    b.Property<Guid>("AchievementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("achievement_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("AchievementId");
-
-                    b.ToTable("Achievements", (string)null);
-                });
-
-            modelBuilder.Entity("AchievementApprove", b =>
-                {
-                    b.Property<Guid>("AchievementApproveId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("achievement_approve_id");
-
-                    b.Property<Guid>("AchievementId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("achievement_id");
-
-                    b.Property<DateTime>("ApprovedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("approved_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_approved");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("AchievementApproveId");
-
-                    b.HasIndex("AchievementId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("AchievementApprove", (string)null);
             modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
                 {
                     b.Property<Guid>("ShoutoutId")
@@ -130,7 +59,7 @@ namespace AchievementOffice.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Shoutouts", (string)null);
+                    b.ToTable("Shoutouts");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
