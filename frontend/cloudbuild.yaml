@@ -25,3 +25,5 @@ steps:
       - 'europe-west1-docker.pkg.dev/aotest-494817/cloud-run-source-deploy/achievementoffice-frontend:$TAG_NAME'
       - '--region'
       - 'europe-west1'
+options:
+  logging: CLOUD_LOGGING_ONLY
