@@ -1,6 +1,6 @@
 import type { Achievement, AchievementApprove, AchievementApprovalSummary } from "../types/achievement";
 
-const API_URL = "http://localhost:8080/api/achievements";
+const API_URL = import.meta.env.VITE_API_URL + "/achievements";
 
 export interface CreateAchievementDto {
     title: string;
