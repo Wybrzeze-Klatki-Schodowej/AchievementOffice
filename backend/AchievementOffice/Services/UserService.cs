@@ -90,6 +90,7 @@ namespace AchievementOffice.Services
                 UserId = user.Id,
                 Login = user.Login
             };
+        }
         public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
         {
             return await _context.Users
