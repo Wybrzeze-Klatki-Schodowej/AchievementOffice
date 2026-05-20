@@ -1,6 +1,6 @@
 
 
-const API_URL = "http://localhost:8080/api/Auth";
+const API_URL = import.meta.env.VITE_API_URL + "/Auth";
 
 export interface LoginDTO {
     Login: string;
