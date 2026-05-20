@@ -14,12 +14,12 @@ namespace AchievementOffice.Services
             _appDbContext = appDbContext;
         }
 
-        public async Task<ShoutoutResponseDto> CreateAsync(CreateShoutoutDto createDto)
+        public async Task<ShoutoutResponseDto> CreateAsync(CreateShoutoutDto createDto, Guid senderId)
         {
             var shoutout = new Shoutout
             {
                 ShoutoutId = Guid.NewGuid(),
-                SenderId = createDto.SenderId,
+                SenderId = senderId,
                 ReceiverId = createDto.ReceiverId,
                 Title = createDto.Title,
                 Description = createDto.Description,

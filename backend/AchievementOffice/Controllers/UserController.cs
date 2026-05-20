@@ -1,13 +1,15 @@
+using System.Security.Claims;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 
 namespace AchievementOffice.Controllers
 {
     [ApiController]
     [Route("api/users")]
+<<<<<<< HEAD
     [Authorize]
     public class UserController : ControllerBase
     {
@@ -107,5 +109,23 @@ namespace AchievementOffice.Controllers
                 Message = "Password changed successfully"
             });
         }
+=======
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync();
+
+            return Ok(users);
+        }
+>>>>>>> d4df33e ([AOF-18] Added basic possibility to manage shoutouts from the frontend)
     }
 }

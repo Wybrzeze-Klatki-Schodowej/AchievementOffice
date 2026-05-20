@@ -8,6 +8,8 @@ import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import ManageUserModal from "../components/profile/ManageUserModal";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
+import ShoutoutList from "../components/shoutouts/ShoutoutList.tsx";
+
 
 interface OutletContext {
     refreshTrigger: number;
