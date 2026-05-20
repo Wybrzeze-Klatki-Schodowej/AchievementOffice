@@ -10,15 +10,30 @@ interface Props {
     onDelete?: (id: string) => void;
 }
 
-export default function AchievementCard({ achievement, currentUserId, currentUserRole, onEdit, onDelete }: Props) {
-    const [vote, setVote] = useState<boolean | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [summary, setSummary] = useState<AchievementApprovalSummary>({ approved: 0, denied: 0 });
+export default function AchievementCard({ 
+    achievement, 
+    currentUserId, 
+    currentUserRole, 
+    onEdit, 
+    onDelete 
+}: Props) {
 
-    const fetchSummary = useCallback(() => {
-        getApprovalSummary(achievement.achievementId)
-            .then(setSummary)
-            .catch(console.error);
+    const [loading, setLoading] = useState(false);
+
+    const [summary, setSummary] = 
+        useState<AchievementApprovalSummary>({ 
+            approved: 0, 
+            denied: 0,
+            currentUserVote: null
+        });
+
+    const fetchSummary = useCallback(async () => {
+        const data = 
+            await getApprovalSummary(
+                achievement.achievementId
+            );
+
+        setSummary(data);
     }, [achievement.achievementId]);
 
     useEffect(() => {
@@ -32,14 +47,12 @@ export default function AchievementCard({ achievement, currentUserId, currentUse
 
     const handleVote = async (isApproved: boolean) => {
         if (loading) return;
+
         setLoading(true);
         try {
-            const isUnvoting = vote === isApproved;
-
             await approveAchievement(achievement.achievementId, isApproved);
 
-            setVote(isUnvoting ? null : isApproved);
-            fetchSummary();
+            await fetchSummary();
         } catch (e) {
             console.error(e);
         } finally {
@@ -75,12 +88,12 @@ export default function AchievementCard({ achievement, currentUserId, currentUse
                         onClick={() => handleVote(true)}
                         disabled={loading}
                         style={{
-                            background: vote === true ? "green" : "#eee",
-                            color: vote === true ? "white" : "black",
+                            background: summary.currentUserVote === true ? "green" : "#eee",
+                            color: summary.currentUserVote === true ? "white" : "black",
                             border: "1px solid #ccc",
                             padding: "6px 12px",
                             borderRadius: "4px",
-                            cursor: vote !== null ? "default" : "pointer",
+                            cursor: "pointer",
                         }}
                     >
                         Approve                    </button>
@@ -88,18 +101,19 @@ export default function AchievementCard({ achievement, currentUserId, currentUse
                         onClick={() => handleVote(false)}
                         disabled={loading}
                         style={{
-                            background: vote === false ? "red" : "#eee",
-                            color: vote === false ? "white" : "black",
+                            background: summary.currentUserVote === false ? "red" : "#eee",
+                            color: summary.currentUserVote === false ? "white" : "black",
                             border: "1px solid #ccc",
                             padding: "6px 12px",
                             borderRadius: "4px",
-                            cursor: vote !== null ? "default" : "pointer",
+                            cursor: "pointer",
                         }}
                     >
                         Deny
                     </button>
                 </div>
             )}
+
             {canEdit && (
                 <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
                     <button onClick={() => onEdit?.(achievement)}>
