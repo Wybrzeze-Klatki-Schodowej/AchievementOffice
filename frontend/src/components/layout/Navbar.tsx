@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { logout } from "../../api/LoginApi";
+import { getCurrentUser } from "../../api/LoginApi";
 
 interface Props {
     onAddAchievementClick?: () => void;
@@ -11,6 +12,20 @@ export default function Navbar({
     onAddAchievementClick,
     onAddShoutoutClick,
 }: Props) {
+    const navigate = useNavigate();
+
+    const handleProfileClick = async () => {
+        try {
+            const user = await getCurrentUser();
+
+            navigate(
+                `/users/${user.userId}`
+            );
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+        }
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
@@ -18,9 +33,11 @@ export default function Navbar({
             </div>
 
             <div className="navbar-right">
-                <Link to="/">
-                    <button>Profile</button>
-                </Link>
+                <button
+                    onClick={handleProfileClick}
+                >
+                    Profile
+                </button>
 
                 <button onClick={onAddAchievementClick}>
                     Add achievement

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260518153029_FixSnapshot")]
-    partial class FixSnapshot
+    [Migration("20260519124445_FixItMaybe")]
+    partial class FixItMaybe
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
