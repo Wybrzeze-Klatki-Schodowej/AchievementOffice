@@ -1,6 +1,6 @@
 import type { UserProfile } from "../types/user";
 
-const API_URL = "http://localhost:8080/api/users";
+const API_URL = import.meta.env.VITE_API_URL + "/users";
 
 export interface UserListItem {
     userId: string;
