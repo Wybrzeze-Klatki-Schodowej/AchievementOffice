@@ -1,14 +1,20 @@
+
+
 export interface Shoutout {
     shoutoutId: string;
-    receiverId: string;
     senderId: string;
+    senderLogin: string;
+    senderFirstname: string;
+    senderLastname: string;
+    receiverId: string;
+    receiverLogin: string;
+    receiverFirstname: string;
+    receiverLastname: string;
     title: string;
     description?: string;
     createdAt: string;
     updatedAt: string;
     deletedAt?: string;
-    visibilityId: number;
-    categoryId: number;
 }
 
 export interface User {
