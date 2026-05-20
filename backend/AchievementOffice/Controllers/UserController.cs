@@ -20,7 +20,7 @@ namespace AchievementOffice.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _userService.GetAllUsersAsync2();
 
             return Ok(users);
         }

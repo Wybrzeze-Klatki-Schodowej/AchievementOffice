@@ -75,7 +75,7 @@ namespace AchievementOffice.Services
             return new UserRegistrationResult() { IsSuccessful = true };
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<UserDto>> GetAllUsersAsync2()
         {
             var users = await _context.Users
                 .ToListAsync();
