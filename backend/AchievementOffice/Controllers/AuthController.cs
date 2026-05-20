@@ -29,8 +29,8 @@ namespace AchievementOffice.Controllers
             var opts = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Strict,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.Now.AddHours(1)
             };
             Response.Cookies.Append("X-jwt-token", result.Token! , opts);
@@ -44,8 +44,8 @@ namespace AchievementOffice.Controllers
             var opts = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Strict,
+                Secure = true,
+                SameSite = SameSiteMode.None,
             };
             Response.Cookies.Delete("X-jwt-token", opts);
             return Ok();
