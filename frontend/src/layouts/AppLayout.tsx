@@ -2,11 +2,19 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import AchievementModal from "../components/achievements/AchievementModal";
+import ShoutoutModal from "../components/shoutouts/ShoutoutModal";
 
 export default function AppLayout() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
+    const [isShoutoutModalOpen, setIsShoutoutModalOpen] = useState(false);
+
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+
     const handleAchievementCreated = () => {
+        setRefreshTrigger((prev) => prev + 1);
+    };
+
+    const handleShoutoutCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
@@ -14,14 +22,25 @@ export default function AppLayout() {
         <>
             <Navbar 
                 onAddAchievementClick={() =>
-                    setIsModalOpen(true)
+                    setIsAchievementModalOpen(true)
+                }
+
+                onAddShoutoutClick={() =>
+                    setIsShoutoutModalOpen(true)
                 }
             />
 
+
             <AchievementModal 
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                open={isAchievementModalOpen}
+                onClose={() => setIsAchievementModalOpen(false)}
                 onAchievementCreated={handleAchievementCreated}
+            />
+
+            <ShoutoutModal 
+                open={isShoutoutModalOpen}
+                onClose={() => setIsShoutoutModalOpen(false)}
+                onShoutoutCreated={handleShoutoutCreated}
             />
 
             <Outlet 

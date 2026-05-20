@@ -4,10 +4,12 @@ import { logout } from "../../api/LoginApi";
 
 interface Props {
     onAddAchievementClick?: () => void;
+    onAddShoutoutClick?: () => void;
 }
 
 export default function Navbar({
     onAddAchievementClick,
+    onAddShoutoutClick,
 }: Props) {
     return (
         <nav className="navbar">
@@ -22,6 +24,10 @@ export default function Navbar({
 
                 <button onClick={onAddAchievementClick}>
                     Add achievement
+                </button>
+
+                <button onClick={onAddShoutoutClick}>
+                    Add shout-out
                 </button>
 
                 <button className="logout-button" onClick={() => logout()}>Logout</button>

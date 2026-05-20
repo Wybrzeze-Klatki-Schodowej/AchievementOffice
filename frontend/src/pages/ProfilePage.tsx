@@ -1,4 +1,5 @@
 import AchievementList from "../components/achievements/AchievementList";
+import ShoutoutList from "../components/shoutouts/ShoutoutList.tsx";
 import { useOutletContext } from "react-router-dom";
 
 interface OutletContext {
@@ -22,6 +23,11 @@ export default function ProfilePage() {
                 <AchievementList 
                     refreshTrigger={refreshTrigger}
                 />
+
+                <ShoutoutList 
+                    refreshTrigger={refreshTrigger}
+                />
+
             </div>
         </div>
     );

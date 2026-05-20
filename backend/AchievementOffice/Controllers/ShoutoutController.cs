@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AchievementOffice.Controllers
@@ -15,16 +17,24 @@ namespace AchievementOffice.Controllers
             _shoutoutService = shoutoutService;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<ShoutoutResponseDto>> Create(CreateShoutoutDto createDto)
         {
-            var shoutout = await _shoutoutService.CreateAsync(createDto);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            return CreatedAtAction(
-                nameof(GetShoutoutById),
-                new { id = shoutout.ShoutoutId },
-                shoutout
-            );
+            if(!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
+
+            var shoutout = await _shoutoutService.CreateAsync(createDto, userId);
+
+            // return CreatedAtAction(
+            //     nameof(GetShoutoutById),
+            //     new { id = shoutout.ShoutoutId },
+            //     shoutout
+            // );
+
+            return Ok(shoutout);
         }
 
         [HttpPut("{shoutoutId:guid}")]

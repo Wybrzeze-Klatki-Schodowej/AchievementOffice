@@ -16,6 +16,10 @@ namespace AchievementOffice.Extensions
             if (corsConfiguration == null) throw new InvalidOperationException("CORS configuration is missing.");
             if (jwtConfiguration == null) throw new InvalidOperationException("JWT configuration is missing.");
 
+            Console.WriteLine("JWT ISSUER: " + jwtConfiguration.Issuer);
+Console.WriteLine("JWT AUDIENCE: " + jwtConfiguration.Audience);
+Console.WriteLine("JWT KEY: " + jwtConfiguration.SigningKey);
+
             services.AddCors(options => AddReactPolicy(options, corsConfiguration.FrontUrl));
 
             services.AddAuthentication(opt =>

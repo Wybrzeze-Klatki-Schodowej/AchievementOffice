@@ -74,5 +74,24 @@ namespace AchievementOffice.Services
 
             return new UserRegistrationResult() { IsSuccessful = true };
         }
+
+        public async Task<List<UserDto>> GetAllUsersAsync()
+        {
+            var users = await _context.Users
+                .ToListAsync();
+
+            return users.Select(MapToUserDto).ToList();
+        }
+
+        private static UserDto MapToUserDto(User user)
+        {
+            return new UserDto
+            {
+                UserId = user.Id,
+                Login = user.Login
+            };
+        }
     }
 }
+
+
