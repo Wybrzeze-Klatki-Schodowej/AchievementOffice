@@ -2,6 +2,7 @@ using AchievementOffice.Data;
 using AchievementOffice.Common;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
+
 using System.Security.Claims;
 
 namespace AchievementOffice.Services;
@@ -140,20 +141,52 @@ public class AchievementService : IAchievementService
         };
     }
 
-    public async Task<AchievementApproveResponseDto> ApproveAsync(Guid userId, CreateAchievementApproveDto dto)
+    public async Task<AchievementApproveResponseDto> ApproveAsync(Guid achievementId, Guid userId, CreateAchievementApproveDto dto)
     {
         var existing = await _context.AchievementApproves
-        .FirstOrDefaultAsync(a => a.AchievementId == dto.AchievementId
-                                && a.UserId == userId
-                                && a.DeletedAt == null);
+        .FirstOrDefaultAsync(a => a.AchievementId == achievementId
+                                && a.UserId == userId);
 
         if (existing != null)
-            throw new InvalidOperationException("User already voted on this achievement");
+        {
+            if (existing.DeletedAt != null)
+            {
+                existing.DeletedAt = null; // Reanimujemy wiersz
+                existing.IsApproved = dto.IsApproved; // Ustawiamy stan przycisku na nowy
+                existing.ApprovedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                return MapApproveToDto(existing);
+            }
+
+            if (existing.IsApproved == dto.IsApproved)
+            {
+                existing.DeletedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return new AchievementApproveResponseDto
+                {
+                    AchievementApproveId = existing.AchievementApproveId,
+                    AchievementId = existing.AchievementId,
+                    UserId = existing.UserId,
+                    IsApproved = null,
+                    ApprovedAt = existing.ApprovedAt
+                };
+            }
+            else
+            {
+                existing.IsApproved = dto.IsApproved;
+                existing.ApprovedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return MapApproveToDto(existing);
+            }
+        }
 
         var approve = new AchievementApprove
         {
             AchievementApproveId = Guid.NewGuid(),
-            AchievementId = dto.AchievementId,
+            AchievementId = achievementId,
             UserId = userId,
             IsApproved = dto.IsApproved,
             ApprovedAt = DateTime.UtcNow

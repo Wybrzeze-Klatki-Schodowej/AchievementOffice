@@ -94,12 +94,14 @@ public class AchievementController : ControllerBase
     {
         try
         {
+
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized(new { message = "Invalid user ID in token." });
             
-            var approve = await _achievementService.ApproveAsync(userId, dto);
+            var approve = await _achievementService.ApproveAsync(id, userId, dto);
+
             return Ok(approve);
         }
         catch (InvalidOperationException ex)
