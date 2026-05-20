@@ -96,7 +96,9 @@ export const approveAchievement = async (
 export const getApprovalSummary = async (
     achievementId: string
 ): Promise<AchievementApprovalSummary> => {
-    const response = await fetch(`${API_URL}/${achievementId}/approvals/summary`);
+    const response = await fetch(`${API_URL}/${achievementId}/approvals/summary`, {
+        credentials: "include"
+    });
     if (!response.ok) {
         throw new Error("Failed to fetch approval summary");
     }

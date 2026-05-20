@@ -89,25 +89,18 @@ public class AchievementController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpPost( "{id:guid}/approve" )]
     public async Task<ActionResult<AchievementApproveResponseDto>> Approve(Guid id, CreateAchievementApproveDto dto)
     {
-        try
-        {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { message = "Invalid user ID in token." });
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { message = "Invalid user ID in token." });
             
-            var approve = await _achievementService.ApproveAsync(id, userId, dto);
+        var approve = await _achievementService.ApproveAsync(id, userId, dto);
 
-            return Ok(approve);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(ex.Message);
-        }
+        return Ok(approve);
     }
 
     [HttpGet( "{id:guid}/approvals" )]
@@ -117,6 +110,7 @@ public class AchievementController : ControllerBase
         return Ok( approvals );
     }
 
+    [Authorize]
     [HttpGet("{id:guid}/approvals/summary" )]
     public async Task<ActionResult<AchievementApprovalSummaryDto>> GetApprovalSummary(Guid id)
     {

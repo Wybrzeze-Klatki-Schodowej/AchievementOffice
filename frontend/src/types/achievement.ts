@@ -18,4 +18,5 @@ export interface AchievementApprove {
 export interface AchievementApprovalSummary {
     approved: number;
     denied: number;
+    currentUserVote: boolean | null;
 }
