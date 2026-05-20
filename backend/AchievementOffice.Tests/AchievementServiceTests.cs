@@ -1,7 +1,13 @@
-using AchievementOffice.Data;
-using AchievementOffice.Features.Achievements;
-using AchievementOffice.Features.Achievements.DTOs;
+using Xunit;
+using Moq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AchievementOffice.Data;
+using AchievementOffice.Services;
+using AchievementOffice.Models;
 
 namespace AchievementOffice.Tests;
 
@@ -10,94 +16,108 @@ public class AchievementServiceTests
     private AppDbContext CreateInMemoryContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString() )
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         return new AppDbContext(options);
     }
 
+    private Mock<IHttpContextAccessor> CreateMockHttpContextAccessor()
+    {
+        return new Mock<IHttpContextAccessor>();
+    }
+
     [Fact]
-    public async Task ApproveAsync_FirstVote_ReturnsDto() // czy pierwszy glos dziala poprawnie
+    public async Task ApproveAsync_FirstVote_ReturnsDtoWithCorrectStatus()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var UserId = Guid.NewGuid();
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+
+        var userId = Guid.NewGuid();
+        var achievementId = Guid.NewGuid();
         var dto = new CreateAchievementApproveDto
         {
-            AchievementId = Guid.NewGuid(),
             IsApproved = true
         };
 
-        var result = await service.ApproveAsync(UserId, dto);
+        // Act
+        var result = await service.ApproveAsync(achievementId, userId, dto);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(dto.AchievementId, result.AchievementId);
-        Assert.Equal(UserId, result.UserId);
+        Assert.Equal(achievementId, result.AchievementId);
+        Assert.Equal(userId, result.UserId);
         Assert.True(result.IsApproved);
     }
 
     [Fact]
-    public async Task ApproveAsync_SecondVote_ThrowsException() // czy drugi glos tego samego uzytkownika na ten sam achievement rzuca wyjatkiem
+    public async Task ApproveAsync_SecondSameVote_PerformsSoftDeleteAndReturnsNullApproved()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var UserId = Guid.NewGuid();
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+
+        var userId = Guid.NewGuid();
+        var achievementId = Guid.NewGuid();
         var dto = new CreateAchievementApproveDto
         {
-            AchievementId = Guid.NewGuid(),
             IsApproved = true
         };
-        await service.ApproveAsync(UserId, dto);
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>( () => service.ApproveAsync(UserId, dto) );
+
+        // Pierwsze klikniêcie (dodanie g³osu)
+        await service.ApproveAsync(achievementId, userId, dto);
+
+        // Act - Drugie klikniêcie (odklikniêcie/cofniêcie g³osu)
+        var result = await service.ApproveAsync(achievementId, userId, dto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Null(result.IsApproved);
+
+        var dbRecord = await context.AchievementApproves.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(a => a.AchievementId == achievementId && a.UserId == userId);
+        Assert.NotNull(dbRecord!.DeletedAt);
     }
 
     [Fact]
-    public async Task ApproveAsync_DifferentUsers_Success() // czy rozne glosy roznych uzytkownikow na ten sam achievement dzialaja poprawnie
+    public async Task ApproveAsync_DifferentUsers_Success()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var AchievementId = Guid.NewGuid();
-        var dto1 = new CreateAchievementApproveDto
-        {
-            AchievementId = AchievementId,
-            IsApproved = true
-        };
-        var dto2 = new CreateAchievementApproveDto
-        {
-            AchievementId = AchievementId,
-            IsApproved = false
-        };
-        var UserId1 = Guid.NewGuid();
-        var UserId2 = Guid.NewGuid();
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+
+        var achievementId = Guid.NewGuid();
+        var dto1 = new CreateAchievementApproveDto { IsApproved = true };
+        var dto2 = new CreateAchievementApproveDto { IsApproved = false };
+        var userId1 = Guid.NewGuid();
+        var userId2 = Guid.NewGuid();
+
         // Act
-        var result1 = await service.ApproveAsync(UserId1, dto1);
-        var result2 = await service.ApproveAsync(UserId2, dto2);
+        var result1 = await service.ApproveAsync(achievementId, userId1, dto1);
+        var result2 = await service.ApproveAsync(achievementId, userId2, dto2);
+
         // Assert
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(dto1.AchievementId, result1.AchievementId);
-        Assert.Equal(dto2.AchievementId, result2.AchievementId);
-        Assert.Equal(UserId1, result1.UserId);
-        Assert.Equal(UserId2, result2.UserId);
         Assert.True(result1.IsApproved);
         Assert.False(result2.IsApproved);
     }
 
-   
-
     [Fact]
-    public async Task GetApprovalSummaryAsync_NoVotes_ReturnsZeros() // czy podsumowanie glosowania na achievement bez glosow zwraca zera
+    public async Task GetApprovalSummaryAsync_NoVotes_ReturnsZeros()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var AchievementId = Guid.NewGuid();
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+        var achievementId = Guid.NewGuid();
+
         // Act
-        var summary = await service.GetApprovalSummaryAsync(AchievementId);
+        var summary = await service.GetApprovalSummaryAsync(achievementId);
+
         // Assert
         Assert.NotNull(summary);
         Assert.Equal(0, summary.Approved);
@@ -108,134 +128,109 @@ public class AchievementServiceTests
     public async Task GetApprovalSummaryAsync_WithVotes_ReturnsCorrectCounts()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
         var achievementId = Guid.NewGuid();
 
-        await service.ApproveAsync( Guid.NewGuid(), new CreateAchievementApproveDto
-        { AchievementId = achievementId, IsApproved = true } );
-        await service.ApproveAsync( Guid.NewGuid(), new CreateAchievementApproveDto
-        { AchievementId = achievementId, IsApproved = true } );
-        await service.ApproveAsync( Guid.NewGuid(), new CreateAchievementApproveDto
-        { AchievementId = achievementId, IsApproved = false } );
+        await service.ApproveAsync(achievementId, Guid.NewGuid(), new CreateAchievementApproveDto { IsApproved = true });
+        await service.ApproveAsync(achievementId, Guid.NewGuid(), new CreateAchievementApproveDto { IsApproved = true });
+        await service.ApproveAsync(achievementId, Guid.NewGuid(), new CreateAchievementApproveDto { IsApproved = false });
 
         // Act
-        var result = await service.GetApprovalSummaryAsync( achievementId );
+        var result = await service.GetApprovalSummaryAsync(achievementId);
 
         // Assert
-        Assert.Equal( 2, result.Approved );
-        Assert.Equal( 1, result.Denied );
+        Assert.Equal(2, result.Approved);
+        Assert.Equal(1, result.Denied);
     }
 
-    // ACHIEVEMENT CRUD
 
     [Fact]
     public async Task CreateAsync_ValidDto_ReturnsAchievement()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var dto = new CreateAchievementDto
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+
+        var dto = new CreateAchievementRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "Test Achievement",
             Description = "Test Description"
         };
 
         // Act
-        var result = await service.CreateAsync( dto );
+        var result = await service.CreateAsync(dto);
 
         // Assert
-        Assert.NotNull( result );
-        Assert.Equal( dto.Title, result.Title );
-        Assert.Equal( dto.UserId, result.UserId );
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(dto.Title, result.Value!.Title);
     }
 
     [Fact]
     public async Task DeleteAsync_ExistingAchievement_ReturnsTrueAndSetsDeletedAt()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-        var created = await service.CreateAsync( new CreateAchievementDto
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
+
+        var createdResult = await service.CreateAsync(new CreateAchievementRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "To delete"
-        } );
+        });
 
         // Act
-        var result = await service.DeleteAsync( created.AchievementId );
+        var result = await service.DeleteAsync(createdResult.Value!.AchievementId);
 
         // Assert
-        Assert.True( result );
+        Assert.True(result.IsSuccess);
         var deleted = await context.Achievements
-            .FirstOrDefaultAsync( a => a.AchievementId == created.AchievementId );
-        Assert.NotNull( deleted!.DeletedAt );
+            .FirstOrDefaultAsync(a => a.AchievementId == createdResult.Value!.AchievementId);
+        Assert.NotNull(deleted!.DeletedAt);
     }
 
     [Fact]
     public async Task DeleteAsync_NonExistingAchievement_ReturnsFalse()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
 
         // Act
-        var result = await service.DeleteAsync( Guid.NewGuid() );
+        var result = await service.DeleteAsync(Guid.NewGuid());
 
         // Assert
-        Assert.False( result );
+        Assert.False(result.IsSuccess);
     }
 
     [Fact]
     public async Task GetAllAsync_ReturnsOnlyNonDeleted()
     {
         // Arrange
+        var mockHttpContextAccessor = CreateMockHttpContextAccessor();
         var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
+        var service = new AchievementService(context, mockHttpContextAccessor.Object);
 
-        var created = await service.CreateAsync( new CreateAchievementDto
+        var achievementToStay = await service.CreateAsync(new CreateAchievementRequest
         {
-            UserId = Guid.NewGuid(),
             Title = "Active"
-        } );
-        await service.CreateAsync( new CreateAchievementDto
+        });
+        var achievementToDelete = await service.CreateAsync(new CreateAchievementRequest
         {
-            UserId = Guid.NewGuid(),
-            Title = "To delete"
-        } );
-        await service.DeleteAsync( created.AchievementId );
-
-        // Act
-        var result = await service.GetAllAsync();
-
-        // Assert
-        Assert.Single( result );
-        Assert.Equal( "To delete", result[0].Title );
-    }
-    public async Task GetAllAsync_ReturnsOnlyNonDeleted()
-    {
-        // Arrange
-        var context = CreateInMemoryContext();
-        var service = new AchievementService( context );
-
-        var achievementToStay = await service.CreateAsync( new CreateAchievementDto
-        {
-            UserId = Guid.NewGuid(),
-            Title = "Active"
-        } );
-        var achievementToDelete = await service.CreateAsync( new CreateAchievementDto
-        {
-            UserId = Guid.NewGuid(),
             Title = "Deleted"
-        } );
-        await service.DeleteAsync( achievementToDelete.AchievementId );
+        });
+        await service.DeleteAsync(achievementToDelete.Value!.AchievementId);
 
         // Act
         var result = await service.GetAllAsync();
 
         // Assert
-        Assert.Single( result );
-        Assert.Equal( "Active", result[0].Title );
+        Assert.True(result.IsSuccess);
+        Assert.Single(result.Value!);
+        Assert.Equal("Active", result.Value![0].Title);
     }
 }
