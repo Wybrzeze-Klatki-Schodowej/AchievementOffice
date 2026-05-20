@@ -1,0 +1,27 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/aotest-494817/cloud-run-source-deploy/achievementoffice-frontend:$TAG_NAME'
+      - '--build-arg'
+      - 'VITE_API_URL=$_VITE_API_URL'
+      - '-f'
+      - 'frontend/Dockerfile.prod'
+      - 'frontend'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'europe-west1-docker.pkg.dev/aotest-494817/cloud-run-source-deploy/achievementoffice-frontend:$TAG_NAME'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'achievementoffice-frontend'
+      - '--image'
+      - 'europe-west1-docker.pkg.dev/aotest-494817/cloud-run-source-deploy/achievementoffice-frontend:$TAG_NAME'
+      - '--region'
+      - 'europe-west1'
