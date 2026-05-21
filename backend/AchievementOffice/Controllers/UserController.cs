@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,14 @@ namespace AchievementOffice.Controllers
                 return NotFound(new { Message = "User not found" });
 
             return Ok(user);
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync2();
+
+            return Ok(users);
         }
 
         [HttpGet]

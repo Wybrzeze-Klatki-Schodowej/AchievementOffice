@@ -1,5 +1,6 @@
 using AchievementOffice.Extensions;
 using AchievementOffice.Services;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureAppConfiguration(builder.Configuration);
 builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+builder.Services.AddScoped<IShoutoutService, ShoutoutService>();
 
 builder.Services.SetupDatabase(builder.Configuration);
 
@@ -37,3 +40,5 @@ app.MapControllers();
 app.UseStaticFiles();
 
 app.Run();
+
+

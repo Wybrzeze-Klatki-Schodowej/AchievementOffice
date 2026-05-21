@@ -1,4 +1,5 @@
 import AchievementList from "../components/achievements/AchievementList";
+import ShoutoutList from "../components/shoutouts/ShoutoutList.tsx";
 import { useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "../types/user";
@@ -60,6 +61,10 @@ export default function ProfilePage() {
 
             <AchievementList
                 userId={userId!}
+                refreshTrigger={refreshTrigger}
+            />
+          
+            <ShoutoutList 
                 refreshTrigger={refreshTrigger}
             />
 

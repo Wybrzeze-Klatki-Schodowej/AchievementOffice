@@ -10,6 +10,8 @@ namespace AchievementOffice.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<UserDetails> UserDetails => Set<UserDetails>();
 
+        public DbSet<Shoutout> Shoutouts => Set<Shoutout>();
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
