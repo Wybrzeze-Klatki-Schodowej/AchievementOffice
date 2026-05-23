@@ -9,6 +9,16 @@ export interface UserListItem {
     lastName: string;
 }
 
+export interface UpdateUserRequest {
+    email: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    jobTitle: string;
+    bio?: string;
+    avatarUrl?: string;
+}
+
 export async function getUserProfile(
     userId: string
 ): Promise<UserProfile> {
@@ -51,6 +61,26 @@ export async function getAllUsers(): Promise<UserListItem[]> {
 
     if (!res.ok) {
         throw new Error(`Error fetching users: ${res.status}`);
+    }
+
+    return res.json();
+}
+
+export async function updateUserProfile(
+    data: UpdateUserRequest
+): Promise<UserProfile> {
+    const res = await fetch(`${API_URL}/me`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message ?? "Error updating profile");
     }
 
     return res.json();

@@ -3,7 +3,9 @@ import { useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "../types/user";
 import { getUserProfile } from "../api/UserApi";
+import EditProfileModal from "../components/profile/EditProfileModal";
 import "./ProfilePage.css";
+import { getCurrentUser } from "../api/LoginApi";
 
 interface OutletContext {
     refreshTrigger: number;
@@ -14,6 +16,14 @@ export default function ProfilePage() {
     const { userId } = useParams();
 
     const [user, setUser] = useState<UserProfile>();
+    const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+
+    function handleUpdated(updated: UserProfile) {
+        setUser(updated);
+    }
 
     useEffect(() => {
 
@@ -22,12 +32,26 @@ export default function ProfilePage() {
         }
 
         getUserProfile(userId)
-            .then(setUser);
+            .then(setUser)
+            .catch(console.error);
     }, [userId]);
+
+    useEffect(() => {
+        getCurrentUser()
+            .then((user) => {
+                setCurrentUserId(user.userId);
+                setCurrentUserRole(user.role);
+            })
+            .catch((error) =>
+                console.error("Failed to fetch current user:", error)
+            );
+    }, []);
 
     if (!user) {
         return <p>Loading...</p>;
     }
+
+    const isOwnProfile = currentUserId === user.userId;
 
     return (
         <div className="profile-container">
@@ -42,6 +66,11 @@ export default function ProfilePage() {
                     <div className="profile-username">
                         @{user.login}
                     </div>
+                    {isOwnProfile && (
+                        <button onClick={() => setIsEditOpen(true)}>
+                            Edit profile
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -64,6 +93,14 @@ export default function ProfilePage() {
             />
 
         </div>
+
+        {isOwnProfile && isEditOpen && user && (
+            <EditProfileModal
+                user={user}
+                onClose={() => setIsEditOpen(false)}
+                onUpdated={handleUpdated}
+            />
+        )}
     </div>
     );
 }
