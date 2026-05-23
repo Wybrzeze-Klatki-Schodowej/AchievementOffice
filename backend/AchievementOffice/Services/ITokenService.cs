@@ -1,9 +1,8 @@
 ﻿using AchievementOffice.Entities;
 
-namespace AchievementOffice.Services
+namespace AchievementOffice.Services;
+
+public interface ITokenService
 {
-    public interface ITokenService
-    {
-        string GenerateToken(User user);
-    }
+    string GenerateToken(User user);
 }

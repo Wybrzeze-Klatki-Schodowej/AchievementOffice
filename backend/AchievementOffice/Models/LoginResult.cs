@@ -1,8 +1,7 @@
-﻿namespace AchievementOffice.Models
+﻿namespace AchievementOffice.Models;
+
+public class LoginResult
 {
-    public class LoginResult
-    {
-        public bool IsSuccessful { get; set; }
-        public string? Token {  get; set; }
-    }
+    public bool IsSuccessful { get; set; }
+    public string? Token {  get; set; }
 }
