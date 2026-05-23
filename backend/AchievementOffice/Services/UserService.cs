@@ -122,5 +122,72 @@ namespace AchievementOffice.Services
 
             return users;
         }
+
+        public async Task<UserProfileResponse?> UpdateUserAsync(
+            Guid userId,
+            UpdateUserRequest request)
+        {
+            var user = await _context.Users
+                .Include(u => u.UserDetails)
+                .Include(u => u.UserRole)
+                .FirstOrDefaultAsync(
+                    u => u.Id == userId &&
+                        u.DeletedAt == null
+                );
+
+            if (user == null)
+                return null;
+
+            bool emailTaken = await _context.Users.AnyAsync(
+                u => u.Email == request.Email &&
+                    u.Id != userId
+            );
+
+            if (emailTaken)
+            {
+                throw new Exception("Email already taken");
+            }
+
+            bool loginTaken = await _context.Users.AnyAsync(
+                u => u.Login == request.Username &&
+                    u.Id != userId
+            );
+
+            if (loginTaken)
+            {
+                throw new Exception("Login already taken");
+            }
+
+            if (user.Email != request.Email)
+            {
+                user.LastEmail = user.Email;
+                user.Email = request.Email;
+            }
+
+            user.Login = request.Username;
+            user.UserDetails.Firstname = request.Firstname;
+            user.UserDetails.Lastname = request.Lastname;
+            user.UserDetails.JobTitle = request.JobTitle;
+            user.UserDetails.Bio = request.Bio;
+            user.UserDetails.AvatarUrl = request.AvatarUrl;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new UserProfileResponse
+            {
+                UserId = user.Id,
+                Login = user.Login,
+                Email = user.Email,
+                FirstName = user.UserDetails.Firstname,
+                LastName = user.UserDetails.Lastname,
+                JobTitle = user.UserDetails.JobTitle,
+                Bio = user.UserDetails.Bio,
+                AvatarUrl = user.UserDetails.AvatarUrl,
+                Role = user.UserRole.Name,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
+            };
+        }
     }
 }

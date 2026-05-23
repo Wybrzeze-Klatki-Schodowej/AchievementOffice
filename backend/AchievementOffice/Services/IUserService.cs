@@ -11,5 +11,10 @@ namespace AchievementOffice.Services
         Task<UserProfileResponse?> GetUserProfileAsync(Guid userId);
 
         Task<List<UserProfileResponse>> GetAllUsersAsync();
+
+        Task<UserProfileResponse?> UpdateUserAsync(
+            Guid userId,
+            UpdateUserRequest request
+        );
     }
 }
