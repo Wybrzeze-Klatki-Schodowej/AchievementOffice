@@ -69,54 +69,65 @@ export default function EditProfileModal({
 
                 <form onSubmit={handleSubmit} className="modal-form">
 
-                    <input 
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="Email"
-                    />
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input 
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="Email"
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label htmlFor="username">Username</label>
+                        <input
+                            name="username"
+                            value={form.username}
+                            onChange={handleChange}
+                            placeholder="Username"
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label htmlFor="firstname">First name</label>
+                        <input 
+                            name="firstname"
+                            value={form.firstname}
+                            onChange={handleChange}
+                            placeholder="First name"
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label htmlFor="lastname">Last name</label>
+                        <input 
+                            name="lastname"
+                            value={form.lastname}
+                            onChange={handleChange}
+                            placeholder="Last name"
+                        />
+                    </div>
 
-                    <input
-                        name="username"
-                        value={form.username}
-                        onChange={handleChange}
-                        placeholder="Username"
-                    />
+                    <div className="form-group">
+                        <label htmlFor="jobTitle">Job title</label>
+                        <input 
+                            name="jobTitle"
+                            value={form.jobTitle}
+                            onChange={handleChange}
+                            placeholder="Job title"
+                        />
+                    </div>
 
-                    <input 
-                        name="firstname"
-                        value={form.firstname}
-                        onChange={handleChange}
-                        placeholder="First name"
-                    />
-
-                    <input 
-                        name="lastname"
-                        value={form.lastname}
-                        onChange={handleChange}
-                        placeholder="Last name"
-                    />
-
-                    <input 
-                        name="jobTitle"
-                        value={form.jobTitle}
-                        onChange={handleChange}
-                        placeholder="Job title"
-                    />
-
-                    <textarea 
-                        name="bio"
-                        value={form.bio}
-                        onChange={handleChange}
-                        placeholder="Bio"
-                    />
-
-                    <input 
-                        name="avatarUrl"
-                        value={form.avatarUrl}
-                        onChange={handleChange}
-                        placeholder="Avatar URL"
-                    />
+                    <div className="form-group">
+                        <label htmlFor="bio">Bio</label>
+                        <textarea 
+                            name="bio"
+                            value={form.bio}
+                            onChange={handleChange}
+                            placeholder="Bio"
+                        />
+                    </div>
 
                     {error && (
                         <p className="error">{error}</p>

@@ -52,6 +52,7 @@ export default function ProfilePage() {
     }
 
     const isOwnProfile = currentUserId === user.userId;
+    const isAdmin = currentUserRole === "Admin";
 
     return (
         <div className="profile-container">
@@ -94,7 +95,7 @@ export default function ProfilePage() {
 
         </div>
 
-        {isOwnProfile && isEditOpen && user && (
+        {(isAdmin || isOwnProfile) && isEditOpen && user && (
             <EditProfileModal
                 user={user}
                 onClose={() => setIsEditOpen(false)}
