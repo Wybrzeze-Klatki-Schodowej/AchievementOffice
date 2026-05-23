@@ -124,7 +124,7 @@ public class UserService : IUserService
         return users;
     }
 
-    public async Task<OperationResult<UserProfileResponse>> UpdateUserAsync(
+    public async Task<Result<UserProfileResponse>> UpdateUserAsync(
         Guid userId,
         UpdateUserRequest request)
     {
@@ -138,8 +138,8 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            return OperationResult<UserProfileResponse>
-                .Failure("User not found");
+            return Result<UserProfileResponse>
+                .Fail("User not found");
         }
 
         bool emailTaken = await _context.Users.AnyAsync(
@@ -149,8 +149,8 @@ public class UserService : IUserService
 
         if (emailTaken)
         {
-            return OperationResult<UserProfileResponse>
-                .Failure("Email already taken");
+            return Result<UserProfileResponse>
+                .Fail("Email already taken");
         }
 
         bool loginTaken = await _context.Users.AnyAsync(
@@ -160,8 +160,8 @@ public class UserService : IUserService
 
         if (loginTaken)
         {
-            return OperationResult<UserProfileResponse>
-                .Failure("Login already taken");
+            return Result<UserProfileResponse>
+                .Fail("Login already taken");
         }
 
         if (user.Email != request.Email)
@@ -180,7 +180,7 @@ public class UserService : IUserService
 
         await _context.SaveChangesAsync();
 
-        return OperationResult<UserProfileResponse>
+        return Result<UserProfileResponse>
             .Success(
                 new UserProfileResponse
                 {
@@ -199,7 +199,7 @@ public class UserService : IUserService
             );
     }
 
-    public async Task<OperationResult> ChangePasswordAsync(
+    public async Task<Result> ChangePasswordAsync(
         Guid userId,
         ChangePasswordRequest request)
     {
@@ -210,8 +210,8 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            return OperationResult
-                .Failure("User not found");
+            return Result
+                .Fail("User not found");
         }
 
         bool currentPasswordValid =
@@ -220,15 +220,15 @@ public class UserService : IUserService
                 user.Password);
 
         if (!currentPasswordValid)
-            return OperationResult
-                .Failure(
+            return Result
+                .Fail(
                     "Current password is incorrect"
                 );
 
         if (request.NewPassword != request.ConfirmNewPassword)
         {
-            return OperationResult
-                .Failure(
+            return Result
+                .Fail(
                     "Passwords do not match"
                 );
         }
@@ -240,8 +240,8 @@ public class UserService : IUserService
 
         if (samePassword)
         {
-            return OperationResult
-                .Failure(
+            return Result
+                .Fail(
                     "New password must be different"
                 );
         }
@@ -258,6 +258,6 @@ public class UserService : IUserService
 
         await _context.SaveChangesAsync();
 
-        return OperationResult.Success();
+        return Result.Success();
     }
 }

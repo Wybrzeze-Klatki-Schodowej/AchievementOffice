@@ -11,12 +11,12 @@ public interface IUserService
 
     Task<List<UserProfileResponse>> GetAllUsersAsync();
 
-    Task<OperationResult<UserProfileResponse>> UpdateUserAsync(
+    Task<Result<UserProfileResponse>> UpdateUserAsync(
         Guid userId,
         UpdateUserRequest request
     );
 
-    Task<OperationResult> ChangePasswordAsync(
+    Task<Result> ChangePasswordAsync(
         Guid userId,
         ChangePasswordRequest request
     );

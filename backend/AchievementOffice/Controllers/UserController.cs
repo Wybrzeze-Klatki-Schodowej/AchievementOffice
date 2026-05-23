@@ -65,7 +65,7 @@ namespace AchievementOffice.Controllers
                     request
                 );
 
-            if (!result.IsSuccessful)
+            if (!result.IsSuccess)
             {
                 return BadRequest(new
                 {
@@ -73,7 +73,7 @@ namespace AchievementOffice.Controllers
                 });
             }
 
-            return Ok(result.Data);
+            return Ok(result.Value);
         }
 
         [HttpPut("me/password")]
@@ -94,7 +94,7 @@ namespace AchievementOffice.Controllers
                         request
                     );
 
-            if (!result.IsSuccessful)
+            if (!result.IsSuccess)
             {
                 return BadRequest(new
                 {
