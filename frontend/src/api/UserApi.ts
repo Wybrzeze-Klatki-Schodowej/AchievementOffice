@@ -19,6 +19,12 @@ export interface UpdateUserRequest {
     avatarUrl?: string;
 }
 
+export interface ChangePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}
+
 export async function getUserProfile(
     userId: string
 ): Promise<UserProfile> {
@@ -84,4 +90,22 @@ export async function updateUserProfile(
     }
 
     return res.json();
+}
+
+export async function changePassword(
+    data: ChangePasswordRequest
+): Promise<void> {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/users/me/password`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message ?? "Error changing password");
+    }
 }

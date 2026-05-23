@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { UserProfile } from "../types/user";
 import { getUserProfile } from "../api/UserApi";
 import EditProfileModal from "../components/profile/EditProfileModal";
+import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
 
@@ -17,6 +18,7 @@ export default function ProfilePage() {
 
     const [user, setUser] = useState<UserProfile>();
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
@@ -72,6 +74,11 @@ export default function ProfilePage() {
                             Edit profile
                         </button>
                     )}
+                    {isOwnProfile && (
+                        <button onClick={() => setIsPasswordOpen(true)}>
+                            Change password
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -100,6 +107,12 @@ export default function ProfilePage() {
                 user={user}
                 onClose={() => setIsEditOpen(false)}
                 onUpdated={handleUpdated}
+            />
+        )}
+
+        {isOwnProfile && isPasswordOpen && (
+            <ChangePasswordModal
+                onClose={() => setIsPasswordOpen(false)}
             />
         )}
     </div>
