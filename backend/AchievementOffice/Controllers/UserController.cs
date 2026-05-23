@@ -50,46 +50,7 @@ namespace AchievementOffice.Controllers
         }
 
         [HttpPut("me")]
-        public async Task<IActionResult> UpdateMe(
-            UpdateUserRequest request)
-        {
-            var userIdClaim = User.FindFirst(
-                ClaimTypes.NameIdentifier
-            );
-
-            if (userIdClaim == null)
-                return Unauthorized();
-
-            var userId = Guid.Parse(
-                userIdClaim.Value
-            );
-
-            try
-            {
-                var updatedUser = 
-                    await _userService.UpdateUserAsync(
-                        userId,
-                        request
-                    );
-
-                if (updatedUser == null)
-                    return NotFound();
-
-                return Ok(updatedUser);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
-                {
-                    Message = ex.Message
-                });
-            }
-        }
-
-        [HttpPut("me/password")]
-        public async Task<IActionResult>
-            ChangePassword(
-                ChangePasswordRequest request)
+        public async Task<IActionResult> UpdateMe(UpdateUserRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -98,30 +59,53 @@ namespace AchievementOffice.Controllers
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            try
-            {
-                var result = 
-                    await _userService
-                        .ChangePasswordAsync(
-                            userId,
-                            request
-                        );
+            var result = 
+                await _userService.UpdateUserAsync(
+                    userId,
+                    request
+                );
 
-                if (!result)
-                    return NotFound();
-
-                return Ok(new
-                {
-                    Message = "Password changed successfully"
-                });
-            }
-            catch (Exception ex)
+            if (!result.IsSuccessful)
             {
                 return BadRequest(new
                 {
-                    Message = ex.Message
+                    Message = result.ErrorMessage
                 });
             }
+
+            return Ok(result.Data);
+        }
+
+        [HttpPut("me/password")]
+        public async Task<IActionResult>
+            ChangePassword(ChangePasswordRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var result = 
+                await _userService
+                    .ChangePasswordAsync(
+                        userId,
+                        request
+                    );
+
+            if (!result.IsSuccessful)
+            {
+                return BadRequest(new
+                {
+                    Message = result.ErrorMessage   
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Password changed successfully"
+            });
         }
     }
 }
