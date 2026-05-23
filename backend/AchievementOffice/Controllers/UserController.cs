@@ -85,5 +85,43 @@ namespace AchievementOffice.Controllers
                 });
             }
         }
+
+        [HttpPut("me/password")]
+        public async Task<IActionResult>
+            ChangePassword(
+                ChangePasswordRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            try
+            {
+                var result = 
+                    await _userService
+                        .ChangePasswordAsync(
+                            userId,
+                            request
+                        );
+
+                if (!result)
+                    return NotFound();
+
+                return Ok(new
+                {
+                    Message = "Password changed successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }

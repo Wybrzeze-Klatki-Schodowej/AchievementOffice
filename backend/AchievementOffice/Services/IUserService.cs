@@ -16,5 +16,10 @@ namespace AchievementOffice.Services
             Guid userId,
             UpdateUserRequest request
         );
+
+        Task<bool> ChangePasswordAsync(
+            Guid userId,
+            ChangePasswordRequest request
+        );
     }
 }

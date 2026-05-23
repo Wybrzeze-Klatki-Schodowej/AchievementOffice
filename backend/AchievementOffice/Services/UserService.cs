@@ -189,5 +189,59 @@ namespace AchievementOffice.Services
                 UpdatedAt = user.UpdatedAt
             };
         }
+
+        public async Task<bool> ChangePasswordAsync(
+            Guid userId,
+            ChangePasswordRequest request)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(
+                    u => u.Id == userId &&
+                        u.DeletedAt == null);
+
+            if (user == null)
+                return false;
+
+            bool currentPasswordValid =
+                BCrypt.Net.BCrypt.Verify(
+                    request.CurrentPassword,
+                    user.Password);
+
+            if (!currentPasswordValid)
+                throw new Exception(
+                    "Current password is incorrect"
+                );
+
+            if (request.NewPassword != request.ConfirmNewPassword)
+            {
+                throw new Exception("Passwords do not match");
+            }
+
+            bool samePassword = BCrypt.Net.BCrypt.Verify(
+                request.NewPassword,
+                user.Password
+            );
+
+            if (samePassword)
+            {
+                throw new Exception(
+                    "New password must be different"
+                );
+            }
+
+            user.LastPassword =
+                user.Password;
+
+            user.Password =
+                BCrypt.Net.BCrypt.HashPassword(
+                    request.NewPassword
+                );
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
