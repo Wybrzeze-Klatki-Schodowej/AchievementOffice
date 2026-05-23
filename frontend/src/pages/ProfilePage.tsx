@@ -57,7 +57,7 @@ export default function ProfilePage() {
     const isAdmin = currentUserRole === "Admin";
 
     return (
-        <div className="profile-container">
+        <div className={`profile-container ${isOwnProfile ? "profile-own" : ""}`}>
             <div className="profile-card">
                 <div className="profile-header">
                     <div>
@@ -69,6 +69,12 @@ export default function ProfilePage() {
                     <div className="profile-username">
                         @{user.login}
                     </div>
+
+                    {isOwnProfile && (
+                        <div className="profile-badge">
+                            Your profile
+                        </div>
+                    )}
                     {isOwnProfile && (
                         <button onClick={() => setIsEditOpen(true)}>
                             Edit profile

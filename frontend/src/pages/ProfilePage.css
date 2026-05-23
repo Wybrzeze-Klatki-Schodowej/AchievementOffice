@@ -45,3 +45,22 @@
     font-weight: 600;
     margin-bottom: 12px;
 }
+
+.profile-own {
+    background: linear-gradient(
+        135deg,
+        #f0f7ff,
+        #ffffff
+    );
+    border-left: 4px solid #3b82f6;
+}
+
+.profile-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    background: #3b82f6;
+    color: white;
+}
