@@ -10,4 +10,14 @@ public interface IUserService
     Task<UserProfileResponse?> GetUserProfileAsync(Guid userId);
 
     Task<List<UserProfileResponse>> GetAllUsersAsync();
+
+    Task<Result<UserProfileResponse>> UpdateUserAsync(
+        Guid userId,
+        UpdateUserRequest request
+    );
+
+    Task<Result> ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordRequest request
+    );
 }

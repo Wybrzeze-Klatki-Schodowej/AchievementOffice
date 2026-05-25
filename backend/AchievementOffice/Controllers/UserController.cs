@@ -1,6 +1,8 @@
+using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AchievementOffice.Controllers
 {
@@ -45,6 +47,65 @@ namespace AchievementOffice.Controllers
         {
             var achievements = await _achievementService.GetByUserIdAsync(userId);
             return Ok(achievements);
+        }
+
+        [HttpPut("me")]
+        public async Task<IActionResult> UpdateMe(UpdateUserRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var result = 
+                await _userService.UpdateUserAsync(
+                    userId,
+                    request
+                );
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Message = result.ErrorMessage
+                });
+            }
+
+            return Ok(result.Value);
+        }
+
+        [HttpPut("me/password")]
+        public async Task<IActionResult>
+            ChangePassword(ChangePasswordRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var result = 
+                await _userService
+                    .ChangePasswordAsync(
+                        userId,
+                        request
+                    );
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Message = result.ErrorMessage   
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Password changed successfully"
+            });
         }
     }
 }

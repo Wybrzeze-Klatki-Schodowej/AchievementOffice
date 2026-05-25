@@ -10,6 +10,7 @@ public class UserService : IUserService
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
 
+
     public UserService(AppDbContext context, ITokenService tokenService)
     {
         _context = context;
@@ -121,5 +122,142 @@ public class UserService : IUserService
             .ToListAsync();
 
         return users;
+    }
+
+    public async Task<Result<UserProfileResponse>> UpdateUserAsync(
+        Guid userId,
+        UpdateUserRequest request)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserDetails)
+            .Include(u => u.UserRole)
+            .FirstOrDefaultAsync(
+                u => u.Id == userId &&
+                    u.DeletedAt == null
+            );
+
+        if (user == null)
+        {
+            return Result<UserProfileResponse>
+                .Fail("User not found");
+        }
+
+        bool emailTaken = await _context.Users.AnyAsync(
+            u => u.Email == request.Email &&
+                u.Id != userId
+        );
+
+        if (emailTaken)
+        {
+            return Result<UserProfileResponse>
+                .Fail("Email already taken");
+        }
+
+        bool loginTaken = await _context.Users.AnyAsync(
+            u => u.Login == request.Username &&
+                u.Id != userId
+        );
+
+        if (loginTaken)
+        {
+            return Result<UserProfileResponse>
+                .Fail("Login already taken");
+        }
+
+        if (user.Email != request.Email)
+        {
+            user.LastEmail = user.Email;
+            user.Email = request.Email;
+        }
+
+        user.Login = request.Username;
+        user.UserDetails.Firstname = request.Firstname;
+        user.UserDetails.Lastname = request.Lastname;
+        user.UserDetails.JobTitle = request.JobTitle;
+        user.UserDetails.Bio = request.Bio;
+        user.UserDetails.AvatarUrl = request.AvatarUrl;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Result<UserProfileResponse>
+            .Success(
+                new UserProfileResponse
+                {
+                    UserId = user.Id,
+                    Login = user.Login,
+                    Email = user.Email,
+                    FirstName = user.UserDetails.Firstname,
+                    LastName = user.UserDetails.Lastname,
+                    JobTitle = user.UserDetails.JobTitle,
+                    Bio = user.UserDetails.Bio,
+                    AvatarUrl = user.UserDetails.AvatarUrl,
+                    Role = user.UserRole.Name,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt
+                }
+            );
+    }
+
+    public async Task<Result> ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordRequest request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(
+                u => u.Id == userId &&
+                    u.DeletedAt == null);
+
+        if (user == null)
+        {
+            return Result
+                .Fail("User not found");
+        }
+
+        bool currentPasswordValid =
+            BCrypt.Net.BCrypt.Verify(
+                request.CurrentPassword,
+                user.Password);
+
+        if (!currentPasswordValid)
+            return Result
+                .Fail(
+                    "Current password is incorrect"
+                );
+
+        if (request.NewPassword != request.ConfirmNewPassword)
+        {
+            return Result
+                .Fail(
+                    "Passwords do not match"
+                );
+        }
+
+        bool samePassword = BCrypt.Net.BCrypt.Verify(
+            request.NewPassword,
+            user.Password
+        );
+
+        if (samePassword)
+        {
+            return Result
+                .Fail(
+                    "New password must be different"
+                );
+        }
+
+        user.LastPassword =
+            user.Password;
+
+        user.Password =
+            BCrypt.Net.BCrypt.HashPassword(
+                request.NewPassword
+            );
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Result.Success();
     }
 }
