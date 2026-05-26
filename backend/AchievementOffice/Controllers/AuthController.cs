@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
         var result = await _userService.LoginAsync(request);
 
         if (!result.IsSuccessful)
-            return Unauthorized(new { Message = "Invalid username or password" });
+            return Unauthorized(new { Message = result.ErrorMessage });
 
         var opts = new CookieOptions
         {

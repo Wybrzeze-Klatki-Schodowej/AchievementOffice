@@ -22,12 +22,18 @@ public class UserService : IUserService
         var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Login == request.Login);
 
         if (user == null)
-            return new LoginResult() { IsSuccessful = false };
+            return new LoginResult() { IsSuccessful = false, ErrorMessage = "Invalid login or password" };
 
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
 
         if (!isPasswordValid)
-            return new LoginResult() { IsSuccessful = false };
+            return new LoginResult() { IsSuccessful = false, ErrorMessage = "Invalid login or password" };
+
+        if(user.DeletedAt != null)
+            return new LoginResult() { IsSuccessful = false, ErrorMessage = "User account is deleted" };
+        
+        if(!user.IsActive)
+            return new LoginResult() { IsSuccessful = false, ErrorMessage = "User account is inactive" };
 
         var token = _tokenService.GenerateToken(user);
 
