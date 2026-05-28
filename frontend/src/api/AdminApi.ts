@@ -12,6 +12,7 @@ export interface AdminUserProfile {
     role: string;
     createdAt: string;
     updatedAt: string;
+    isActive: boolean;
 }
 
 export async function getAllUsers(isActive?: boolean): Promise<AdminUserProfile[]> {
@@ -29,4 +30,19 @@ export async function getAllUsers(isActive?: boolean): Promise<AdminUserProfile[
     }
 
     return response.json();
+}
+
+export async function updateUserStatus(userId: string, isActive: boolean): Promise<void> {
+    const response = await fetch(`${ADMIN_API_URL}/users/${userId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ isActive: isActive })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to update user status: ${response.status}`);
+    }
 }
