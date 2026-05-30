@@ -3,124 +3,261 @@ using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AchievementOffice.Services
+namespace AchievementOffice.Services;
+
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly AppDbContext _context;
+    private readonly ITokenService _tokenService;
+
+
+    public UserService(AppDbContext context, ITokenService tokenService)
     {
-        private readonly AppDbContext _context;
-        private readonly ITokenService _tokenService;
+        _context = context;
+        _tokenService = tokenService;
+    }
 
-        public UserService(AppDbContext context, ITokenService tokenService)
+    public async Task<LoginResult> LoginAsync(LoginRequest request)
+    {
+        var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Login == request.Login);
+
+        if (user == null)
+            return new LoginResult() { IsSuccessful = false };
+
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+
+        if (!isPasswordValid)
+            return new LoginResult() { IsSuccessful = false };
+
+        var token = _tokenService.GenerateToken(user);
+
+        if (string.IsNullOrEmpty(token))
+            return new LoginResult() { IsSuccessful = false };
+
+        return new LoginResult() { IsSuccessful = true, Token = token };
+    }
+
+    public async Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request)
+    {
+        bool userExists = await _context.Users.AnyAsync(u => u.Email == request.Email || u.Login == request.Username);
+
+        if (userExists)
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "User already exists" };
+
+        if (string.IsNullOrEmpty(request.RoleName))
+            request.RoleName = "user";
+
+        var userRole = await _context.UserRoles.FirstOrDefaultAsync(r => r.Name == request.RoleName);
+
+        if (userRole == null)
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = $"User role {request.RoleName} does not exist" };
+
+        var userDetails = new UserDetails()
         {
-            _context = context;
-            _tokenService = tokenService;
-        }
+            Firstname = request.Firstname,
+            Lastname = request.Lastname,
+            JobTitle = request.JobTitle
+        };
 
-        public async Task<LoginResult> LoginAsync(LoginRequest request)
+        var user = new User()
         {
-            var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Login == request.Login);
+            Login = request.Username,
+            Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Email = request.Email,
+            UserDetails = userDetails,
+            UserRoleId = userRole.Id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
 
-            if (user == null)
-                return new LoginResult() { IsSuccessful = false };
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
 
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+        return new UserRegistrationResult() { IsSuccessful = true };
+    }
 
-            if (!isPasswordValid)
-                return new LoginResult() { IsSuccessful = false };
-
-            var token = _tokenService.GenerateToken(user);
-
-            if (string.IsNullOrEmpty(token))
-                return new LoginResult() { IsSuccessful = false };
-
-            return new LoginResult() { IsSuccessful = true, Token = token };
-        }
-
-        public async Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request)
-        {
-            bool userExists = await _context.Users.AnyAsync(u => u.Email == request.Email || u.Login == request.Username);
-
-            if (userExists)
-                return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "User already exists" };
-
-            if (string.IsNullOrEmpty(request.RoleName))
-                request.RoleName = "user";
-
-            var userRole = await _context.UserRoles.FirstOrDefaultAsync(r => r.Name == request.RoleName);
-
-            if (userRole == null)
-                return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = $"User role {request.RoleName} does not exist" };
-
-            var userDetails = new UserDetails()
+    public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
+    {
+        return await _context.Users
+            .Include(u => u.UserDetails)
+            .Include(u => u.UserRole)
+            .Where(u => u.Id == userId)
+            .Select(u => new UserProfileResponse
             {
-                Firstname = request.Firstname,
-                Lastname = request.Lastname,
-                JobTitle = request.JobTitle
-            };
+                UserId = u.Id,
+                Login = u.Login,
+                Email = u.Email,
+                FirstName = u.UserDetails.Firstname,
+                LastName = u.UserDetails.Lastname,
+                JobTitle = u.UserDetails.JobTitle,
+                Bio = u.UserDetails.Bio,
+                AvatarUrl = u.UserDetails.AvatarUrl,
+                Role = u.UserRole.Name,
+                CreatedAt = u.CreatedAt,
+                UpdatedAt = u.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
+    }
 
-            var user = new User()
+    public async Task<List<UserProfileResponse>> GetAllUsersAsync()
+    {
+        var users = await _context.Users
+            .Include(u => u.UserDetails)
+            .Include(u => u.UserRole)
+            .Where(u => u.DeletedAt == null)
+            .Select(u => new UserProfileResponse
             {
-                Login = request.Username,
-                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Email = request.Email,
-                UserDetails = userDetails,
-                UserRoleId = userRole.Id,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+                UserId = u.Id,
+                Login = u.Login,
+                Email = u.Email,
+                FirstName = u.UserDetails.Firstname,
+                LastName = u.UserDetails.Lastname,
+                JobTitle = u.UserDetails.JobTitle,
+                Bio = u.UserDetails.Bio,
+                AvatarUrl = u.UserDetails.AvatarUrl,
+                Role = u.UserRole.Name,
+                CreatedAt = u.CreatedAt,
+                UpdatedAt = u.UpdatedAt
+            })
+            .ToListAsync();
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+        return users;
+    }
 
-            return new UserRegistrationResult() { IsSuccessful = true };
-        }
+    public async Task<Result<UserProfileResponse>> UpdateUserAsync(
+        Guid userId,
+        UpdateUserRequest request)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserDetails)
+            .Include(u => u.UserRole)
+            .FirstOrDefaultAsync(
+                u => u.Id == userId &&
+                    u.DeletedAt == null
+            );
 
-        public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
+        if (user == null)
         {
-            return await _context.Users
-                .Include(u => u.UserDetails)
-                .Include(u => u.UserRole)
-                .Where(u => u.Id == userId)
-                .Select(u => new UserProfileResponse
-                {
-                    UserId = u.Id,
-                    Login = u.Login,
-                    Email = u.Email,
-                    FirstName = u.UserDetails.Firstname,
-                    LastName = u.UserDetails.Lastname,
-                    JobTitle = u.UserDetails.JobTitle,
-                    Bio = u.UserDetails.Bio,
-                    AvatarUrl = u.UserDetails.AvatarUrl,
-                    Role = u.UserRole.Name,
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt
-                })
-                .FirstOrDefaultAsync();
+            return Result<UserProfileResponse>
+                .Fail("User not found");
         }
 
-        public async Task<List<UserProfileResponse>> GetAllUsersAsync()
+        bool emailTaken = await _context.Users.AnyAsync(
+            u => u.Email == request.Email &&
+                u.Id != userId
+        );
+
+        if (emailTaken)
         {
-            var users = await _context.Users
-                .Include(u => u.UserDetails)
-                .Include(u => u.UserRole)
-                .Where(u => u.DeletedAt == null)
-                .Select(u => new UserProfileResponse
-                {
-                    UserId = u.Id,
-                    Login = u.Login,
-                    Email = u.Email,
-                    FirstName = u.UserDetails.Firstname,
-                    LastName = u.UserDetails.Lastname,
-                    JobTitle = u.UserDetails.JobTitle,
-                    Bio = u.UserDetails.Bio,
-                    AvatarUrl = u.UserDetails.AvatarUrl,
-                    Role = u.UserRole.Name,
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt
-                })
-                .ToListAsync();
-
-            return users;
+            return Result<UserProfileResponse>
+                .Fail("Email already taken");
         }
+
+        bool loginTaken = await _context.Users.AnyAsync(
+            u => u.Login == request.Username &&
+                u.Id != userId
+        );
+
+        if (loginTaken)
+        {
+            return Result<UserProfileResponse>
+                .Fail("Login already taken");
+        }
+
+        if (user.Email != request.Email)
+        {
+            user.LastEmail = user.Email;
+            user.Email = request.Email;
+        }
+
+        user.Login = request.Username;
+        user.UserDetails.Firstname = request.Firstname;
+        user.UserDetails.Lastname = request.Lastname;
+        user.UserDetails.JobTitle = request.JobTitle;
+        user.UserDetails.Bio = request.Bio;
+        user.UserDetails.AvatarUrl = request.AvatarUrl;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Result<UserProfileResponse>
+            .Success(
+                new UserProfileResponse
+                {
+                    UserId = user.Id,
+                    Login = user.Login,
+                    Email = user.Email,
+                    FirstName = user.UserDetails.Firstname,
+                    LastName = user.UserDetails.Lastname,
+                    JobTitle = user.UserDetails.JobTitle,
+                    Bio = user.UserDetails.Bio,
+                    AvatarUrl = user.UserDetails.AvatarUrl,
+                    Role = user.UserRole.Name,
+                    CreatedAt = user.CreatedAt,
+                    UpdatedAt = user.UpdatedAt
+                }
+            );
+    }
+
+    public async Task<Result> ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordRequest request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(
+                u => u.Id == userId &&
+                    u.DeletedAt == null);
+
+        if (user == null)
+        {
+            return Result
+                .Fail("User not found");
+        }
+
+        bool currentPasswordValid =
+            BCrypt.Net.BCrypt.Verify(
+                request.CurrentPassword,
+                user.Password);
+
+        if (!currentPasswordValid)
+            return Result
+                .Fail(
+                    "Current password is incorrect"
+                );
+
+        if (request.NewPassword != request.ConfirmNewPassword)
+        {
+            return Result
+                .Fail(
+                    "Passwords do not match"
+                );
+        }
+
+        bool samePassword = BCrypt.Net.BCrypt.Verify(
+            request.NewPassword,
+            user.Password
+        );
+
+        if (samePassword)
+        {
+            return Result
+                .Fail(
+                    "New password must be different"
+                );
+        }
+
+        user.LastPassword =
+            user.Password;
+
+        user.Password =
+            BCrypt.Net.BCrypt.HashPassword(
+                request.NewPassword
+            );
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Result.Success();
     }
 }

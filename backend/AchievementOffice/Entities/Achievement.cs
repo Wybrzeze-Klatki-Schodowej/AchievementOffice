@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace AchievementOffice.Entities;
+
 public class Achievement
 {
     public Guid AchievementId { get; set; }

@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AchievementOffice.Configuration
-{
-    public class CorsConfiguration
-    {
-        public static string SectionName => nameof(CorsConfiguration);
+namespace AchievementOffice.Configuration;
 
-        [Required]
-        [Url]
-        public string FrontUrl { get; set; } = string.Empty;
-    }
+public class CorsConfiguration
+{
+    public static string SectionName => nameof(CorsConfiguration);
+
+    [Required]
+    [Url]
+    public string FrontUrl { get; set; } = string.Empty;
 }
