@@ -35,7 +35,7 @@ public class AdminService : IAdminService
 			JobTitle = u.UserDetails.JobTitle,
 			Role = u.UserRole.Name,
 			IsActive = u.IsActive,
-            CreatedAt = u.CreatedAt,
+      CreatedAt = u.CreatedAt,
 			UpdatedAt = u.UpdatedAt
 		}).ToListAsync();
 	}
