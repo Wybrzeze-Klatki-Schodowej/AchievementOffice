@@ -13,6 +13,8 @@ public class UserProfileResponse
 
     public string JobTitle { get; set; } = string.Empty;
 
+    public bool IsActive { get; set; }
+
     public string? Bio { get; set; }
 
     public string? AvatarUrl { get; set; }
