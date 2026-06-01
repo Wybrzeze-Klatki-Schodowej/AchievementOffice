@@ -67,19 +67,4 @@ public class AdminService : IAdminService
 
 		return Result.Success();
 	}
-
-	public async Task<Result> DeleteUserAsync(Guid userId)
-	{
-		var user = await _context.Users
-			.FirstOrDefaultAsync( u => u.Id == userId && u.DeletedAt == null );
-
-		if (user == null)
-			return Result.Fail( "User not found" );
-
-		user.DeletedAt = DateTime.UtcNow;
-		user.UpdatedAt = DateTime.UtcNow;
-		await _context.SaveChangesAsync();
-
-		return Result.Success();
-	}
 }

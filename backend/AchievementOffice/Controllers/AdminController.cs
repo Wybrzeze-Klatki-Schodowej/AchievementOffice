@@ -37,18 +37,6 @@ namespace AchievementOffice.Controllers
             return Ok( new { message = "User status updated successfully" } );
         }
 
-        [HttpDelete( "users/{id:guid}" )]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            var result = await _adminService.DeleteUserAsync( id );
-            if (!result.IsSuccess)
-            {
-                return NotFound( new { message = result.ErrorMessage } );
-            }
-            return Ok( new { message = "User deleted successfully" } );
-
-        }
-
         [HttpGet( "stats" )]
         public async Task<IActionResult> GetStats()
         {
