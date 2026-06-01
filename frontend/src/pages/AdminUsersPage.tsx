@@ -129,7 +129,7 @@ export default function AdminUsersPage() {
                                             className="approve-button"
                                             onClick={() => handleToggleStatus(user.userId, true)}
                                         >
-                                            Zatwierdź
+                                            Aktywuj
                                         </button>
                                     )
                                 ) : (
