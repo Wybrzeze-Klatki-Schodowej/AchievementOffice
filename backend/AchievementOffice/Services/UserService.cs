@@ -72,6 +72,7 @@ public class UserService : IUserService
             Email = request.Email,
             UserDetails = userDetails,
             UserRoleId = userRole.Id,
+            IsActive = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };

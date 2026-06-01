@@ -10,9 +10,9 @@ export interface AdminUserProfile {
     bio?: string;
     avatarUrl?: string;
     role: string;
+    isActive: boolean;
     createdAt: string;
     updatedAt: string;
-    isActive: boolean;
 }
 
 export async function getAllUsers(isActive?: boolean): Promise<AdminUserProfile[]> {

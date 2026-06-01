@@ -44,7 +44,6 @@
     font-weight: bold;
 }
 
-/* Badge dla roli i statusów */
 .role-badge {
     background: #e2e8f0;
     padding: 0.25rem 0.5rem;
@@ -69,7 +68,6 @@
         color: #a16207;
     }
 
-/* Przycisk akceptacji */
 .approve-button {
     background-color: #22c55e;
     color: white;
@@ -87,5 +85,47 @@
 
 .error-message {
     color: #ef4444;
+    font-weight: bold;
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+    .sortable-header:hover {
+        background-color: #f3f4f6;
+    }
+
+.user-login-link,
+.user-login-link:visited,
+.user-login-link:hover,
+.user-login-link:active {
+    color: #1f2937;
+    text-decoration: none;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+    .user-login-link:hover {
+        color: #4b5563;
+    }
+
+.deactivate-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+    .deactivate-button:hover {
+        background-color: #dc2626;
+    }
+
+.text-muted-action {
+    color: #9ca3af;
     font-weight: bold;
 }
