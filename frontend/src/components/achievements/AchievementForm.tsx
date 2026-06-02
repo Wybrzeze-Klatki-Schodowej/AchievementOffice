@@ -22,6 +22,7 @@ export default function AchievementForm({
         achievement?.description ?? ""
     );
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
@@ -30,6 +31,7 @@ export default function AchievementForm({
 
         try {
             setLoading(true);
+            setError(null);
 
             if (achievement) {
                 await updateAchievement(
@@ -52,9 +54,9 @@ export default function AchievementForm({
 
             setTitle("");
             setDescription("");
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Operation failed");
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -78,9 +80,14 @@ export default function AchievementForm({
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    required
                 />
             </div>
+
+            {error && (
+                <p style={{ color: "red", marginTop: "8px" }}>
+                    {error}
+                </p>
+            )}
 
             <button type="submit" disabled={loading}>
                 {loading ? achievement ? "Saving..." : "Adding..." : achievement ? "Save changes" : "Add achievement"}
