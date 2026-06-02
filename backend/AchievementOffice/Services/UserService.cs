@@ -1,4 +1,5 @@
-﻿using AchievementOffice.Data;
+﻿using System.Text.RegularExpressions;
+using AchievementOffice.Data;
 using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +82,11 @@ public class UserService : IUserService
         if(request.Username.Any(char.IsWhiteSpace))
         {
             return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Username cannot contain spaces" };
+        }
+
+        if(!Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Invalid email format" };
         }
 
         var userDetails = new UserDetails()
@@ -203,6 +209,12 @@ public class UserService : IUserService
         {
             return Result<UserProfileResponse>
                 .Fail("Username cannot contain spaces");
+        }
+
+        if (!Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            return Result<UserProfileResponse>
+                .Fail("Invalid email format");
         }
 
         bool emailTaken = await _context.Users.AnyAsync(

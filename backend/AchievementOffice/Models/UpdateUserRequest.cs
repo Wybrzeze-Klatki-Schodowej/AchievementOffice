@@ -4,7 +4,6 @@ namespace AchievementOffice.Models
 {
     public class UpdateUserRequest
     {
-        [EmailAddress]
         public required string Email { get; set; }
 
         public required string Username { get; set; }
