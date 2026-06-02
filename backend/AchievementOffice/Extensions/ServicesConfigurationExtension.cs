@@ -14,6 +14,8 @@ public static class ServicesConfigurationExtension
 
         services.AddScoped<IAchievementService, AchievementService>();
 
+        services.AddScoped<IAdminService, AdminService>();
+
         return services;
     }
 }

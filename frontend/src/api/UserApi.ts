@@ -7,6 +7,7 @@ export interface UserListItem {
     login: string;
     firstName: string;
     lastName: string;
+    isActive: boolean;
 }
 
 export interface UpdateUserRequest {
