@@ -7,6 +7,7 @@ import UserList from "../components/users/UserList";
 export default function AppLayout() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
     const handleAchievementCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
@@ -40,7 +41,7 @@ export default function AppLayout() {
                         overflowY: "auto",
                     }}
                 >
-                    <UserList />
+                    <UserList refreshTrigger={usersRefreshTrigger} />
                 </aside>
 
                 <main 
@@ -52,7 +53,11 @@ export default function AppLayout() {
                     }}
                 >
                     <Outlet 
-                        context={{ refreshTrigger }}
+                        context={{ 
+                            refreshTrigger,
+                            refreshUsers: () =>
+                                setUsersRefreshTrigger(prev => prev + 1)
+                        }}
                     />
                 </main>
             </div>

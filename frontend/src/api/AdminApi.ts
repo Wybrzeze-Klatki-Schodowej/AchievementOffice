@@ -32,17 +32,30 @@ export async function getAllUsers(isActive?: boolean): Promise<AdminUserProfile[
     return response.json();
 }
 
-export async function updateUserStatus(userId: string, isActive: boolean): Promise<void> {
-    const response = await fetch(`${ADMIN_API_URL}/users/${userId}/status`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ isActive: isActive })
-    });
+export async function updateUserStatus(
+    userId: string, 
+    isActive: boolean
+): Promise<void> {
+    const response = await fetch(
+        `${ADMIN_API_URL}/users/${userId}/status`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                isActive 
+            }),
+            credentials: "include"
+        }
+    );
 
     if (!response.ok) {
-        throw new Error(`Failed to update user status: ${response.status}`);
+        const error = await response.json().catch(() => null);
+
+        throw new Error(
+            error?.message ??
+            "Failed to update user status"
+        );
     }
 }

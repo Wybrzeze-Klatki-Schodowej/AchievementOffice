@@ -5,26 +5,46 @@ import type { UserProfile } from "../types/user";
 import { getUserProfile } from "../api/UserApi";
 import EditProfileModal from "../components/profile/EditProfileModal";
 import ChangePasswordModal from "../components/profile/ChangePasswordModal";
+import ManageUserModal from "../components/profile/ManageUserModal";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
 
 interface OutletContext {
     refreshTrigger: number;
+    refreshUsers: () => void;
 }
 
 export default function ProfilePage() {
-    const { refreshTrigger } = useOutletContext<OutletContext>();
+    const { 
+        refreshTrigger,
+        refreshUsers
+    } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
     const [user, setUser] = useState<UserProfile>();
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+    const [isManageUserOpen, setIsManageUserOpen] = useState(false);
 
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
     function handleUpdated(updated: UserProfile) {
         setUser(updated);
+    }
+
+    async function refreshProfile() {
+        if (!userId) {
+            return;
+        }
+
+        try {
+            const updatedUser = await getUserProfile(userId);
+            setUser(updatedUser);
+            refreshUsers();
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     useEffect(() => {
@@ -55,9 +75,15 @@ export default function ProfilePage() {
 
     const isOwnProfile = currentUserId === user.userId;
     const isAdmin = currentUserRole === "Admin";
+    const canManageUser = isAdmin && !isOwnProfile;
 
     return (
-        <div className={`profile-container ${isOwnProfile ? "profile-own" : ""}`}>
+        <div className={`
+            profile-container 
+            ${isOwnProfile ? "profile-own" : ""}
+            ${!user.isActive ? "profile-inactive" : ""}
+            `}
+        >
             <div className="profile-card">
                 <div className="profile-header">
                     <div>
@@ -75,6 +101,11 @@ export default function ProfilePage() {
                             Your profile
                         </div>
                     )}
+                    {!user.isActive && (
+                        <div className="profile-badge-inactive">
+                            Inactive user
+                        </div>
+                    )}
                     {isOwnProfile && (
                         <button onClick={() => setIsEditOpen(true)}>
                             Edit profile
@@ -83,6 +114,13 @@ export default function ProfilePage() {
                     {isOwnProfile && (
                         <button onClick={() => setIsPasswordOpen(true)}>
                             Change password
+                        </button>
+                    )}
+                    {canManageUser && (
+                        <button 
+                            onClick={() => setIsManageUserOpen(true)}
+                        >
+                            Manage user
                         </button>
                     )}
                 </div>
@@ -119,6 +157,15 @@ export default function ProfilePage() {
         {isOwnProfile && isPasswordOpen && (
             <ChangePasswordModal
                 onClose={() => setIsPasswordOpen(false)}
+            />
+        )}
+
+        {canManageUser && isManageUserOpen && (
+            <ManageUserModal 
+                userId={user.userId}
+                isActive={user.isActive}
+                onClose={() => setIsManageUserOpen(false)}
+                onUpdated={refreshProfile}
             />
         )}
     </div>

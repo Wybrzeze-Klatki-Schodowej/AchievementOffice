@@ -64,3 +64,23 @@
     background: #3b82f6;
     color: white;
 }
+
+.profile-inactive {
+    background: linear-gradient(
+        135deg,
+        #f5f5f5,
+        #ffffff
+    );
+
+    border-left: 4px solid #9ca3af;
+}
+
+.profile-badge-inactive {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    background: #9ca3af;
+    color: white;
+}
