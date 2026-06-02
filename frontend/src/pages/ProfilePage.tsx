@@ -11,10 +11,14 @@ import { getCurrentUser } from "../api/LoginApi";
 
 interface OutletContext {
     refreshTrigger: number;
+    refreshUsers: () => void;
 }
 
 export default function ProfilePage() {
-    const { refreshTrigger } = useOutletContext<OutletContext>();
+    const { 
+        refreshTrigger,
+        refreshUsers
+    } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
     const [user, setUser] = useState<UserProfile>();
@@ -37,6 +41,7 @@ export default function ProfilePage() {
         try {
             const updatedUser = await getUserProfile(userId);
             setUser(updatedUser);
+            refreshUsers();
         } catch (error) {
             console.error(error);
         }
@@ -73,7 +78,12 @@ export default function ProfilePage() {
     const canManageUser = isAdmin && !isOwnProfile;
 
     return (
-        <div className={`profile-container ${isOwnProfile ? "profile-own" : ""}`}>
+        <div className={`
+            profile-container 
+            ${isOwnProfile ? "profile-own" : ""}
+            ${!user.isActive ? "profile-inactive" : ""}
+            `}
+        >
             <div className="profile-card">
                 <div className="profile-header">
                     <div>
@@ -89,6 +99,11 @@ export default function ProfilePage() {
                     {isOwnProfile && (
                         <div className="profile-badge">
                             Your profile
+                        </div>
+                    )}
+                    {!user.isActive && (
+                        <div className="profile-badge-inactive">
+                            Inactive user
                         </div>
                     )}
                     {isOwnProfile && (
