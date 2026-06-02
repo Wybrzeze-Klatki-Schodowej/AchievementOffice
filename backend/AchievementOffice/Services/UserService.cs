@@ -58,6 +58,26 @@ public class UserService : IUserService
         if (userRole == null)
             return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = $"User role {request.RoleName} does not exist" };
 
+        if (string.IsNullOrWhiteSpace(request.Username))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Username cannot be empty" };
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Firstname))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "First name cannot be empty" };
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Lastname))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Last name cannot be empty" };
+        }
+
+        if (string.IsNullOrWhiteSpace(request.JobTitle))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Job title cannot be empty" };
+        }
+
         var userDetails = new UserDetails()
         {
             Firstname = request.Firstname,
@@ -148,6 +168,30 @@ public class UserService : IUserService
         {
             return Result<UserProfileResponse>
                 .Fail("User not found");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Username))
+        {
+            return Result<UserProfileResponse>
+                .Fail("Username cannot be empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Firstname))
+        {
+            return Result<UserProfileResponse>
+                .Fail("First name cannot be empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Lastname))
+        {
+            return Result<UserProfileResponse>
+                .Fail("Last name cannot be empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.JobTitle))
+        {
+            return Result<UserProfileResponse>
+                .Fail("Job title cannot be empty");
         }
 
         bool emailTaken = await _context.Users.AnyAsync(
