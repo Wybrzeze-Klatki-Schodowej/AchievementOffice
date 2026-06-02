@@ -20,7 +20,7 @@ export default function AdminUsersPage() {
             setError(null);
         } catch (err) {
             console.error(err);
-            setError("Nie udało się pobrać listy użytkowników.");
+            setError("Error fetching users");
         } finally {
             setLoading(false);
         }
@@ -31,12 +31,12 @@ export default function AdminUsersPage() {
     }, [fetchUsers]);
 
     const handleToggleStatus = async (userId: string, newStatus: boolean) => {
-        const actionText = newStatus ? "aktywacji" : "dezaktywacji";
+        const actionText = newStatus ? "activating" : "deactivating";
         try {
             await updateUserStatus(userId, newStatus);
             fetchUsers();
         } catch (err) {
-            alert(`Błąd podczas ${actionText} użytkownika!`);
+            alert(`Error ${actionText} user`);
             console.error(err);
         }
     };
@@ -68,14 +68,14 @@ export default function AdminUsersPage() {
         });
     }, [users, sortField, sortOrder]);
 
-    if (loading) return <div className="admin-container">Ładowanie danych...</div>;
+    if (loading) return <div className="admin-container">Loading data...</div>;
     if (error) return <div className="admin-container error-message">{error}</div>;
 
     return (
         <div className="admin-container">
             <div className="admin-header">
-                <h1>Zarządzanie Użytkownikami</h1>
-                <p>Przeglądaj konta i zatwierdzaj nowe rejestracje.</p>
+                <h1>Admin Dashboard</h1>
+                <p>Manage users and their permissions</p>
             </div>
 
             <table className="admin-table">
@@ -85,18 +85,18 @@ export default function AdminUsersPage() {
                             Login
                         </th>
                         <th onClick={() => handleSort("firstName")} className="sortable-header">
-                            Imię i Nazwisko
+                            Name
                         </th>
                         <th onClick={() => handleSort("email")} className="sortable-header">
                             Email
                         </th>
                         <th onClick={() => handleSort("role")} className="sortable-header">
-                            Rola
+                            Role
                         </th>
                         <th onClick={() => handleSort("isActive")} className="sortable-header">
                             Status
                         </th>
-                        <th>Akcje</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
                             <td><span className="role-badge">{user.role}</span></td>
                             <td>
                                 <span className={`status-badge ${user.isActive ? "active" : "pending"}`}>
-                                    {user.isActive ? "Aktywny" : "Oczekuje"}
+                                    {user.isActive ? "Active" : "Pending"}
                                 </span>
                             </td>
                             <td>
@@ -122,14 +122,14 @@ export default function AdminUsersPage() {
                                             className="deactivate-button"
                                             onClick={() => handleToggleStatus(user.userId, false)}
                                         >
-                                            Dezaktywuj
+                                            Deactivate
                                         </button>
                                     ) : (
                                         <button
                                             className="approve-button"
                                             onClick={() => handleToggleStatus(user.userId, true)}
                                         >
-                                            Aktywuj
+                                            Activate
                                         </button>
                                     )
                                 ) : (

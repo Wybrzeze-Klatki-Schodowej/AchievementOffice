@@ -9,15 +9,15 @@
     margin-bottom: 2rem;
 }
 
-    .admin-header h1 {
-        margin: 0 0 0.5rem 0;
-        color: #1e293b;
-    }
+.admin-header h1 {
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+}
 
-    .admin-header p {
-        color: #64748b;
-        margin: 0;
-    }
+.admin-header p {
+    color: #64748b;
+    margin: 0;
+}
 
 .admin-table {
     width: 100%;
@@ -28,17 +28,17 @@
     overflow: hidden;
 }
 
-    .admin-table th, .admin-table td {
-        padding: 1rem 1.5rem;
-        text-align: left;
-        border-bottom: 1px solid #e2e8f0;
-    }
+.admin-table th, .admin-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
 
-    .admin-table th {
-        background-color: #f8fafc;
-        color: #475569;
-        font-weight: 600;
-    }
+.admin-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
 
 .font-bold {
     font-weight: bold;
@@ -58,15 +58,15 @@
     font-weight: 500;
 }
 
-    .status-badge.active {
-        background-color: #dcfce7;
-        color: #15803d;
-    }
+.status-badge.active {
+    background-color: #dcfce7;
+    color: #15803d;
+}
 
-    .status-badge.pending {
-        background-color: #fef9c3;
-        color: #a16207;
-    }
+.status-badge.pending {
+    background-color: #fef9c3;
+    color: #a16207;
+}
 
 .approve-button {
     background-color: #22c55e;
@@ -79,9 +79,9 @@
     transition: background 0.2s;
 }
 
-    .approve-button:hover {
-        background-color: #16a34a;
-    }
+.approve-button:hover {
+    background-color: #16a34a;
+}
 
 .error-message {
     color: #ef4444;
@@ -93,9 +93,9 @@
     user-select: none;
 }
 
-    .sortable-header:hover {
-        background-color: #f3f4f6;
-    }
+.sortable-header:hover {
+    background-color: #f3f4f6;
+}
 
 .user-login-link,
 .user-login-link:visited,
@@ -107,9 +107,9 @@
     cursor: pointer;
 }
 
-    .user-login-link:hover {
-        color: #4b5563;
-    }
+.user-login-link:hover {
+    color: #4b5563;
+}
 
 .deactivate-button {
     background-color: #ef4444;
@@ -121,9 +121,9 @@
     font-weight: 500;
 }
 
-    .deactivate-button:hover {
-        background-color: #dc2626;
-    }
+.deactivate-button:hover {
+    background-color: #dc2626;
+}
 
 .text-muted-action {
     color: #9ca3af;
