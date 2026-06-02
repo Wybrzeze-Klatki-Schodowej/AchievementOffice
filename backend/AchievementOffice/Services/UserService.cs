@@ -78,6 +78,11 @@ public class UserService : IUserService
             return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Job title cannot be empty" };
         }
 
+        if(request.Username.Any(char.IsWhiteSpace))
+        {
+            return new UserRegistrationResult() { IsSuccessful = false, ErrorMessage = "Username cannot contain spaces" };
+        }
+
         var userDetails = new UserDetails()
         {
             Firstname = request.Firstname,
@@ -192,6 +197,12 @@ public class UserService : IUserService
         {
             return Result<UserProfileResponse>
                 .Fail("Job title cannot be empty");
+        }
+
+        if (request.Username.Any(char.IsWhiteSpace))
+        {
+            return Result<UserProfileResponse>
+                .Fail("Username cannot contain spaces");
         }
 
         bool emailTaken = await _context.Users.AnyAsync(
