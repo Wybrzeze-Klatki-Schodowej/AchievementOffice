@@ -11,6 +11,8 @@ export interface UserProfile {
 
     jobTitle: string;
 
+    isActive: boolean;
+
     bio?: string;
 
     avatarUrl?: string;
