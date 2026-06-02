@@ -33,7 +33,6 @@ public class AdminService : IAdminService
 			FirstName = u.UserDetails.Firstname,
 			LastName = u.UserDetails.Lastname,
 			JobTitle = u.UserDetails.JobTitle,
-			IsActive = u.IsActive,
 			Role = u.UserRole.Name,
 			IsActive = u.IsActive,
 			CreatedAt = u.CreatedAt,
