@@ -130,7 +130,17 @@ export default function EditProfileModal({
                     </div>
 
                     {error && (
-                        <p className="error">{error}</p>
+                        <pre 
+                            className="error-message"
+                            style={{
+                                color: 'red', 
+                                margin: '1rem 0',
+                                whiteSpace: 'pre-wrap',
+                                fontFamily: 'inherit'
+                            }}
+                        >
+                            {error}
+                        </pre>
                     )}
 
                     <div className="modal-actions">

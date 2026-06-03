@@ -26,6 +26,20 @@ export interface ChangePasswordRequest {
     confirmNewPassword: string;
 }
 
+function getErrorMessage(error: any, defaultMessage: string): string {
+    if (error?.message) {
+        return error.message;
+    }
+
+    if (error?.errors) {
+        return Object.values(error.errors)
+            .flat()
+            .join("\n");
+    }
+
+    return defaultMessage;
+}
+
 export async function getUserProfile(
     userId: string
 ): Promise<UserProfile> {
@@ -87,7 +101,9 @@ export async function updateUserProfile(
 
     if (!res.ok) {
         const error = await res.json().catch(() => null);
-        throw new Error(error?.message ?? "Error updating profile");
+        throw new Error(
+            getErrorMessage(error, "Error updating profile")
+        );
     }
 
     return res.json();
@@ -107,6 +123,8 @@ export async function changePassword(
 
     if (!res.ok) {
         const error = await res.json().catch(() => null);
-        throw new Error(error?.message ?? "Error changing password");
+        throw new Error(
+            getErrorMessage(error, "Error changing password")
+        );
     }
 }
