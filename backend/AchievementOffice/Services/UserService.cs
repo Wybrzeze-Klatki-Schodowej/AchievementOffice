@@ -145,6 +145,7 @@ public class UserService : IUserService
             );
 
         if (user == null)
+        //public async Task<List<UserDto>> GetAllUsersAsync2()
         {
             return Result<UserProfileResponse>
                 .Fail("User not found");
