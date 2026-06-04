@@ -4,7 +4,6 @@ namespace AchievementOffice.Services;
 
 public interface IUserService
 {
-<<<<<<< HEAD
     Task<LoginResult> LoginAsync(LoginRequest request);
     Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
 
@@ -21,12 +20,13 @@ public interface IUserService
         Guid userId,
         ChangePasswordRequest request
     );
-=======
-    public interface IUserService
-    {
-        Task<LoginResult> LoginAsync(LoginRequest request);
-        Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
-        Task<List<UserDto>> GetAllUsersAsync();
-    }
->>>>>>> d4df33e ([AOF-18] Added basic possibility to manage shoutouts from the frontend)
 }
+
+/*
+public interface IUserService
+{
+    Task<LoginResult> LoginAsync(LoginRequest request);
+    Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
+    Task<List<UserDto>> GetAllUsersAsync();
+} 
+*/

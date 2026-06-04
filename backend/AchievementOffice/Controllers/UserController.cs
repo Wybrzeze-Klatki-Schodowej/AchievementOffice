@@ -9,7 +9,6 @@ namespace AchievementOffice.Controllers
 {
     [ApiController]
     [Route("api/users")]
-<<<<<<< HEAD
     [Authorize]
     public class UserController : ControllerBase
     {
@@ -109,8 +108,11 @@ namespace AchievementOffice.Controllers
                 Message = "Password changed successfully"
             });
         }
-=======
-    public class UserController : ControllerBase
+    }
+}
+
+/*
+public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
 
@@ -126,6 +128,5 @@ namespace AchievementOffice.Controllers
 
             return Ok(users);
         }
->>>>>>> d4df33e ([AOF-18] Added basic possibility to manage shoutouts from the frontend)
     }
-}
+*/
