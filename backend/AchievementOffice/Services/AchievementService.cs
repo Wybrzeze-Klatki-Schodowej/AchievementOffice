@@ -21,6 +21,9 @@ public class AchievementService : IAchievementService
         CreateAchievementRequest dto
     )
     {
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            return Result<AchievementResponse>.Fail("Title is required.");
+
         var achievement = new Achievement
         {
             AchievementId = Guid.NewGuid(),
@@ -67,6 +70,9 @@ public class AchievementService : IAchievementService
 
         if (achievement == null)
             return Result<AchievementResponse>.Fail("Achievement not found.");
+        
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            return Result<AchievementResponse>.Fail("Title is required.");
 
         var userId = GetUserId();
         var role = GetRole();
