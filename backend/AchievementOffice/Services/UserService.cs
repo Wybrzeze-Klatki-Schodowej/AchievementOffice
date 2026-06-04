@@ -174,6 +174,13 @@ public class UserService : IUserService
         }
 
         if (user.Email != request.Email)
+        //     return new UserDto
+        //     {
+        //         UserId = user.Id,
+        //         Login = user.Login
+        //     };
+        // }
+        // public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
         {
             user.LastEmail = user.Email;
             user.Email = request.Email;
