@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
+    public DbSet<Comment> Comments => Set<Comment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
