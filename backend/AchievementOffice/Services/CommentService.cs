@@ -26,6 +26,7 @@ public class CommentService : ICommentService
             .Select(c => new CommentResponse
             {
                 Id = c.Id,
+                AuthorId = c.AuthorId,
                 AuthorLogin = c.Author.Login,
                 AuthorFirstName = c.Author.UserDetails.Firstname,
                 AuthorLastName = c.Author.UserDetails.Lastname,
@@ -81,6 +82,7 @@ public class CommentService : ICommentService
         var response = new CommentResponse
         {
             Id = comment.Id,
+            AuthorId = author.Id,
             AuthorLogin = author.Login,
             AuthorFirstName = author.UserDetails.Firstname,
             AuthorLastName = author.UserDetails.Lastname,
@@ -121,6 +123,7 @@ public class CommentService : ICommentService
         var response = new CommentResponse
         {
             Id = comment.Id,
+            AuthorId = comment.AuthorId,
             AuthorLogin = comment.Author.Login,
             AuthorFirstName = comment.Author.UserDetails.Firstname,
             AuthorLastName = comment.Author.UserDetails.Lastname,

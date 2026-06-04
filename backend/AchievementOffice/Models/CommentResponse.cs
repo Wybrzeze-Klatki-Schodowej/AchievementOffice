@@ -3,6 +3,8 @@ namespace AchievementOffice.Models;
 public class CommentResponse
 {
     public Guid Id { get; set; }
+
+    public Guid AuthorId { get; set; }
     
     public string AuthorLogin { get; set; } = string.Empty;
 
