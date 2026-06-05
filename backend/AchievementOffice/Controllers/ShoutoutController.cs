@@ -19,65 +19,80 @@ namespace AchievementOffice.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<ShoutoutResponseDto>> Create(CreateShoutoutDto createDto)
+        public async Task<ActionResult<ShoutoutResponse>> Create(CreateShoutoutRequest createDto)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if(!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { message = "Invalid user ID in token." });
+            // if(!Guid.TryParse(userIdClaim, out var userId))
+            //     return Unauthorized(new { message = "Invalid user ID in token." });
 
-            var shoutout = await _shoutoutService.CreateAsync(createDto, userId);
+            var shoutout = await _shoutoutService.CreateAsync(createDto);
 
-            // return CreatedAtAction(
-            //     nameof(GetShoutoutById),
-            //     new { id = shoutout.ShoutoutId },
-            //     shoutout
-            // );
+            if (!shoutout.IsSuccess)
+                return BadRequest(new { message = shoutout.ErrorMessage });
 
-            return Ok(shoutout);
+            return CreatedAtAction(
+                nameof(GetShoutoutById),
+                new { id = shoutout.Value!.ShoutoutId },
+                shoutout.Value
+            );
         }
 
+        [Authorize]
         [HttpPut("{shoutoutId:guid}")]
-        public async Task<ActionResult<ShoutoutResponseDto>> Update(Guid shoutoutId, UpdateShoutoutDto updateDto)
+        public async Task<ActionResult<ShoutoutResponse>> Update(Guid shoutoutId, UpdateShoutoutRequest updateDto)
         {
-            var shoutout = await _shoutoutService.UpdateAsync(shoutoutId, updateDto);
+            var updated = await _shoutoutService.UpdateAsync(shoutoutId, updateDto);
 
-            if (shoutout == null)
-                return NotFound();
+            if (!updated.IsSuccess)
+                return updated.ErrorMessage switch
+                {
+                    "Not found" => NotFound(),
+                    "Forbidden" => Forbid(),
+                    _ => BadRequest(new { message = updated.ErrorMessage })
+                };
 
-            return Ok(shoutout);
+            return Ok(updated.Value);
         }
 
-
+        [Authorize]
         [HttpDelete("{shoutoutId:guid}")]
-        public async Task<ActionResult> Delete([FromRoute] Guid shoutoutId)
+        public async Task<ActionResult> Delete(Guid shoutoutId)
         {
             var deleted = await _shoutoutService.DeleteAsync(shoutoutId);
 
-            if (!deleted)
-                return NotFound();
+            if (!deleted.IsSuccess)
+                return deleted.ErrorMessage switch
+                {
+                    "Not found" => NotFound(),
+                    "Forbidden" => Forbid(),
+                    _ => BadRequest(new { message = deleted.ErrorMessage })
+                };
 
             return NoContent();
         }
 
         [HttpGet("{shoutoutId:guid}")]
-        public async Task<ActionResult<ShoutoutResponseDto>> GetShoutoutById([FromRoute] Guid shoutoutId)
+        public async Task<ActionResult<ShoutoutResponse>> GetShoutoutById(Guid shoutoutId)
         {
             var shoutout = await _shoutoutService.GetShoutoutByIdAsync(shoutoutId);
 
-            if (shoutout == null)
-                return NotFound();
+            if (!shoutout.IsSuccess)
+                return NotFound(new { message = shoutout.ErrorMessage });
 
-            return Ok(shoutout);
+            return Ok(shoutout.Value);
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<List<ShoutoutResponseDto>>> GetAllShoutouts()
+        public async Task<ActionResult<List<ShoutoutResponse>>> GetAllShoutouts()
         {
             var shoutouts = await _shoutoutService.GetAllShoutoutsAsync();
 
-            return Ok(shoutouts);
+            if (!shoutouts.IsSuccess)
+                return BadRequest(new {message = shoutouts.ErrorMessage});
+
+            return Ok(shoutouts.Value);
         }
     }
 }

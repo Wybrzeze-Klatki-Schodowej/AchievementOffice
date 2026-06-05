@@ -4,10 +4,10 @@ namespace AchievementOffice.Services
 {
     public interface IShoutoutService
     {
-        Task<ShoutoutResponseDto> CreateAsync(CreateShoutoutDto createDto, Guid senderId);
-        Task<ShoutoutResponseDto?> UpdateAsync(Guid shoutoutId, UpdateShoutoutDto updateDto);
-        Task<bool> DeleteAsync(Guid shoutoutId);
-        Task<ShoutoutResponseDto?> GetShoutoutByIdAsync(Guid shoutoutId);
-        Task<List<ShoutoutResponseDto>> GetAllShoutoutsAsync();
+        Task<Result<ShoutoutResponse>> CreateAsync(CreateShoutoutRequest createDto);
+        Task<Result<ShoutoutResponse>> UpdateAsync(Guid shoutoutId, UpdateShoutoutRequest updateDto);
+        Task<Result<bool>> DeleteAsync(Guid shoutoutId);
+        Task<Result<ShoutoutResponse>> GetShoutoutByIdAsync(Guid shoutoutId);
+        Task<Result<List<ShoutoutResponse>>> GetAllShoutoutsAsync();
     }
 }

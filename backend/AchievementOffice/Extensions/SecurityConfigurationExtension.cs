@@ -20,34 +20,9 @@ public static class SecurityConfigurationExtension
 
         services.AddAuthentication(opt =>
         {
-<<<<<<< HEAD
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
-=======
-            var corsConfiguration = configuration.GetSection(CorsConfiguration.SectionName).Get<CorsConfiguration>();
-            var jwtConfiguration = configuration.GetSection(JwtConfiguration.SectionName).Get<JwtConfiguration>();
-
-            if (corsConfiguration == null) throw new InvalidOperationException("CORS configuration is missing.");
-            if (jwtConfiguration == null) throw new InvalidOperationException("JWT configuration is missing.");
-
-            services.AddCors(options => AddReactPolicy(options, corsConfiguration.FrontUrl));
-
-            services.AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = GetValidationParameters(jwtConfiguration!);
-                options.Events = GetJwtBearerEvents();
-            });
-
-            return services;
-        }
-
-        private static void AddReactPolicy(CorsOptions options, string frontUrl)
->>>>>>> d4df33e ([AOF-18] Added basic possibility to manage shoutouts from the frontend)
         {
             options.TokenValidationParameters = GetValidationParameters(jwtConfiguration!);
             options.Events = GetJwtBearerEvents();

@@ -1,5 +1,3 @@
-
-
 export interface Shoutout {
     shoutoutId: string;
     senderId: string;
