@@ -10,14 +10,20 @@ export default function UserSearch({
     onChange
 }: Props) {
     return (
-        <input 
-            className="user-search"
-            type="text"
-            placeholder="Search users..."
-            value={value}
-            onChange={(e) =>
-                onChange(e.target.value)
-            }
-        />
+        <div className="user-search-container">
+            <label className="user-search-label">
+                Search
+            </label>
+
+            <input 
+                className="user-search"
+                type="text"
+                placeholder="Search users..."
+                value={value}
+                onChange={(e) =>
+                    onChange(e.target.value)
+                }
+            />
+        </div>
     );
 }
