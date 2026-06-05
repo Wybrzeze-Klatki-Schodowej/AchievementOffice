@@ -1,0 +1,17 @@
+.user-search {
+    width: 100%;
+    padding: 8px 10px;
+    box-sizing: border-box;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    margin-bottom: 12px;
+}
+
+.user-search:focus {
+    outline: none;
+    border-color: #2563eb;
+}
