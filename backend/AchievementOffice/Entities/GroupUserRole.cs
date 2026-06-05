@@ -2,7 +2,7 @@
 {
     public class GroupUserRole
     {
-        public Guid GroupUserRoleId { get; set; }
+        public int GroupUserRoleId { get; set; }
         public required string Name { get; set; }
     }
 }

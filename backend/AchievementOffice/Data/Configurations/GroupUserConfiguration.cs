@@ -34,7 +34,7 @@ namespace AchievementOffice.Data.Configurations
                 .HasForeignKey(gu => gu.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(gu => gu.GroupUserRoleId)
+            builder.HasOne(gu => gu.GroupUserRole)
                 .WithMany()
                 .HasForeignKey(gu => gu.GroupUserRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
