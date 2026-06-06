@@ -98,17 +98,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("AchievementApprove", (string)null);
                 });
 
-            modelBuilder.Entity("AchievementOffice.Entities.Group", b =>
-                {
-                    b.Property<Guid>("GroupId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("group_id");
-
-                    b.Property<string>("AvatarUrl")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("group_avatar_url");
             modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -126,6 +115,49 @@ namespace AchievementOffice.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("ProfileUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("profile_user_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId")
+                        .HasDatabaseName("ix_comments_author");
+
+                    b.HasIndex("ProfileUserId")
+                        .HasDatabaseName("ix_comments_profile_user");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.Group", b =>
+                {
+                    b.Property<Guid>("GroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("group_avatar_url");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -235,25 +267,6 @@ namespace AchievementOffice.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ranks", (string)null);
-                    b.Property<Guid>("ProfileUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("profile_user_id");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId")
-                        .HasDatabaseName("ix_comments_author");
-
-                    b.HasIndex("ProfileUserId")
-                        .HasDatabaseName("ix_comments_profile_user");
-
-                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -415,6 +428,27 @@ namespace AchievementOffice.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_comments_author");
+
+                    b.HasOne("AchievementOffice.Entities.User", "ProfileUser")
+                        .WithMany()
+                        .HasForeignKey("ProfileUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_comments_profile_user");
+
+                    b.Navigation("Author");
+
+                    b.Navigation("ProfileUser");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.GroupUser", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.Group", "Group")
@@ -451,25 +485,6 @@ namespace AchievementOffice.Migrations
                         .IsRequired();
 
                     b.Navigation("Group");
-            modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_comments_author");
-
-                    b.HasOne("AchievementOffice.Entities.User", "ProfileUser")
-                        .WithMany()
-                        .HasForeignKey("ProfileUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_comments_profile_user");
-
-                    b.Navigation("Author");
-
-                    b.Navigation("ProfileUser");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
