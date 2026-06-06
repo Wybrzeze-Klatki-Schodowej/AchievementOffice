@@ -1,0 +1,42 @@
+.user-search-container {
+    margin-bottom: 6px;
+}
+
+.user-search-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #6b7280;
+}
+
+.user-search {
+    width: 100%;
+    padding: 8px 10px;
+    box-sizing: border-box;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.user-search:focus {
+    outline: none;
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.12);
+}
+
+.user-search::placeholder {
+    color: #9ca3af;
+}
