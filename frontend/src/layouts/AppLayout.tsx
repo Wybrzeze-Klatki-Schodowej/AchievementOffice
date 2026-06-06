@@ -81,7 +81,8 @@ export default function AppLayout() {
                         context={{ 
                             refreshTrigger,
                             refreshUsers: () =>
-                                setUsersRefreshTrigger(prev => prev + 1)
+                            setUsersRefreshTrigger(prev => prev + 1),
+                            onAddShoutoutClick: () => setIsShoutoutModalOpen(true)
                         }}
                     />
                 </main>

@@ -9,17 +9,20 @@ import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import ManageUserModal from "../components/profile/ManageUserModal";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
+import ShoutoutModal from "../components/shoutouts/ShoutoutModal.tsx";
 
 
 interface OutletContext {
     refreshTrigger: number;
     refreshUsers: () => void;
+    onAddShoutoutClick?: () => void;
 }
 
 export default function ProfilePage() {
     const { 
         refreshTrigger,
-        refreshUsers
+        refreshUsers,
+        onAddShoutoutClick,
     } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
@@ -30,6 +33,9 @@ export default function ProfilePage() {
 
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+
+    const [isShoutoutModalOpen, setIsShoutoutModalOpen] = useState(false);
+    const [localRefreshTrigger, setLocalRefreshTrigger] = useState(0);
 
     function handleUpdated(updated: UserProfile) {
         setUser(updated);
@@ -125,6 +131,17 @@ export default function ProfilePage() {
                             Manage user
                         </button>
                     )}
+                    {!isOwnProfile && (
+                        <div className="shout-out-user">
+                            <button 
+                                onClick={() => setIsShoutoutModalOpen(true)}
+                            >
+                                Shout-out user
+                            </button>
+                        </div>
+                    )}
+
+                    
                 </div>
             </div>
 
@@ -147,7 +164,7 @@ export default function ProfilePage() {
             />
             <ShoutoutList
                 userId={userId!}
-                refreshTrigger={refreshTrigger}
+                refreshTrigger={refreshTrigger + localRefreshTrigger}
             />
 
         </div>
@@ -174,6 +191,13 @@ export default function ProfilePage() {
                 onUpdated={refreshProfile}
             />
         )}
+
+        <ShoutoutModal
+            open={isShoutoutModalOpen}
+            receiverId={userId!}
+            onClose={() => setIsShoutoutModalOpen(false)}
+            onShoutoutCreated={() => setLocalRefreshTrigger(prev => prev + 1)}
+        />
     </div>
     );
 }

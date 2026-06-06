@@ -2,7 +2,7 @@ namespace AchievementOffice.Models
 {
     public class CreateShoutoutDto
     {
-        public Guid SenderId { get; set; }
+        // public Guid SenderId { get; set; }
         public Guid ReceiverId { get; set; }
 
         public string Title { get; set; } = string.Empty;
