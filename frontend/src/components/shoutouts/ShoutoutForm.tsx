@@ -26,7 +26,6 @@ export default function ShoutoutForm({
     const [receiverId, setReceiverId] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -47,7 +46,6 @@ export default function ShoutoutForm({
                 const data: User[] = await response.json();
 
                 const current = await getCurrentUser();
-                setCurrentUserId(current.userId);
 
                 const filteredUsers = data.filter(u => u.userId !== current.userId);
                 setUsers(filteredUsers);
