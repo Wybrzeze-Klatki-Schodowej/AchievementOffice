@@ -35,6 +35,14 @@ namespace AchievementOffice.Controllers
 
             return Ok(user);
         }
+        
+        // [HttpGet]
+        // public async Task<ActionResult<List<UserDto>>> GetAllUsers()
+        // {
+        //     var users = await _userService.GetAllUsersAsync2();
+
+        //     return Ok(users);
+        // }
 
         [HttpGet]
         public async Task<IActionResult> GetAllUsersAsync()

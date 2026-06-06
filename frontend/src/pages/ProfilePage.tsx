@@ -1,4 +1,5 @@
 import AchievementList from "../components/achievements/AchievementList";
+import ShoutoutList from "../components/shoutouts/ShoutoutList.tsx";
 import { useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "../types/user";
@@ -8,7 +9,6 @@ import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import ManageUserModal from "../components/profile/ManageUserModal";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
-import ShoutoutList from "../components/shoutouts/ShoutoutList.tsx";
 
 
 interface OutletContext {
