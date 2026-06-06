@@ -11,6 +11,8 @@ public class User
     public string? LastEmail { get; set; }
     public Guid UserRoleId { get; set; }
     public UserRole UserRole { get; set; } = null!;
+    public Guid? RankId { get; set; }
+    public Rank? Rank { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; }
