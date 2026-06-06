@@ -12,8 +12,7 @@ namespace AchievementOffice.Data.Configurations
             builder.HasKey(r => r.Id);
 
             builder.Property(r => r.Id)
-                .HasColumnName("rank_id")
-                .HasDefaultValueSql("gen_random_uuid()");
+                .HasColumnName("rank_id");
 
             builder.Property(r => r.Name)
                 .HasColumnName("rank_name")
