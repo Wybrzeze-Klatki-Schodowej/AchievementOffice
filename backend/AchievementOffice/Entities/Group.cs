@@ -11,6 +11,7 @@
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
+        public ICollection<GroupUser> GroupUsers { get; set; } = [];
+        public ICollection<GroupUserRole> UserRoles { get; set; } = [];
     }
 }

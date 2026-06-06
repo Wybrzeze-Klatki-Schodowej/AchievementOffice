@@ -19,6 +19,19 @@ namespace AchievementOffice.Data.Configurations
                 .HasColumnName("group_user_role_name")
                 .IsRequired()
                 .HasMaxLength(100);
+
+            builder.Property(gur => gur.IsAdmin)
+                .HasColumnName("is_admin")
+                .IsRequired();
+
+            builder.Property(gur => gur.GroupId)
+                .HasColumnName("group_id")
+                .IsRequired();
+
+            builder.HasOne(gur => gur.Group)
+                .WithMany(g => g.UserRoles)
+                .HasForeignKey(gur => gur.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -16,5 +16,5 @@ public class User
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
+    public ICollection<GroupUser> GroupUsers { get; set; } = [];
 }
