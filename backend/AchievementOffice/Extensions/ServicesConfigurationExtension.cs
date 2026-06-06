@@ -16,6 +16,8 @@ public static class ServicesConfigurationExtension
 
         services.AddScoped<IAdminService, AdminService>();
 
+        services.AddScoped<ICommentService, CommentService>();
+
         return services;
     }
 }
