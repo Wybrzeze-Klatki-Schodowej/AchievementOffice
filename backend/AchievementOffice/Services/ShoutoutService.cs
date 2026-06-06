@@ -20,6 +20,12 @@ namespace AchievementOffice.Services
 
         public async Task<Result<ShoutoutResponse>> CreateAsync(CreateShoutoutRequest createDto)
         {
+            if (createDto.ReceiverId == GetUserId())
+                return Result<ShoutoutResponse>.Fail("Cannot send shoutout to yourself");
+
+            if (GetUserId() == Guid.Empty)
+                return Result<ShoutoutResponse>.Fail("Unauthorized");
+
             var shoutout = new Shoutout
             {
                 ShoutoutId = Guid.NewGuid(),
@@ -55,6 +61,9 @@ namespace AchievementOffice.Services
             var userId = GetUserId();
             var role = GetRole();
 
+            if (GetUserId() == Guid.Empty)
+                return Result<ShoutoutResponse>.Fail("Unauthorized");
+
             var isOwner = shoutout.SenderId == userId;
             var isAdmin = role == "Admin";
 
@@ -80,6 +89,9 @@ namespace AchievementOffice.Services
 
             var userId = GetUserId();
             var role = GetRole();
+
+            if (GetUserId() == Guid.Empty)
+                return Result<bool>.Fail("Unauthorized");
 
             var isOwner = shoutout.SenderId == userId;
             var isAdmin = role == "Admin";

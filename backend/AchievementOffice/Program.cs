@@ -17,6 +17,7 @@ builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 builder.Services.AddScoped<IShoutoutService, ShoutoutService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.SetupDatabase(builder.Configuration);
 

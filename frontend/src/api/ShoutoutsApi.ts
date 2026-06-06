@@ -35,7 +35,7 @@ export const getShoutoutById = async (id: string): Promise<Shoutout> => {
 };
 
 export const createShoutout = async (dto: CreateShoutoutDto) => {
-    const response = await fetch("http://localhost:8080/api/shoutouts", {
+    const response = await fetch(API_URL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -83,6 +83,7 @@ export const deleteShoutout = async (
 ): Promise<void> => {
     const response = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        credentials: "include",
     });
 
     if (!response.ok) {

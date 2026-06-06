@@ -5,6 +5,7 @@ import {
     type CreateShoutoutDto,
 } from "../../api/ShoutoutsApi";
 import type { Shoutout } from "../../types/shoutout";
+import { getCurrentUser } from "../../api/LoginApi";
 
 interface User {
     userId: string;
@@ -25,6 +26,7 @@ export default function ShoutoutForm({
     const [receiverId, setReceiverId] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -44,10 +46,14 @@ export default function ShoutoutForm({
 
                 const data: User[] = await response.json();
 
-                setUsers(data);
+                const current = await getCurrentUser();
+                setCurrentUserId(current.userId);
 
-                if (data.length > 0) {
-                    setReceiverId(data[0].userId);
+                const filteredUsers = data.filter(u => u.userId !== current.userId);
+                setUsers(filteredUsers);
+
+                if (filteredUsers.length > 0) {
+                    setReceiverId(filteredUsers[0].userId);
                 }
             } catch (error) {
                 console.error("FETCH USERS ERROR:", error);

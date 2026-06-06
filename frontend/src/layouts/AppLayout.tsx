@@ -12,11 +12,7 @@ export default function AppLayout() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
 
-    const handleAchievementCreated = () => {
-        setRefreshTrigger((prev) => prev + 1);
-    };
-
-    const handleShoutoutCreated = () => {
+    const handleContentCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
@@ -36,7 +32,13 @@ export default function AppLayout() {
             <AchievementModal 
                 open={isAchievementModalOpen}
                 onClose={() => setIsAchievementModalOpen(false)}
-                onAchievementCreated={handleAchievementCreated}
+                onAchievementCreated={handleContentCreated}
+            />
+
+            <ShoutoutModal 
+                open={isShoutoutModalOpen}
+                onClose={() => setIsShoutoutModalOpen(false)}
+                onShoutoutCreated={handleContentCreated}
             />
 
             <div 

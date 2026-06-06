@@ -2,7 +2,6 @@ namespace AchievementOffice.Entities
 {
     public class Shoutout
     {
-        // Konieczne może być zaktualizowanie encji User lub Shoutout lub KudosShoutout. 
         public Guid ShoutoutId { get; set; }
 
         public Guid ReceiverId { get; set; }

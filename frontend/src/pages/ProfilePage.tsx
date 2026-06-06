@@ -145,6 +145,10 @@ export default function ProfilePage() {
                 userId={userId!}
                 refreshTrigger={refreshTrigger}
             />
+            <ShoutoutList
+                userId={userId!}
+                refreshTrigger={refreshTrigger}
+            />
 
         </div>
 
