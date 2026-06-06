@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<GroupUser> GroupUser => Set<GroupUser>();
     public DbSet<GroupUserRole> GroupUserRoles => Set<GroupUserRole>();
+    public DbSet<Comment> Comments => Set<Comment>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
