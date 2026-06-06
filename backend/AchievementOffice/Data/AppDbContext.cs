@@ -9,14 +9,16 @@ public class AppDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserDetails> UserDetails => Set<UserDetails>();
+    public DbSet<Achievement> Achievements => Set<Achievement>();
+    public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
+    public DbSet<Group> Groups => Set<Group>();
+    public DbSet<GroupUser> GroupUser => Set<GroupUser>();
+    public DbSet<GroupUserRole> GroupUserRoles => Set<GroupUserRole>();
+    public DbSet<Comment> Comments => Set<Comment>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-
-    public DbSet<Achievement> Achievements => Set<Achievement>();
-    public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
-    public DbSet<Comment> Comments => Set<Comment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

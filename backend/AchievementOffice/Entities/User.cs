@@ -15,4 +15,6 @@ public class User
     public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<GroupUser> GroupUsers { get; set; } = [];
 }
