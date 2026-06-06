@@ -15,14 +15,12 @@ import ShoutoutModal from "../components/shoutouts/ShoutoutModal.tsx";
 interface OutletContext {
     refreshTrigger: number;
     refreshUsers: () => void;
-    onAddShoutoutClick?: () => void;
 }
 
 export default function ProfilePage() {
     const { 
         refreshTrigger,
         refreshUsers,
-        onAddShoutoutClick,
     } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
