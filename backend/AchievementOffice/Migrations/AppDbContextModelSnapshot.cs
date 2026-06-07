@@ -133,6 +133,8 @@ namespace AchievementOffice.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Shoutouts");
+                });
+                
             modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +367,8 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+                });
+                
             modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.User", "Author")
