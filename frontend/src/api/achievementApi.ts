@@ -35,7 +35,11 @@ export const createAchievement = async (
     });
 
     if (!response.ok) {
-        throw new Error("Failed to create achievement");
+        const error = await response.json().catch(() => null);
+
+        const message = error?.message ?? "Failed to create achievement";
+
+        throw new Error(message);
     }
 
     return response.json();
@@ -58,7 +62,9 @@ export async function updateAchievement(
     );
 
     if (!response.ok) {
-        throw new Error("Failed to update achievement");
+        const error = await response.json().catch(() => null);
+        const message = error?.message ?? "Failed to update achievement";
+        throw new Error(message);
     }
 }
 
@@ -88,7 +94,9 @@ export const approveAchievement = async (
         body: JSON.stringify({ achievementId, isApproved }),
     });
     if (!response.ok) {
-        throw new Error("Failed to approve achievement");
+        const error = await response.json().catch(() => null);
+        const message = error?.message ?? "Failed to approve achievement";
+        throw new Error(message);
     }
     return response.json();
 };

@@ -44,7 +44,7 @@ export default function Navbar({
 
     const handleAdminClick = () => {
         if (user?.userId) {
-            navigate(`/admin/users/${user.userId}`);
+            navigate(`/admin/users`);
         }
     };
 

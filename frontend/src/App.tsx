@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import { useEffect, useState } from 'react';
 import { checkAuth } from './api/LoginApi';
 import ProfilePage from './pages/ProfilePage';
+import AdminUsersPage from './pages/AdminUsersPage';
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -37,7 +38,11 @@ function App() {
           <Route 
             path="/users/:userId" 
             element={ isLoggedIn ? <ProfilePage /> : <LoginPage onLogin={() => checkLoggedIn()} />} 
-          />
+                  />
+                  <Route
+                      path="/admin/users"
+                      element={isLoggedIn ? <AdminUsersPage /> : <LoginPage onLogin={() => checkLoggedIn()} />}
+        />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -13,12 +13,11 @@ public class AdminService : IAdminService
 		_context = context;
 	}
 
-	public async Task<List<UserProfileResponse>> GetAllUsersAsync(bool? isActiveFilter = null)
+	public async Task<List<AdminUserProfileResponse>> GetAllUsersAsync(bool? isActiveFilter = null)
 	{
 		var query = _context.Users
 			.Include(u => u.UserDetails)
 			.Include(u => u.UserRole)
-			.Where(u => u.UserRole.Name != "Admin")
 			.Where(u => u.DeletedAt == null);
 
 		if (isActiveFilter.HasValue)
@@ -26,7 +25,7 @@ public class AdminService : IAdminService
 			query = query.Where(u => u.IsActive == isActiveFilter.Value);
 		}
 
-		return await query.Select(u => new UserProfileResponse
+		return await query.Select(u => new AdminUserProfileResponse
 		{
 			UserId = u.Id,
 			Login = u.Login,
@@ -34,8 +33,8 @@ public class AdminService : IAdminService
 			FirstName = u.UserDetails.Firstname,
 			LastName = u.UserDetails.Lastname,
 			JobTitle = u.UserDetails.JobTitle,
-			IsActive = u.IsActive,
 			Role = u.UserRole.Name,
+			IsActive = u.IsActive,
 			CreatedAt = u.CreatedAt,
 			UpdatedAt = u.UpdatedAt
 		}).ToListAsync();
