@@ -15,6 +15,9 @@ public class AppDbContext : DbContext
     public DbSet<GroupUser> GroupUser => Set<GroupUser>();
     public DbSet<GroupUserRole> GroupUserRoles => Set<GroupUserRole>();
     public DbSet<Comment> Comments => Set<Comment>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<AchievementVerificationRequest> AchievementVerificationRequests 
+        => Set<AchievementVerificationRequest>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
