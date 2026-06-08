@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom"; // <-- Removed useNavigate
+import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import AchievementModal from "../components/achievements/AchievementModal";
 import UserList from "../components/users/UserList";
 
 export default function AppLayout() {
-    // <-- Removed const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
@@ -66,7 +65,7 @@ export default function AppLayout() {
                         }}
                     />
                 </main>
-            </div>
+            </div> 
         </>
     );
 }

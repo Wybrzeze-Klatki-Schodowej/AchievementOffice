@@ -1,4 +1,3 @@
-// src/pages/GroupPage.tsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getGroupById, getGroupMembers, removeGroupMember, type Group, type GroupMember } from "../api/GroupApi";

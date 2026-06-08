@@ -1,17 +1,14 @@
-// src/pages/GroupsPage.tsx
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getGroups, createGroup, type Group } from "../api/GroupApi";
 import { getCurrentUser } from "../api/LoginApi";
-import "./GroupsPage.css"; // We'll create this CSS next
+import "./GroupsPage.css";
 
 export default function GroupsPage() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newGroup, setNewGroup] = useState({ name: "", description: "", maxUserCount: 100 });
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -34,7 +31,7 @@ export default function GroupsPage() {
             await createGroup(newGroup);
             setShowCreateModal(false);
             setNewGroup({ name: "", description: "", maxUserCount: 100 });
-            fetchData(); // Refresh list
+            fetchData();
         } catch (err: any) {
             alert(err.message);
         }
