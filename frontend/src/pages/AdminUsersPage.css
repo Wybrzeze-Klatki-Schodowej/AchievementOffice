@@ -1,0 +1,131 @@
+.admin-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: sans-serif;
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+}
+
+.admin-header p {
+    color: #64748b;
+    margin: 0;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.admin-table th, .admin-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.role-badge {
+    background: #e2e8f0;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.pending {
+    background-color: #fef9c3;
+    color: #a16207;
+}
+
+.approve-button {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.approve-button:hover {
+    background-color: #16a34a;
+}
+
+.error-message {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-header:hover {
+    background-color: #f3f4f6;
+}
+
+.user-login-link,
+.user-login-link:visited,
+.user-login-link:hover,
+.user-login-link:active {
+    color: #1f2937;
+    text-decoration: none;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.user-login-link:hover {
+    color: #4b5563;
+}
+
+.deactivate-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.deactivate-button:hover {
+    background-color: #dc2626;
+}
+
+.text-muted-action {
+    color: #9ca3af;
+    font-weight: bold;
+}
