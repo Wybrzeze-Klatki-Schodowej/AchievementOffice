@@ -18,6 +18,11 @@ public static class ServicesConfigurationExtension
 
         services.AddScoped<ICommentService, CommentService>();
 
+        services.AddScoped<INotificationService, NotificationService>();
+
+        services.AddScoped<IAchievementVerificationRequestService, 
+            AchievementVerificationRequestService>();
+
         return services;
     }
 }
