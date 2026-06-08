@@ -3,6 +3,7 @@ using System;
 using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608203847_AddGroups")]
+    partial class AddGroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,48 +99,6 @@ namespace AchievementOffice.Migrations
                         .IsUnique();
 
                     b.ToTable("AchievementApprove", (string)null);
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("AchievementId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("achievement_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid>("RequesterUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("requester_user_id");
-
-                    b.Property<DateTime?>("RespondedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("responded_at");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<Guid>("TargetUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("target_user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AchievementId");
-
-                    b.HasIndex("RequesterUserId");
-
-                    b.HasIndex("TargetUserId");
-
-                    b.ToTable("achievement_verification_requests", (string)null);
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
@@ -286,81 +247,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("GroupUserRole", (string)null);
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("AchievementVerificationRequestId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("achievement_verification_request_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_read");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("message");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("title");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AchievementVerificationRequestId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("notifications", (string)null);
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
-                    b.Property<decimal>("Multiplier")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric")
-                        .HasDefaultValue(1m)
-                        .HasColumnName("multiplier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("rank_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ranks", (string)null);
-                });
-
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -411,10 +297,6 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("password_hash");
 
-                    b.Property<Guid?>("RankId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -435,11 +317,22 @@ namespace AchievementOffice.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_user_login");
 
-                    b.HasIndex("RankId");
-
                     b.HasIndex("UserRoleId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                            CreatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@example.com",
+                            IsActive = true,
+                            Login = "admin_test",
+                            Password = "nihjcbweiij12",
+                            UpdatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UserRoleId = new Guid("fb279f32-7235-4306-8968-380f76953e6b")
+                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
@@ -520,33 +413,6 @@ namespace AchievementOffice.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.Achievement", "Achievement")
-                        .WithMany()
-                        .HasForeignKey("AchievementId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AchievementOffice.Entities.User", "RequesterUser")
-                        .WithMany()
-                        .HasForeignKey("RequesterUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AchievementOffice.Entities.User", "TargetUser")
-                        .WithMany()
-                        .HasForeignKey("TargetUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Achievement");
-
-                    b.Navigation("RequesterUser");
-
-                    b.Navigation("TargetUser");
-                });
-
             modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.User", "Author")
@@ -606,43 +472,14 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Group");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.AchievementVerificationRequest", "AchievementVerificationRequest")
-                        .WithMany()
-                        .HasForeignKey("AchievementVerificationRequestId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("AchievementOffice.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AchievementVerificationRequest");
-
-                    b.Navigation("User");
-                });
-
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
-                    b.HasOne("AchievementOffice.Entities.Rank", "Rank")
-                        .WithMany("Users")
-                        .HasForeignKey("RankId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_rank");
-
                     b.HasOne("AchievementOffice.Entities.UserRole", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_users_roles");
-
-                    b.Navigation("Rank");
 
                     b.Navigation("UserRole");
                 });
@@ -666,14 +503,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("UserRoles");
                 });
 
-<<<<<<< HEAD
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Navigation("GroupUsers");

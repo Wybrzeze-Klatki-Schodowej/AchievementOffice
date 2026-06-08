@@ -64,6 +64,10 @@ export default function Navbar({
                     </button>
                 )}
 
+                <button onClick={() => navigate('/groups')}>
+                    Groups
+                </button>
+
                 <button
                     onClick={handleProfileClick}
                 >

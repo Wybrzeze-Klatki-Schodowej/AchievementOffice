@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom"; // <-- Removed useNavigate
 import Navbar from "../components/layout/Navbar";
 import AchievementModal from "../components/achievements/AchievementModal";
 import UserList from "../components/users/UserList";
 
 export default function AppLayout() {
+    // <-- Removed const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
+    
     const handleAchievementCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
@@ -38,10 +40,14 @@ export default function AppLayout() {
                         width: "250px",
                         borderRight: "1px solid #ddd",
                         height: "calc(100vh - 60px)",
-                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column"
                     }}
                 >
-                    <UserList refreshTrigger={usersRefreshTrigger} />
+
+                    <div style={{ flex: 1, overflowY: "auto" }}>
+                        <UserList refreshTrigger={usersRefreshTrigger} />
+                    </div>
                 </aside>
 
                 <main 
