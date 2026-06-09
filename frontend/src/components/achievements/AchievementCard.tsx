@@ -1,6 +1,7 @@
 import type { Achievement, AchievementApprovalSummary } from "../../types/achievement";
 import { approveAchievement, getApprovalSummary } from "../../api/achievementApi";
 import { useState, useEffect, useCallback } from "react";
+import SelectReviewerModal from "./SelectReviewerModal";
 
 interface Props {
     achievement: Achievement;
@@ -19,6 +20,7 @@ export default function AchievementCard({
 }: Props) {
 
     const [loading, setLoading] = useState(false);
+    const [showReviewerModal, setShowReviewerModal] = useState(false);
 
     const [summary, setSummary] = 
         useState<AchievementApprovalSummary>({ 
@@ -59,6 +61,7 @@ export default function AchievementCard({
             setLoading(false);
         }
     };
+
     return (
         <div
             style={{
@@ -123,6 +126,22 @@ export default function AchievementCard({
                         Delete
                     </button>
                 </div>
+            )}
+
+            {isOwner && (
+                <div style={{ marginTop: 12 }}>
+                    <button onClick={() => setShowReviewerModal(true)}>
+                        Request verification
+                    </button>
+                </div>
+            )}
+
+            {showReviewerModal && (
+                <SelectReviewerModal 
+                    achievementId={achievement.achievementId}
+                    onClose={() => setShowReviewerModal(false)}
+                    onSuccess={fetchSummary}
+                />
             )}
         </div>
     );
