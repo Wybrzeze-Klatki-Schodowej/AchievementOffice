@@ -75,6 +75,10 @@ namespace AchievementOffice.Services
 
         public async Task<Result<List<UserResponse>>> GetAllUsersWithRank(Guid rankId)
         {
+            var rankExist = await _context.Ranks.AnyAsync(r => r.Id == rankId);
+
+            if (!rankExist) return Result<List<UserResponse>>.Fail("Rank does not exsist");
+
             var users = await _context.Users.Where(u => u.RankId == rankId).ToListAsync();
             var res = users.Select(MapToDto).ToList();
             return Result<List<UserResponse>>.Success(res);
