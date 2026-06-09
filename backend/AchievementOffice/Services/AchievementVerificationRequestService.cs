@@ -111,7 +111,8 @@ public class AchievementVerificationRequestService
             .Success(MapToResponse(
                 verificationRequest,
                 string.Empty,
-                targetUser.Login));
+                targetUser.Login,
+                achievement.Title));
     }
 
     public async Task<Result>
@@ -143,6 +144,7 @@ public class AchievementVerificationRequestService
     {
         var requests = 
             await _context.AchievementVerificationRequests
+                .Include(r => r.Achievement)
                 .Include(r => r.RequesterUser)
                 .Include(r => r.TargetUser)
                 .Where(r =>
@@ -155,7 +157,8 @@ public class AchievementVerificationRequestService
                 MapToResponse(
                     r,
                     r.RequesterUser.Login,
-                    r.TargetUser.Login))
+                    r.TargetUser.Login,
+                    r.Achievement.Title))
             .ToList();
 
         return Result<List<AchievementVerificationRequestResponse>>
@@ -239,12 +242,14 @@ public class AchievementVerificationRequestService
         MapToResponse(
             AchievementVerificationRequest request,
             string requesterLogin,
-            string targetLogin)
+            string targetLogin,
+            string achievementTitle)
     {
         return new AchievementVerificationRequestResponse
         {
             Id = request.Id,
             AchievementId = request.AchievementId,
+            AchievementTitle = achievementTitle,
             RequesterUserId = request.RequesterUserId,
             RequesterLogin = requesterLogin,
             TargetUserId = request.TargetUserId,
@@ -302,5 +307,31 @@ public class AchievementVerificationRequestService
 
         return Result<List<UserReviewerResponse>>
             .Success(availableUsers);
+    }
+
+    public async Task<Result<AchievementVerificationRequestResponse>>
+        GetByIdAsync(Guid requestId)
+    {
+        var request =
+            await _context.AchievementVerificationRequests
+                .Include(r => r.Achievement)
+                .Include(r => r.RequesterUser)
+                .Include(r => r.TargetUser)
+                .FirstOrDefaultAsync(r =>
+                    r.Id == requestId);
+
+        if (request == null)
+        {
+            return Result<AchievementVerificationRequestResponse>
+                .Fail("Verification request not found");
+        }
+
+        return Result<AchievementVerificationRequestResponse>
+            .Success(
+                MapToResponse(
+                    request,
+                    request.RequesterUser.Login,
+                    request.TargetUser.Login,
+                    request.Achievement.Title));
     }
 }

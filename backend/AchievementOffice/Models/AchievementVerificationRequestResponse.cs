@@ -14,6 +14,8 @@ public class AchievementVerificationRequestResponse
 
     public string TargetUserLogin { get; set; } = string.Empty;
 
+    public string AchievementTitle { get; set; } = string.Empty;
+
     public string Status { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }

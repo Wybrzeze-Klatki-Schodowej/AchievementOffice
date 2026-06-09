@@ -175,4 +175,22 @@ public class AchievementVerificationRequestController
 
         return Ok(result.Value);
     }
+
+    [HttpGet(
+        "api/verification-requests/{id:guid}")]
+    public async Task<ActionResult<AchievementVerificationRequestResponse>>
+        GetById(Guid id)
+    {
+        var result = await _verificationRequestService.GetByIdAsync(id);
+
+        if (!result.IsSuccess)
+        {
+            return NotFound(new
+            {
+                message = result.ErrorMessage
+            });
+        }
+
+        return Ok(result.Value);
+    }
 }

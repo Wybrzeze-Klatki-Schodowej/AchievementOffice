@@ -25,4 +25,7 @@ public interface IAchievementVerificationRequestService
 
     Task<Result<List<UserReviewerResponse>>>
         GetAvailableReviewersAsync(Guid achievementId);
+
+    Task<Result<AchievementVerificationRequestResponse>>
+        GetByIdAsync(Guid requestId);
 }

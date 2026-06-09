@@ -122,3 +122,23 @@ export async function getAvailableReviewers(
 
     return response.json();
 }
+
+export async function getVerificationRequest(
+    requestId: string
+): Promise<AchievementVerificationRequest> {
+
+    const response = await fetch(
+        `${API_URL}/verification-requests/${requestId}`,
+        {
+            credentials: "include"
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to fetch verification request"
+        );
+    }
+
+    return response.json();
+}

@@ -21,4 +21,10 @@ public class NotificationResponse
     public Guid? AchievementId { get; set; }
 
     public Guid? AchievementOwnerId { get; set; }
+
+    public string? AchievementTitle { get; set; }
+
+    public string? AchievementDescription { get; set; }
+
+    public string? AchievementOwnerLogin { get; set; }
 }

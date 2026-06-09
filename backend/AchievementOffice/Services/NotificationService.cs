@@ -43,6 +43,10 @@ public class NotificationService : INotificationService
         GetUserNotificationsAsync(Guid userId)
     {
         var notifications = await _context.Notifications
+            .Include(n => n.AchievementVerificationRequest!)
+                .ThenInclude(r => r.Achievement)
+            .Include(n => n.AchievementVerificationRequest!)
+                .ThenInclude(r => r.RequesterUser)
             .Where(n => n.UserId == userId)
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
@@ -84,7 +88,14 @@ public class NotificationService : INotificationService
             Message = notification.Message,
             IsRead = notification.IsRead,
             CreatedAt = notification.CreatedAt,
-            VerificationRequestId = notification.AchievementVerificationRequestId
+            VerificationRequestId = notification.AchievementVerificationRequestId,
+            AchievementId = notification.AchievementVerificationRequest?.AchievementId,
+            AchievementOwnerId = notification.AchievementVerificationRequest?.Achievement?.UserId,
+            AchievementTitle = notification.AchievementVerificationRequest?.Achievement?.Title,
+            AchievementDescription = 
+                notification.AchievementVerificationRequest?.Achievement?.Description,
+            AchievementOwnerLogin = 
+                notification.AchievementVerificationRequest?.RequesterUser?.Login
         };
     }
 }
