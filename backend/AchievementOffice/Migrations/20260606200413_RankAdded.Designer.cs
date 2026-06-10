@@ -3,6 +3,7 @@ using System;
 using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606200413_RankAdded")]
+    partial class RankAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,55 +99,6 @@ namespace AchievementOffice.Migrations
                         .IsUnique();
 
                     b.ToTable("AchievementApprove", (string)null);
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("comment_id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("author_id");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("content");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<Guid>("ProfileUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("profile_user_id");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId")
-                        .HasDatabaseName("ix_comments_author");
-
-                    b.HasIndex("ProfileUserId")
-                        .HasDatabaseName("ix_comments_profile_user");
-
-                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.Group", b =>
@@ -426,27 +380,6 @@ namespace AchievementOffice.Migrations
                             Id = new Guid("7a610998-3843-4315-9923-92f7634f1981"),
                             Name = "User"
                         });
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Comment", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_comments_author");
-
-                    b.HasOne("AchievementOffice.Entities.User", "ProfileUser")
-                        .WithMany()
-                        .HasForeignKey("ProfileUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_comments_profile_user");
-
-                    b.Navigation("Author");
-
-                    b.Navigation("ProfileUser");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.GroupUser", b =>

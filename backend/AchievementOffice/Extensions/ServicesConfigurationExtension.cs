@@ -18,6 +18,8 @@ public static class ServicesConfigurationExtension
 
         services.AddScoped<ICommentService, CommentService>();
 
+        services.AddScoped<IRankService, RankService>();
+
         return services;
     }
 }
