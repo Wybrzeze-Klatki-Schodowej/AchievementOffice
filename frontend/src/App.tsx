@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { checkAuth } from './api/LoginApi';
 import ProfilePage from './pages/ProfilePage';
 import AdminUsersPage from './pages/AdminUsersPage';
+import NotificationDetailsPage from './pages/NotificationDetailsPage';
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -45,6 +46,14 @@ function App() {
                       element={isLoggedIn ? <AdminUsersPage /> : <LoginPage onLogin={() => checkLoggedIn()} />}
         />
         </Route>
+        <Route 
+          path="/verification-requests/:requestId"
+          element={
+            isLoggedIn
+              ? <NotificationDetailsPage />
+              : <LoginPage onLogin={() => checkLoggedIn()} />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

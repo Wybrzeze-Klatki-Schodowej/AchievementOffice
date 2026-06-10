@@ -3,6 +3,7 @@ using System;
 using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609143337_NotificationsAdded")]
+    partial class NotificationsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,30 +337,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
-                    b.Property<decimal>("Multiplier")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric")
-                        .HasDefaultValue(1m)
-                        .HasColumnName("multiplier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("rank_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ranks", (string)null);
-                });
-
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -408,10 +387,6 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("password_hash");
 
-                    b.Property<Guid?>("RankId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -432,11 +407,22 @@ namespace AchievementOffice.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_user_login");
 
-                    b.HasIndex("RankId");
-
                     b.HasIndex("UserRoleId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                            CreatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@example.com",
+                            IsActive = true,
+                            Login = "admin_test",
+                            Password = "nihjcbweiij12",
+                            UpdatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UserRoleId = new Guid("fb279f32-7235-4306-8968-380f76953e6b")
+                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
@@ -623,20 +609,12 @@ namespace AchievementOffice.Migrations
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
-                    b.HasOne("AchievementOffice.Entities.Rank", "Rank")
-                        .WithMany("Users")
-                        .HasForeignKey("RankId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_rank");
-
                     b.HasOne("AchievementOffice.Entities.UserRole", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_users_roles");
-
-                    b.Navigation("Rank");
 
                     b.Navigation("UserRole");
                 });
@@ -658,11 +636,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("GroupUsers");
 
                     b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>

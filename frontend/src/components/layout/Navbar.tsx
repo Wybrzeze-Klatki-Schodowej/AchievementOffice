@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { logout } from "../../api/LoginApi";
 import { getCurrentUser } from "../../api/LoginApi";
+import NotificationBell from "../notifications/NotificationBell";
 
 interface Props {
     onAddAchievementClick?: () => void;
@@ -53,6 +54,8 @@ export default function Navbar({
             </div>
 
             <div className="navbar-right">
+                <NotificationBell />
+
                 {!loading && user?.role === "Admin" && (
                     <button
                         onClick={handleAdminClick}
