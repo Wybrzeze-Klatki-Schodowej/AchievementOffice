@@ -25,6 +25,8 @@ public static class ServicesConfigurationExtension
         
         services.AddScoped<IRankService, RankService>();
 
+        services.AddScoped<IGroupService, GroupService>();
+
         return services;
     }
 }
