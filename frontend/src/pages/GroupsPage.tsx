@@ -66,15 +66,18 @@ export default function GroupsPage() {
                         <form onSubmit={handleCreateGroup}>
                             <div className="form-group">
                                 <label>Group Name</label>
-                                <input required value={newGroup.name} onChange={e => setNewGroup({...newGroup, name: e.target.value})} />
+                                <input required value={newGroup.name} onChange={e => 
+                                    setNewGroup({...newGroup, name: e.target.value})} />
                             </div>
                             <div className="form-group">
                                 <label>Description</label>
-                                <textarea required value={newGroup.description} onChange={e => setNewGroup({...newGroup, description: e.target.value})} />
+                                <textarea required value={newGroup.description} onChange={e => 
+                                    setNewGroup({...newGroup, description: e.target.value})} />
                             </div>
                             <div className="form-group">
                                 <label>Max Users</label>
-                                <input type="number" required value={newGroup.maxUserCount} onChange={e => setNewGroup({...newGroup, maxUserCount: parseInt(e.target.value)})} />
+                                <input type="number" required value={newGroup.maxUserCount} onChange={e => 
+                                    setNewGroup({...newGroup, maxUserCount: parseInt(e.target.value)})} />
                             </div>
                             <div className="modal-actions">
                                 <button type="button" onClick={() => setShowCreateModal(false)}>Cancel</button>
