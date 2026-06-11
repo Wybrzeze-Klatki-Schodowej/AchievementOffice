@@ -286,7 +286,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("GroupUserRole", (string)null);
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -359,8 +358,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("Ranks", (string)null);
                 });
 
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -606,7 +603,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Group");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.AchievementVerificationRequest", "AchievementVerificationRequest")
@@ -625,8 +621,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("User");
                 });
 
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.Rank", "Rank")
@@ -666,14 +660,11 @@ namespace AchievementOffice.Migrations
                     b.Navigation("UserRoles");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
                 {
                     b.Navigation("Users");
                 });
 
-=======
->>>>>>> 1f6cd73 ([AOF-16] Add groups with functionalities)
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Navigation("GroupUsers");
