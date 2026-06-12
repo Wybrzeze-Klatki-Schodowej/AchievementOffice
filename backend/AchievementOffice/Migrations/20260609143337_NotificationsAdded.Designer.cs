@@ -3,6 +3,7 @@ using System;
 using AchievementOffice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609143337_NotificationsAdded")]
+    partial class NotificationsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,79 +337,6 @@ namespace AchievementOffice.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
-                    b.Property<decimal>("Multiplier")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric")
-                        .HasDefaultValue(1m)
-                        .HasColumnName("multiplier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("rank_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ranks", (string)null);
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
-                {
-                    b.Property<Guid>("ShoutoutId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("shoutout_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<Guid>("ReceiverId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("receiver_id");
-
-                    b.Property<Guid>("SenderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sender_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("ShoutoutId");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Shoutouts", (string)null);
-                });
-
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -457,10 +387,6 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("password_hash");
 
-                    b.Property<Guid?>("RankId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rank_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -481,11 +407,22 @@ namespace AchievementOffice.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_user_login");
 
-                    b.HasIndex("RankId");
-
                     b.HasIndex("UserRoleId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
+                            CreatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@example.com",
+                            IsActive = true,
+                            Login = "admin_test",
+                            Password = "nihjcbweiij12",
+                            UpdatedAt = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UserRoleId = new Guid("fb279f32-7235-4306-8968-380f76953e6b")
+                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
@@ -670,41 +607,14 @@ namespace AchievementOffice.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AchievementOffice.Entities.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
-                    b.HasOne("AchievementOffice.Entities.Rank", "Rank")
-                        .WithMany("Users")
-                        .HasForeignKey("RankId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_rank");
-
                     b.HasOne("AchievementOffice.Entities.UserRole", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_users_roles");
-
-                    b.Navigation("Rank");
 
                     b.Navigation("UserRole");
                 });
@@ -726,11 +636,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("GroupUsers");
 
                     b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>

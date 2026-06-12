@@ -17,6 +17,8 @@ export default function AppLayout() {
     };
 
     const handleShoutoutCreated = () => {
+    
+    const handleAchievementCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
@@ -63,10 +65,14 @@ export default function AppLayout() {
                         width: "250px",
                         borderRight: "1px solid #ddd",
                         height: "calc(100vh - 60px)",
-                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column"
                     }}
                 >
-                    <UserList refreshTrigger={usersRefreshTrigger} />
+
+                    <div style={{ flex: 1, overflowY: "auto" }}>
+                        <UserList refreshTrigger={usersRefreshTrigger} />
+                    </div>
                 </aside>
 
                 <main 
@@ -86,7 +92,7 @@ export default function AppLayout() {
                         }}
                     />
                 </main>
-            </div>
+            </div> 
         </>
     );
 }

@@ -34,4 +34,4 @@ steps:
       - '--region'
       - '$_REGION'
 options:
-  logging: CLOUD_LOGGING_ONLY 
+  logging: CLOUD_LOGGING_ONLY

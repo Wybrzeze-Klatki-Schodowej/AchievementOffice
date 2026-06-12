@@ -1,4 +1,4 @@
-using AchievementOffice.Entities;
+﻿using AchievementOffice.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -12,10 +12,14 @@ public class AppDbContext : DbContext
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
     public DbSet<Group> Groups => Set<Group>();
-    public DbSet<GroupUser> GroupUser => Set<GroupUser>();
+    public DbSet<GroupUser> GroupUsers => Set<GroupUser>();
     public DbSet<GroupUserRole> GroupUserRoles => Set<GroupUserRole>();
+    public DbSet<Rank> Ranks => Set<Rank>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Shoutout> Shoutouts => Set<Shoutout>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<AchievementVerificationRequest> AchievementVerificationRequests 
+        => Set<AchievementVerificationRequest>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
