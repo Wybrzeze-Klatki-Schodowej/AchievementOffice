@@ -17,6 +17,7 @@ public class User
     public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public decimal RankingPoints { get; set; } = 0.0m;
 
     public ICollection<GroupUser> GroupUsers { get; set; } = [];
 }

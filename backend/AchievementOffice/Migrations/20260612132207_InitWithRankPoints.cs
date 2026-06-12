@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AchievementOffice.Migrations
 {
     /// <inheritdoc />
-    public partial class NewMigration : Migration
+    public partial class InitWithRankPoints : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -124,7 +124,8 @@ namespace AchievementOffice.Migrations
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ranking_points = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false, defaultValue: 0.0m)
                 },
                 constraints: table =>
                 {
@@ -289,11 +290,6 @@ namespace AchievementOffice.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "UserDetails",
-                columns: new[] { "user_id", "avatar_url", "profile_bio", "firstname", "job_title", "lastname" },
-                values: new object[] { new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"), null, null, "Jan", "Admin", "Kowalski" });
 
             migrationBuilder.InsertData(
                 table: "UserRole",

@@ -24,4 +24,6 @@ public class UserProfileResponse
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public decimal RankingPoints { get; set; }
 }

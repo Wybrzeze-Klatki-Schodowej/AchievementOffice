@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260611001817_AddGroups")]
-    partial class AddGroups
+    [Migration("20260612132207_InitWithRankPoints")]
+    partial class InitWithRankPoints
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -415,6 +415,13 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("rank_id");
 
+                    b.Property<decimal>("RankingPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasDefaultValue(0.0m)
+                        .HasColumnName("ranking_points");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -478,15 +485,6 @@ namespace AchievementOffice.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserDetails", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
-                            Firstname = "Jan",
-                            JobTitle = "Admin",
-                            Lastname = "Kowalski"
-                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
