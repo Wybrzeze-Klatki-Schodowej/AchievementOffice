@@ -21,11 +21,6 @@ namespace AchievementOffice.Controllers
         [HttpPost]
         public async Task<ActionResult<ShoutoutResponse>> Create(CreateShoutoutRequest createDto)
         {
-            // var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // if(!Guid.TryParse(userIdClaim, out var userId))
-            //     return Unauthorized(new { message = "Invalid user ID in token." });
-
             var shoutout = await _shoutoutService.CreateAsync(createDto);
 
             if (!shoutout.IsSuccess)
@@ -33,7 +28,7 @@ namespace AchievementOffice.Controllers
 
             return CreatedAtAction(
                 nameof(GetShoutoutById),
-                new { id = shoutout.Value!.ShoutoutId },
+                new { shoutoutId = shoutout.Value!.ShoutoutId },
                 shoutout.Value
             );
         }
@@ -47,7 +42,7 @@ namespace AchievementOffice.Controllers
             if (!updated.IsSuccess)
                 return updated.ErrorMessage switch
                 {
-                    "Shoutout not found" => NotFound(),
+                    "Not found" => NotFound(),
                     "Forbidden" => Forbid(),
                     _ => BadRequest(new { message = updated.ErrorMessage })
                 };
@@ -64,7 +59,7 @@ namespace AchievementOffice.Controllers
             if (!deleted.IsSuccess)
                 return deleted.ErrorMessage switch
                 {
-                    "Shoutout not found" => NotFound(),
+                    "Not found" => NotFound(),
                     "Forbidden" => Forbid(),
                     _ => BadRequest(new { message = deleted.ErrorMessage })
                 };
@@ -85,7 +80,7 @@ namespace AchievementOffice.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<ShoutoutResponse>>> GetAllShoutouts()
+        public async Task<ActionResult<List<ShoutoutResponse>>> GetAll()
         {
             var shoutouts = await _shoutoutService.GetAllShoutoutsAsync();
 

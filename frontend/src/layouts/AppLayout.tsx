@@ -16,12 +16,6 @@ export default function AppLayout() {
         setRefreshTrigger((prev) => prev + 1);
     };
 
-    const handleShoutoutCreated = () => {
-    
-    const handleAchievementCreated = () => {
-        setRefreshTrigger((prev) => prev + 1);
-    };
-
     return (
         <>
             <Navbar 
@@ -50,7 +44,7 @@ export default function AppLayout() {
             <ShoutoutModal 
                 open={isShoutoutModalOpen}
                 onClose={() => setIsShoutoutModalOpen(false)}
-                onShoutoutCreated={handleShoutoutCreated}
+                onShoutoutCreated={handleContentCreated}
             />
 
             <div 

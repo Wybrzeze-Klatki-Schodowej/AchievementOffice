@@ -19,16 +19,21 @@ namespace AchievementOffice.Services
 
         public async Task<Result<ShoutoutResponse>> CreateAsync(CreateShoutoutRequest createDto)
         {
-            if (createDto.ReceiverId == GetUserId())
+            var userId = GetUserId();
+
+            if (userId == Guid.Empty)
+                return Result<ShoutoutResponse>.Fail("Unauthorized");
+
+            if (createDto.ReceiverId == userId)
                 return Result<ShoutoutResponse>.Fail("Cannot send shoutout to yourself");
 
-            if (GetUserId() == Guid.Empty)
-                return Result<ShoutoutResponse>.Fail("Unauthorized");
+            if (string.IsNullOrWhiteSpace(createDto.Title))
+                return Result<ShoutoutResponse>.Fail("Title is required");
 
             var shoutout = new Shoutout
             {
                 ShoutoutId = Guid.NewGuid(),
-                SenderId = GetUserId(),
+                SenderId = userId,
                 ReceiverId = createDto.ReceiverId,
                 Title = createDto.Title,
                 Description = createDto.Description,
@@ -53,7 +58,7 @@ namespace AchievementOffice.Services
             var userId = GetUserId();
             var role = GetRole();
 
-            if (GetUserId() == Guid.Empty)
+            if (userId == Guid.Empty)
                 return Result<ShoutoutResponse>.Fail("Unauthorized");
 
             var isOwner = shoutout.SenderId == userId;
@@ -82,7 +87,7 @@ namespace AchievementOffice.Services
             var userId = GetUserId();
             var role = GetRole();
 
-            if (GetUserId() == Guid.Empty)
+            if (userId == Guid.Empty)
                 return Result<bool>.Fail("Unauthorized");
 
             var isOwner = shoutout.SenderId == userId;
@@ -100,6 +105,10 @@ namespace AchievementOffice.Services
         public async Task<Result<ShoutoutResponse>> GetShoutoutByIdAsync(Guid shoutoutId)
         {
             var shoutout = await _appDbContext.Shoutouts
+                .Include(s => s.Sender)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver)
+                    .ThenInclude(u => u.UserDetails)
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
@@ -112,6 +121,11 @@ namespace AchievementOffice.Services
         {
             var shoutouts = await _appDbContext.Shoutouts
                 .Where(s => s.DeletedAt == null)
+                .Include(s => s.Sender)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver)
+                    .ThenInclude(u => u.UserDetails)
+                .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
             var result =shoutouts.Select(MapToDto).ToList();
@@ -124,7 +138,13 @@ namespace AchievementOffice.Services
             {
                 ShoutoutId = shoutout.ShoutoutId,
                 SenderId = shoutout.SenderId,
+                SenderLogin = shoutout.Sender.Login,
+                SenderFirstname = shoutout.Sender.UserDetails.Firstname,
+                SenderLastname = shoutout.Sender.UserDetails.Lastname,
                 ReceiverId = shoutout.ReceiverId,
+                ReceiverLogin = shoutout.Receiver.Login,
+                ReceiverFirstname = shoutout.Receiver.UserDetails.Firstname,
+                ReceiverLastname = shoutout.Receiver.UserDetails.Lastname,
                 Title = shoutout.Title,
                 Description = shoutout.Description,
                 CreatedAt = shoutout.CreatedAt,
