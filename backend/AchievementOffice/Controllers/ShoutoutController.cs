@@ -47,7 +47,7 @@ namespace AchievementOffice.Controllers
             if (!updated.IsSuccess)
                 return updated.ErrorMessage switch
                 {
-                    "Shoutout not found" => NotFound(),
+                    "Not found" => NotFound(),
                     "Forbidden" => Forbid(),
                     _ => BadRequest(new { message = updated.ErrorMessage })
                 };
@@ -64,7 +64,7 @@ namespace AchievementOffice.Controllers
             if (!deleted.IsSuccess)
                 return deleted.ErrorMessage switch
                 {
-                    "Shoutout not found" => NotFound(),
+                    "Not found" => NotFound(),
                     "Forbidden" => Forbid(),
                     _ => BadRequest(new { message = deleted.ErrorMessage })
                 };

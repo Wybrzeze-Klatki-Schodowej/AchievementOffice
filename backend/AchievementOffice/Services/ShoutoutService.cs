@@ -48,7 +48,7 @@ namespace AchievementOffice.Services
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
-                return Result<ShoutoutResponse>.Fail("Shoutout not found");
+                return Result<ShoutoutResponse>.Fail("Not found");
 
             var userId = GetUserId();
             var role = GetRole();
@@ -77,7 +77,7 @@ namespace AchievementOffice.Services
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
-                return Result<bool>.Fail("Shoutout not found");
+                return Result<bool>.Fail("Not found");
 
             var userId = GetUserId();
             var role = GetRole();
@@ -103,7 +103,7 @@ namespace AchievementOffice.Services
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
-                return Result<ShoutoutResponse>.Fail("Shoutout not found");
+                return Result<ShoutoutResponse>.Fail("Not found");
 
             return Result<ShoutoutResponse>.Success(MapToDto(shoutout));
         }
