@@ -1,4 +1,4 @@
-﻿using AchievementOffice.Entities;
+using AchievementOffice.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<AchievementApprove> AchievementApproves => Set<AchievementApprove>();
 
     public DbSet<Shoutout> Shoutouts => Set<Shoutout>();
+    public DbSet<KudosShoutout> KudosShoutouts => Set<KudosShoutout>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

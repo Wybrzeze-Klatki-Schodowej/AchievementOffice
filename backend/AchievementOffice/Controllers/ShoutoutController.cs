@@ -33,7 +33,7 @@ namespace AchievementOffice.Controllers
 
             return CreatedAtAction(
                 nameof(GetShoutoutById),
-                new { id = shoutout.Value!.ShoutoutId },
+                new { shoutoutId = shoutout.Value!.ShoutoutId },
                 shoutout.Value
             );
         }
@@ -93,6 +93,30 @@ namespace AchievementOffice.Controllers
                 return BadRequest(new {message = shoutouts.ErrorMessage});
 
             return Ok(shoutouts.Value);
+        }
+
+        [Authorize]
+        [HttpPost("{shoutoutId:guid}/react")]
+        public async Task<ActionResult<ShoutoutResponse>> React(Guid shoutoutId, [FromBody] AchievementOffice.Entities.ReactionType reaction)
+        {
+            var result = await _shoutoutService.ReactAsync(shoutoutId, reaction);
+
+            if (!result.IsSuccess)
+                return result.ErrorMessage == "Not found" ? NotFound() : BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Value);
+        }
+
+        [Authorize]
+        [HttpDelete("{shoutoutId:guid}/react")]
+        public async Task<ActionResult<ShoutoutResponse>> Unreact(Guid shoutoutId)
+        {
+            var result = await _shoutoutService.UnreactAsync(shoutoutId);
+
+            if (!result.IsSuccess)
+                return result.ErrorMessage == "Not found" ? NotFound() : BadRequest(new { message = result.ErrorMessage });
+
+            return Ok(result.Value);
         }
     }
 }

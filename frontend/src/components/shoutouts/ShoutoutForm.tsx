@@ -26,12 +26,15 @@ export default function ShoutoutForm({
     const [receiverId, setReceiverId] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (shoutout) return;
+
         const fetchUsers = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:8080/api/users",
+                    import.meta.env.VITE_API_URL + "/users",
                     {
                         credentials: "include",
                     }
@@ -59,7 +62,7 @@ export default function ShoutoutForm({
         };
 
         fetchUsers();
-    }, []);
+    }, [shoutout]);
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
@@ -69,7 +72,7 @@ export default function ShoutoutForm({
         try {
             setLoading(true);
 
-            if (!receiverId) {
+            if (!shoutout && !receiverId) {
                 throw new Error("No receiver selected");
             }
 
@@ -94,65 +97,139 @@ export default function ShoutoutForm({
 
             setTitle("");
             setDescription("");
+            setError(null);
 
             if (users.length > 0) {
                 setReceiverId(users[0].userId);
             }
         } catch (error) {
             console.error("SHOUTOUT ERROR:", error);
-            alert(error instanceof Error ? error.message : "Operation failed");
+            setError(error instanceof Error ? error.message : "Operation failed");
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <form onSubmit={handleSubmit}>
+    // return (
+    //     <form onSubmit={handleSubmit}>
+    //         <h2>{shoutout ? "Edit shoutout" : "Add shoutout"}</h2>
+
+    //         {!shoutout && (
+    //             <div>
+    //                 <select
+    //                     value={receiverId}
+    //                     onChange={(e) => setReceiverId(e.target.value)}
+    //                     required
+    //                 >
+    //                     <option value="">Select user</option>
+
+    //                     {users.map((user) => (
+    //                         <option key={user.userId} value={user.userId}>
+    //                             {user.login}
+    //                         </option>
+    //                     ))}
+    //                 </select>
+    //             </div>
+    //         )}
+
+    //         <div>
+    //             <input
+    //                 type="text"
+    //                 placeholder="Title"
+    //                 value={title}
+    //                 onChange={(e) => setTitle(e.target.value)}
+    //                 required
+    //                 maxLength={100}
+    //                 className={error ? "error" : ""}
+    //             />
+    //         </div>
+
+    //         <div>
+    //             <textarea
+    //                 placeholder="Description"
+    //                 value={description}
+    //                 onChange={(e) => setDescription(e.target.value)}
+    //                 required
+    //                 maxLength={500}
+    //                 className={error ? "error" : ""}
+    //             />
+    //         </div>
+
+    //         {error && <div className="error-message">{error}</div>}
+
+    //         <button type="submit" disabled={loading}>
+    //             {loading
+    //                 ? shoutout
+    //                     ? "Saving..."
+    //                     : "Adding..."
+    //                 : shoutout
+    //                     ? "Save changes"
+    //                     : "Add shoutout"}
+    //         </button>
+    //     </form>
+    // );
+
+        return (
+        <form onSubmit={handleSubmit} className="shoutout-form">
             <h2>{shoutout ? "Edit shoutout" : "Add shoutout"}</h2>
 
-            <div>
-                <select
-                    value={receiverId}
-                    onChange={(e) => setReceiverId(e.target.value)}
-                    required
-                >
-                    <option value="">Select user</option>
+            {!shoutout && (
+                <div className="form-group">
+                    <label htmlFor="receiver">Receiver</label>
+                    <select
+                        id="receiver"
+                        value={receiverId}
+                        onChange={(e) => setReceiverId(e.target.value)}
+                        required
+                    >
+                        <option value="">Select user</option>
 
-                    {users.map((user) => (
-                        <option key={user.userId} value={user.userId}>
-                            {user.login}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                        {users.map((user) => (
+                            <option key={user.userId} value={user.userId}>
+                                {user.login}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
-            <div>
+            <div className="form-group">
+                <label htmlFor="title">{shoutout ? "Edit title" : "Title"}</label>
                 <input
+                    id="title"
                     type="text"
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    maxLength={100}
+                    className={error ? "error" : ""}
                 />
             </div>
 
-            <div>
+            <div className="form-group">
+                <label htmlFor="description">{shoutout ? "Edit description" : "Description"}</label>
                 <textarea
+                    id="description"
                     placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
+                    maxLength={500}
+                    className={error ? "error" : ""}
                 />
             </div>
 
-            <button type="submit" disabled={loading}>
+            {error && <div className="error-message">{error}</div>}
+
+            <button type="submit" disabled={loading} className="submit-btn">
                 {loading
                     ? shoutout
                         ? "Saving..."
                         : "Adding..."
                     : shoutout
-                    ? "Save changes"
-                    : "Add shoutout"}
+                        ? "Save changes"
+                        : "Add shoutout"}
             </button>
         </form>
     );

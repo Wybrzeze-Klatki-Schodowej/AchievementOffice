@@ -19,7 +19,7 @@ export default function ShoutoutList({ refreshTrigger, userId }: Props) {
 
     const loadShoutouts = async () => {
         try {
-            setLoading(true);
+            //setLoading(true);
             const data = await getShoutouts();
             const sorted = [...data]
                 .filter(s => s.senderId === userId || s.receiverId === userId)
@@ -80,6 +80,7 @@ export default function ShoutoutList({ refreshTrigger, userId }: Props) {
                     currentUserId={currentUserId}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onReaction={loadShoutouts}
                 />
             ))}
         </div>

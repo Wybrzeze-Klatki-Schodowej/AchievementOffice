@@ -15,7 +15,9 @@ export interface UpdateShoutoutDto {
 }
 
 export const getShoutouts = async (): Promise<Shoutout[]> => {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+        credentials: "include",
+    });
 
     if (!response.ok) {
         throw new Error("Failed to fetch shoutouts");
@@ -25,7 +27,9 @@ export const getShoutouts = async (): Promise<Shoutout[]> => {
 };
 
 export const getShoutoutById = async (id: string): Promise<Shoutout> => {
-    const response = await fetch(`${API_URL}/${id}`);
+    const response = await fetch(`${API_URL}/${id}`, {
+        credentials: "include",
+    });
 
     if (!response.ok) {
         throw new Error("Failed to fetch shoutout");
@@ -69,6 +73,7 @@ export async function updateShoutout(
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(dto),
         }
     );
@@ -96,6 +101,36 @@ export const getUsers = async (): Promise<User[]> => {
 
     if (!response.ok) {
         throw new Error("Failed to fetch users");
+    }
+
+    return response.json();
+};
+
+export const addReaction = async (shoutoutId: string, reactionType: number): Promise<Shoutout> => {
+    const response = await fetch(`${API_URL}/${shoutoutId}/react`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(reactionType),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to add reaction");
+    }
+
+    return response.json();
+};
+
+export const removeReaction = async (shoutoutId: string): Promise<Shoutout> => {
+    const response = await fetch(`${API_URL}/${shoutoutId}/react`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to remove reaction");
     }
 
     return response.json();

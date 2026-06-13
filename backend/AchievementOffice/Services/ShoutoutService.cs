@@ -99,7 +99,11 @@ namespace AchievementOffice.Services
 
         public async Task<Result<ShoutoutResponse>> GetShoutoutByIdAsync(Guid shoutoutId)
         {
+            var userId = GetUserId();
             var shoutout = await _appDbContext.Shoutouts
+                .Include(s => s.Sender).ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver).ThenInclude(u => u.UserDetails)
+                .Include(s => s.Kudos)
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
@@ -110,25 +114,124 @@ namespace AchievementOffice.Services
 
         public async Task<Result<List<ShoutoutResponse>>> GetAllShoutoutsAsync()
         {
+            var userId = GetUserId();
             var shoutouts = await _appDbContext.Shoutouts
+                .Include(s => s.Sender).ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver).ThenInclude(u => u.UserDetails)
+                .Include(s => s.Kudos)
                 .Where(s => s.DeletedAt == null)
+                .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
-            var result =shoutouts.Select(MapToDto).ToList();
+            var result = shoutouts.Select(s => MapToDto(s)).ToList();
             return Result<List<ShoutoutResponse>>.Success(result);
         }
 
-        private static ShoutoutResponse MapToDto(Shoutout shoutout)
+        public async Task<Result<ShoutoutResponse>> ReactAsync(Guid shoutoutId, ReactionType reaction)
         {
-            return new ShoutoutResponse
+            var userId = GetUserId();
+            if (userId == Guid.Empty) return Result<ShoutoutResponse>.Fail("Unauthorized");
+
+            var shoutout = await _appDbContext.Shoutouts
+                .Include(s => s.Kudos)
+                .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
+
+            if (shoutout == null) return Result<ShoutoutResponse>.Fail("Not found");
+
+            var existingReaction = await _appDbContext.KudosShoutouts
+                .FirstOrDefaultAsync(r => r.ShoutoutId == shoutoutId && r.UserId == userId);
+
+            if (existingReaction != null)
+            {
+                if (existingReaction.Reaction == reaction)
+                {
+                    // If same reaction, remove it (toggle behavior)
+                    _appDbContext.KudosShoutouts.Remove(existingReaction);
+                }
+                else
+                {
+                    existingReaction.Reaction = reaction;
+                }
+            }
+            else
+            {
+                var newReaction = new KudosShoutout
+                {
+                    ShoutoutId = shoutoutId,
+                    UserId = userId,
+                    Reaction = reaction
+                };
+                _appDbContext.KudosShoutouts.Add(newReaction);
+            }
+
+            await _appDbContext.SaveChangesAsync();
+            return await GetShoutoutByIdAsync(shoutoutId);
+        }
+
+        public async Task<Result<ShoutoutResponse>> UnreactAsync(Guid shoutoutId)
+        {
+            var userId = GetUserId();
+            if (userId == Guid.Empty) return Result<ShoutoutResponse>.Fail("Unauthorized");
+
+            var reaction = await _appDbContext.KudosShoutouts
+                .FirstOrDefaultAsync(r => r.ShoutoutId == shoutoutId && r.UserId == userId);
+
+            if (reaction != null)
+            {
+                _appDbContext.KudosShoutouts.Remove(reaction);
+                await _appDbContext.SaveChangesAsync();
+            }
+
+            return await GetShoutoutByIdAsync(shoutoutId);
+        }
+
+        private ShoutoutResponse MapToDto(Shoutout shoutout)
+        {
+            var currentUserId = GetUserId();
+            var response = new ShoutoutResponse
             {
                 ShoutoutId = shoutout.ShoutoutId,
                 SenderId = shoutout.SenderId,
+                SenderLogin = shoutout.Sender?.Login ?? string.Empty,
+                SenderFirstname = shoutout.Sender?.UserDetails?.Firstname ?? string.Empty,
+                SenderLastname = shoutout.Sender?.UserDetails?.Lastname ?? string.Empty,
                 ReceiverId = shoutout.ReceiverId,
+                ReceiverLogin = shoutout.Receiver?.Login ?? string.Empty,
+                ReceiverFirstname = shoutout.Receiver?.UserDetails?.Firstname ?? string.Empty,
+                ReceiverLastname = shoutout.Receiver?.UserDetails?.Lastname ?? string.Empty,
                 Title = shoutout.Title,
                 Description = shoutout.Description,
                 CreatedAt = shoutout.CreatedAt,
                 UpdatedAt = shoutout.UpdatedAt
+            };
+
+            if (shoutout.Kudos != null)
+            {
+                response.Reactions = shoutout.Kudos
+                    .GroupBy(k => k.Reaction)
+                    .ToDictionary(g => GetEmoji(g.Key), g => g.Count());
+
+                var userReaction = shoutout.Kudos.FirstOrDefault(k => k.UserId == currentUserId);
+                if (userReaction != null)
+                {
+                    response.CurrentUserReaction = GetEmoji(userReaction.Reaction);
+                }
+            }
+
+            return response;
+        }
+
+        private static string GetEmoji(ReactionType reaction)
+        {
+            return reaction switch
+            {
+                ReactionType.Like => "👍",
+                ReactionType.Love => "❤️",
+                ReactionType.Haha => "😂",
+                ReactionType.Wow => "😮",
+                ReactionType.Sad => "😢",
+                ReactionType.Angry => "😠",
+                _ => "❓"
             };
         }
 

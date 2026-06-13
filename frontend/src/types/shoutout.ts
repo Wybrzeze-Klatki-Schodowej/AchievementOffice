@@ -12,6 +12,8 @@ export interface Shoutout {
     description?: string;
     createdAt: string;
     updatedAt: string;
+    reactions: Record<string, number>;
+    currentUserReaction?: string;
     // deletedAt?: string;
 }
 

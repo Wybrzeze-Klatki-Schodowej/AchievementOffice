@@ -1,4 +1,4 @@
-﻿namespace AchievementOffice.Entities;
+namespace AchievementOffice.Entities;
 
 public class User
 {
@@ -15,4 +15,6 @@ public class User
     public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<KudosShoutout> ShoutoutReactions { get; set; } = new List<KudosShoutout>();
 }
