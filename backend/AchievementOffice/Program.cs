@@ -1,3 +1,4 @@
+using AchievementOffice.Configuration;
 using AchievementOffice.Extensions;
 
 
@@ -15,6 +16,7 @@ builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 builder.Services.SetupDatabase(builder.Configuration);
+builder.Services.AddRankingSettings(builder.Configuration);
 
 var app = builder.Build();
 
