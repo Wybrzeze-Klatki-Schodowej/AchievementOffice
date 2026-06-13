@@ -7,6 +7,7 @@ import { getUserProfile } from "../api/UserApi";
 import EditProfileModal from "../components/profile/EditProfileModal";
 import ChangePasswordModal from "../components/profile/ChangePasswordModal";
 import ManageUserModal from "../components/profile/ManageUserModal";
+import CommentSection from "../components/comments/CommentSection";
 import "./ProfilePage.css";
 import { getCurrentUser } from "../api/LoginApi";
 import ShoutoutModal from "../components/shoutouts/ShoutoutModal.tsx";
@@ -166,6 +167,10 @@ export default function ProfilePage() {
             />
 
         </div>
+
+        <CommentSection 
+            profileUserId={userId!}
+        />
 
         {(isAdmin || isOwnProfile) && isEditOpen && user && (
             <EditProfileModal

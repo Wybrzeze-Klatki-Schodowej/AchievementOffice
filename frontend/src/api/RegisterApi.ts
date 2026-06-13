@@ -10,6 +10,20 @@ export interface RegisterDTO {
     RoleName?: string;
 }
 
+function getErrorMessage(error: any, defaultMessage: string): string {
+    if (error?.message) {
+        return error.message;
+    }
+
+    if (error?.errors) {
+        return Object.values(error.errors)
+            .flat()
+            .join("\n");
+    }
+
+    return defaultMessage;
+}
+
 export async function register(data: RegisterDTO): Promise<void> {
     const res = await fetch(API_URL + "/register", {
         method: "POST",
@@ -23,13 +37,8 @@ export async function register(data: RegisterDTO): Promise<void> {
     if (!res.ok) {
         const errData = await res.json().catch(() => null);
         
-        if (errData?.errors) {
-            const firstErrorKey = Object.keys(errData.errors)[0];
-            throw new Error(errData.errors[firstErrorKey][0]);
-        } else if (errData?.title) {
-            throw new Error(errData.title);
-        } else {
-            throw new Error(errData?.message || "Registration failed");
-        }
+        throw new Error(
+            getErrorMessage(errData, "Error registering user")
+        );
     }
 }

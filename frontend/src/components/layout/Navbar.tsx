@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { logout } from "../../api/LoginApi";
 import { getCurrentUser } from "../../api/LoginApi";
+import NotificationBell from "../notifications/NotificationBell";
 
 interface Props {
     onAddAchievementClick?: () => void;
@@ -44,7 +45,7 @@ export default function Navbar({
 
     const handleAdminClick = () => {
         if (user?.userId) {
-            navigate(`/admin/users/${user.userId}`);
+            navigate(`/admin/users`);
         }
     };
 
@@ -55,6 +56,8 @@ export default function Navbar({
             </div>
 
             <div className="navbar-right">
+                <NotificationBell />
+
                 {!loading && user?.role === "Admin" && (
                     <button
                         onClick={handleAdminClick}
@@ -62,6 +65,10 @@ export default function Navbar({
                         Admin dashboard
                     </button>
                 )}
+
+                <button onClick={() => navigate('/groups')}>
+                    Groups
+                </button>
 
                 <button
                     onClick={handleProfileClick}

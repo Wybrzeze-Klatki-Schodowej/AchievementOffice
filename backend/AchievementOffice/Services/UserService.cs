@@ -1,4 +1,5 @@
-﻿using AchievementOffice.Data;
+﻿using System.Text.RegularExpressions;
+using AchievementOffice.Data;
 using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,7 @@ public class UserService : IUserService
             Email = request.Email,
             UserDetails = userDetails,
             UserRoleId = userRole.Id,
+            IsActive = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };

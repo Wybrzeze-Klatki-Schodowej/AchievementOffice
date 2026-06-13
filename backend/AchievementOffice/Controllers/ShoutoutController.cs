@@ -21,11 +21,6 @@ namespace AchievementOffice.Controllers
         [HttpPost]
         public async Task<ActionResult<ShoutoutResponse>> Create(CreateShoutoutRequest createDto)
         {
-            // var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // if(!Guid.TryParse(userIdClaim, out var userId))
-            //     return Unauthorized(new { message = "Invalid user ID in token." });
-
             var shoutout = await _shoutoutService.CreateAsync(createDto);
 
             if (!shoutout.IsSuccess)
@@ -85,7 +80,7 @@ namespace AchievementOffice.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<ShoutoutResponse>>> GetAllShoutouts()
+        public async Task<ActionResult<List<ShoutoutResponse>>> GetAll()
         {
             var shoutouts = await _shoutoutService.GetAllShoutoutsAsync();
 

@@ -19,16 +19,21 @@ namespace AchievementOffice.Services
 
         public async Task<Result<ShoutoutResponse>> CreateAsync(CreateShoutoutRequest createDto)
         {
-            if (createDto.ReceiverId == GetUserId())
+            var userId = GetUserId();
+
+            if (userId == Guid.Empty)
+                return Result<ShoutoutResponse>.Fail("Unauthorized");
+
+            if (createDto.ReceiverId == userId)
                 return Result<ShoutoutResponse>.Fail("Cannot send shoutout to yourself");
 
-            if (GetUserId() == Guid.Empty)
-                return Result<ShoutoutResponse>.Fail("Unauthorized");
+            if (string.IsNullOrWhiteSpace(createDto.Title))
+                return Result<ShoutoutResponse>.Fail("Title is required");
 
             var shoutout = new Shoutout
             {
                 ShoutoutId = Guid.NewGuid(),
-                SenderId = GetUserId(),
+                SenderId = userId,
                 ReceiverId = createDto.ReceiverId,
                 Title = createDto.Title,
                 Description = createDto.Description,
@@ -53,7 +58,7 @@ namespace AchievementOffice.Services
             var userId = GetUserId();
             var role = GetRole();
 
-            if (GetUserId() == Guid.Empty)
+            if (userId == Guid.Empty)
                 return Result<ShoutoutResponse>.Fail("Unauthorized");
 
             var isOwner = shoutout.SenderId == userId;
@@ -82,7 +87,7 @@ namespace AchievementOffice.Services
             var userId = GetUserId();
             var role = GetRole();
 
-            if (GetUserId() == Guid.Empty)
+            if (userId == Guid.Empty)
                 return Result<bool>.Fail("Unauthorized");
 
             var isOwner = shoutout.SenderId == userId;
@@ -192,13 +197,20 @@ namespace AchievementOffice.Services
             {
                 ShoutoutId = shoutout.ShoutoutId,
                 SenderId = shoutout.SenderId,
-                SenderLogin = shoutout.Sender?.Login ?? string.Empty,
-                SenderFirstname = shoutout.Sender?.UserDetails?.Firstname ?? string.Empty,
-                SenderLastname = shoutout.Sender?.UserDetails?.Lastname ?? string.Empty,
+                // SenderLogin = shoutout.Sender?.Login ?? string.Empty,
+                // SenderFirstname = shoutout.Sender?.UserDetails?.Firstname ?? string.Empty,
+                // SenderLastname = shoutout.Sender?.UserDetails?.Lastname ?? string.Empty,
+                // ReceiverId = shoutout.ReceiverId,
+                // ReceiverLogin = shoutout.Receiver?.Login ?? string.Empty,
+                // ReceiverFirstname = shoutout.Receiver?.UserDetails?.Firstname ?? string.Empty,
+                // ReceiverLastname = shoutout.Receiver?.UserDetails?.Lastname ?? string.Empty,
+                SenderLogin = shoutout.Sender.Login,
+                SenderFirstname = shoutout.Sender.UserDetails.Firstname,
+                SenderLastname = shoutout.Sender.UserDetails.Lastname,
                 ReceiverId = shoutout.ReceiverId,
-                ReceiverLogin = shoutout.Receiver?.Login ?? string.Empty,
-                ReceiverFirstname = shoutout.Receiver?.UserDetails?.Firstname ?? string.Empty,
-                ReceiverLastname = shoutout.Receiver?.UserDetails?.Lastname ?? string.Empty,
+                ReceiverLogin = shoutout.Receiver.Login,
+                ReceiverFirstname = shoutout.Receiver.UserDetails.Firstname,
+                ReceiverLastname = shoutout.Receiver.UserDetails.Lastname,
                 Title = shoutout.Title,
                 Description = shoutout.Description,
                 CreatedAt = shoutout.CreatedAt,

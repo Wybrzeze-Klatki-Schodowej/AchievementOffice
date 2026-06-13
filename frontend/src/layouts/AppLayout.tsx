@@ -16,10 +16,6 @@ export default function AppLayout() {
         setRefreshTrigger((prev) => prev + 1);
     };
 
-    const handleShoutoutCreated = () => {
-        setRefreshTrigger((prev) => prev + 1);
-    };
-
     return (
         <>
             <Navbar 
@@ -48,7 +44,7 @@ export default function AppLayout() {
             <ShoutoutModal 
                 open={isShoutoutModalOpen}
                 onClose={() => setIsShoutoutModalOpen(false)}
-                onShoutoutCreated={handleShoutoutCreated}
+                onShoutoutCreated={handleContentCreated}
             />
 
             <div 
@@ -63,10 +59,14 @@ export default function AppLayout() {
                         width: "250px",
                         borderRight: "1px solid #ddd",
                         height: "calc(100vh - 60px)",
-                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column"
                     }}
                 >
-                    <UserList refreshTrigger={usersRefreshTrigger} />
+
+                    <div style={{ flex: 1, overflowY: "auto" }}>
+                        <UserList refreshTrigger={usersRefreshTrigger} />
+                    </div>
                 </aside>
 
                 <main 
@@ -86,7 +86,7 @@ export default function AppLayout() {
                         }}
                     />
                 </main>
-            </div>
+            </div> 
         </>
     );
 }

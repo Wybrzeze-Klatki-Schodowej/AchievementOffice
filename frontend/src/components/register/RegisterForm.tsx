@@ -33,14 +33,26 @@ export default function RegisterForm({ isLoading, onSubmit, error }: RegisterFor
     return (
         <form onSubmit={handleSubmit}>
             <h2>Register</h2>
-            <input type="email" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="text" placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <input type="password" placeholder='Password (min. 8 characters)' value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
-            <input type="text" placeholder='First Name' value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
-            <input type="text" placeholder='Last Name' value={lastname} onChange={(e) => setLastname(e.target.value)} required />
-            <input type="text" placeholder='Job Title' value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} required />
+            <input type="text" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input type="text" placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input type="password" placeholder='Password (min. 8 characters)' value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input type="text" placeholder='First Name' value={firstname} onChange={(e) => setFirstname(e.target.value)} />
+            <input type="text" placeholder='Last Name' value={lastname} onChange={(e) => setLastname(e.target.value)} />
+            <input type="text" placeholder='Job Title' value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
             
-            {error && <div style={{color: 'red', margin: '1rem 0'}} className="error-message">{error}</div>}
+            {error && (
+                <pre 
+                    className="error-message"
+                    style={{
+                        color: 'red', 
+                        margin: '1rem 0',
+                        whiteSpace: 'pre-wrap',
+                        fontFamily: 'inherit'
+                    }}
+                >
+                    {error}
+                </pre>
+            )}
             
             <button className="login-button" type="submit" disabled={isLoading}>
                 {isLoading ? 'Loading...' : 'Register'}
