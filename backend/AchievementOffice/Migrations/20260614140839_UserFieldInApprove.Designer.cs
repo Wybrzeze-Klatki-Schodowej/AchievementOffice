@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260610002644_NewMigration")]
-    partial class NewMigration
+    [Migration("20260614140839_UserFieldInApprove")]
+    partial class UserFieldInApprove
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,6 +94,8 @@ namespace AchievementOffice.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("AchievementApproveId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("AchievementId", "UserId")
                         .IsUnique();
@@ -518,6 +520,17 @@ namespace AchievementOffice.Migrations
                             Id = new Guid("7a610998-3843-4315-9923-92f7634f1981"),
                             Name = "User"
                         });
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>

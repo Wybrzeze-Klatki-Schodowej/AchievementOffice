@@ -92,6 +92,8 @@ namespace AchievementOffice.Migrations
 
                     b.HasKey("AchievementApproveId");
 
+                    b.HasIndex("UserId");
+
                     b.HasIndex("AchievementId", "UserId")
                         .IsUnique();
 
@@ -515,6 +517,17 @@ namespace AchievementOffice.Migrations
                             Id = new Guid("7a610998-3843-4315-9923-92f7634f1981"),
                             Name = "User"
                         });
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>

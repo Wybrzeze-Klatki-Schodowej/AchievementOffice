@@ -224,9 +224,33 @@ public class AchievementService : IAchievementService
     public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)
     {
         var approvals = await _context.AchievementApproves
-            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .Where(a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .Include(a => a.User)
+                .ThenInclude(u => u.UserDetails)
             .ToListAsync();
         return approvals.Select( MapApproveToDto ).ToList();
+    }
+
+    public async Task<AchievementApprovalsGroupedDto> GetApprovalsGroupedAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where(a => a.AchievementId == achievementId && a.DeletedAt == null)
+            .Include(a => a.User)
+                .ThenInclude(u => u.UserDetails)
+            .ToListAsync();
+
+        return new AchievementApprovalsGroupedDto
+        {
+            Approved = approvals
+                .Where(a => a.IsApproved == true)
+                .Select(MapApproveToDto)
+                .ToList(),
+
+            Denied = approvals
+                .Where(a => a.IsApproved == false)
+                .Select(MapApproveToDto)
+                .ToList()
+        };
     }
 
     private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve)
@@ -236,6 +260,9 @@ public class AchievementService : IAchievementService
             AchievementApproveId = approve.AchievementApproveId,
             AchievementId = approve.AchievementId,
             UserId = approve.UserId,
+            UserLogin = approve.User.Login,
+            UserFirstName = approve.User.UserDetails.Firstname,
+            UserLastName = approve.User.UserDetails.Lastname,
             IsApproved = approve.IsApproved,
             ApprovedAt = approve.ApprovedAt
         };
