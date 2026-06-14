@@ -103,7 +103,8 @@ public class UserService : IUserService
                 AvatarUrl = u.UserDetails.AvatarUrl,
                 Role = u.UserRole.Name,
                 CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
+                UpdatedAt = u.UpdatedAt,
+                RankingPoints = u.RankingPoints
             })
             .FirstOrDefaultAsync();
     }
@@ -127,7 +128,8 @@ public class UserService : IUserService
                 AvatarUrl = u.UserDetails.AvatarUrl,
                 Role = u.UserRole.Name,
                 CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
+                UpdatedAt = u.UpdatedAt,
+                RankingPoints = u.RankingPoints
             })
             .ToListAsync();
 
@@ -205,7 +207,8 @@ public class UserService : IUserService
                     AvatarUrl = user.UserDetails.AvatarUrl,
                     Role = user.UserRole.Name,
                     CreatedAt = user.CreatedAt,
-                    UpdatedAt = user.UpdatedAt
+                    UpdatedAt = user.UpdatedAt,
+                    RankingPoints = user.RankingPoints
                 }
             );
     }

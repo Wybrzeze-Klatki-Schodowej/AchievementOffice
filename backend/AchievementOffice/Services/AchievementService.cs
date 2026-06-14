@@ -158,7 +158,7 @@ public class AchievementService : IAchievementService
 
         var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
 
-        if (achievement != null) return null;
+        if (achievement is null) return null;
         var ownerId = achievement.UserId;
 
         if (existing is null)
