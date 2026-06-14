@@ -37,13 +37,15 @@ namespace AchievementOffice.Services
 
         public async Task<Result> AddPointsFromShoutOut(Guid reactingUserId, Guid ownerId)
         {
-            return await AddPoints(reactingUserId, ownerId, _rankingSettings.ReactionShoutOutPoints);
+            return await AddPoints(reactingUserId, ownerId, _rankingSettings.ShoutoutBase);
         }
 
         public async Task<Result> SubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId)
         {
             return await AddPoints(reactingUserId, ownerId, _rankingSettings.DisapprovalPoints);
         }
+
+        
 
         public async Task<Result> UndoPointsFromAchievement(Guid reactingUserId, Guid ownerId)
         {
@@ -52,12 +54,22 @@ namespace AchievementOffice.Services
 
         public async Task<Result> UndoPointsFromShoutOut(Guid reactingUserId, Guid ownerId)
         {
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ReactionShoutOutPoints);
+            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ShoutoutBase);
         }
 
         public async Task<Result> UndoSubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId)
         {
             return await AddPoints(reactingUserId, ownerId, -_rankingSettings.DisapprovalPoints);
+        }
+
+        public async Task<Result> AddPointsReactionS(Guid reactingUserId, Guid ownerId)
+        {
+            return await AddPoints(reactingUserId, ownerId, _rankingSettings.ReactionShoutOutPoints);
+        }
+
+        public async Task<Result> UndoPointsReactionS(Guid reactingUserId, Guid ownerId)
+        {
+            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ReactionShoutOutPoints);
         }
     }
 }
