@@ -8,9 +8,15 @@ export default function AppLayout() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
+    const [notificationsRefreshTrigger, setNotificationsRefreshTrigger] = useState(0);
     
     const handleAchievementCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
+        setNotificationsRefreshTrigger(prev => prev + 1);
+    };
+
+    const refreshNotifications = () => {
+        setNotificationsRefreshTrigger(prev => prev + 1);
     };
 
     return (
@@ -19,6 +25,7 @@ export default function AppLayout() {
                 onAddAchievementClick={() =>
                     setIsModalOpen(true)
                 }
+                notificationsRefreshTrigger={notificationsRefreshTrigger}
             />
 
             <AchievementModal 
@@ -61,7 +68,8 @@ export default function AppLayout() {
                         context={{ 
                             refreshTrigger,
                             refreshUsers: () =>
-                                setUsersRefreshTrigger(prev => prev + 1)
+                                setUsersRefreshTrigger(prev => prev + 1),
+                            refreshNotifications
                         }}
                     />
                 </main>

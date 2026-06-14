@@ -13,12 +13,14 @@ import { getCurrentUser } from "../api/LoginApi";
 interface OutletContext {
     refreshTrigger: number;
     refreshUsers: () => void;
+    refreshNotifications: () => void;
 }
 
 export default function ProfilePage() {
     const { 
         refreshTrigger,
-        refreshUsers
+        refreshUsers,
+        refreshNotifications
     } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
@@ -143,6 +145,7 @@ export default function ProfilePage() {
             <AchievementList
                 userId={userId!}
                 refreshTrigger={refreshTrigger}
+                onNotificationsRefresh={refreshNotifications}
             />
 
         </div>

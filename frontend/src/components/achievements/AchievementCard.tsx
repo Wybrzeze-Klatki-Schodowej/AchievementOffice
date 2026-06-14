@@ -9,6 +9,7 @@ interface Props {
     currentUserRole?: string | null;
     onEdit?: (achievement: Achievement) => void;
     onDelete?: (id: string) => void;
+    onVoteCompleted?: () => void;
 }
 
 export default function AchievementCard({ 
@@ -16,7 +17,8 @@ export default function AchievementCard({
     currentUserId, 
     currentUserRole, 
     onEdit, 
-    onDelete 
+    onDelete,
+    onVoteCompleted
 }: Props) {
 
     const [loading, setLoading] = useState(false);
@@ -55,6 +57,8 @@ export default function AchievementCard({
             await approveAchievement(achievement.achievementId, isApproved);
 
             await fetchSummary();
+
+            onVoteCompleted?.();
         } catch (e) {
             console.error(e);
         } finally {
