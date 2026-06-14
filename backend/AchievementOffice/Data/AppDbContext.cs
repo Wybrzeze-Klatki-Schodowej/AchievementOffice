@@ -21,6 +21,10 @@ public class AppDbContext : DbContext
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AchievementVerificationRequest> AchievementVerificationRequests 
         => Set<AchievementVerificationRequest>();
+    public DbSet<Visibility> Visibilities => Set<Visibility>();
+    public DbSet<ShoutoutGroup> ShoutoutGroups => Set<ShoutoutGroup>();
+    public DbSet<AchievementGroup> AchievementGroups => Set<AchievementGroup>();
+    public DbSet<ProfileGroup> ProfileGroups => Set<ProfileGroup>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
