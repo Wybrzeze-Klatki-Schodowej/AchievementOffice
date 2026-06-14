@@ -104,17 +104,7 @@ public class AchievementController : ControllerBase
 
         if (approve is null) return NotFound(new { message = "Achievement not found" });
 
-        if (approve.IsApproved == true)
-            await _rankingService.AddPointsFromAchievement(userId, approve.OwnerId);
-        else if (approve.IsApproved == false)
-            await _rankingService.SubtractPointsFromAchievement(userId, approve.OwnerId);
-        else
-        {
-            if (dto.IsApproved == true)
-                await _rankingService.UndoPointsFromAchievement(userId, approve.OwnerId);
-            else
-                await _rankingService.UndoSubtractPointsFromAchievement(userId, approve.OwnerId);
-        }
+        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.IsApproved, dto.IsApproved);
 
         return Ok(approve);
     }

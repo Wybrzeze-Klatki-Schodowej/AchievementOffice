@@ -4,13 +4,8 @@ namespace AchievementOffice.Services
 {
     public interface IRankingService
     {
-        Task<Result> AddPointsFromShoutOut(Guid reactingUserId, Guid ownerId);
-        Task<Result> AddPointsFromAchievement(Guid reactingUserId, Guid ownerId);
-        Task<Result> SubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId);
-        Task<Result> AddPointsReactionS(Guid reactingUserId, Guid ownerId);
-        Task<Result> UndoPointsFromShoutOut(Guid reactingUserId, Guid ownerId);
-        Task<Result> UndoPointsFromAchievement(Guid reactingUserId, Guid ownerId);
-        Task<Result> UndoSubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId);
-        Task<Result> UndoPointsReactionS(Guid reactingUserId, Guid ownerId);
+        Task<Result> ApplyAchievementPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved);
+        Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool addPoints);
+        Task<Result> ApplyShoutOutPointsCreate(Guid reactingUserId, Guid ownerId, bool addPoints);
     }
 }

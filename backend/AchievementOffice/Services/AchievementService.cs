@@ -146,7 +146,7 @@ public class AchievementService : IAchievementService
         };
     }
 
-    public async Task<AchievementApproveResponseDto> ApproveAsync(
+    public async Task<AchievementApproveResponseDto?> ApproveAsync(
         Guid achievementId, 
         Guid userId, 
         CreateAchievementApproveDto dto)

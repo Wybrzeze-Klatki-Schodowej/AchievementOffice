@@ -1,4 +1,6 @@
-﻿namespace AchievementOffice.Configuration
+﻿using AchievementOffice.Configuration;
+
+namespace AchievementOffice.Extensions
 {
     public static class RankingSettingsConfiguration
     {
