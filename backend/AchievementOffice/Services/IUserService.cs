@@ -22,20 +22,3 @@ public interface IUserService
         ChangePasswordRequest request
     );
 }
-
-/*
-public interface IUserService
-{
-    Task<LoginResult> LoginAsync(LoginRequest request);
-    Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
-    Task<List<UserDto>> GetAllUsersAsync();
-} 
-*/
-
-// public interface IUserService
-//     {
-//         Task<LoginResult> LoginAsync(LoginRequest request);
-//         Task<UserRegistrationResult> RegisterUserAsync(UserRegistrationRequest request);
-//         Task<List<UserDto>> GetAllUsersAsync2();
-        
-//     }

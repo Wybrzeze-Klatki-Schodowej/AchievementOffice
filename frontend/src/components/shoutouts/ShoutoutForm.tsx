@@ -4,7 +4,8 @@ import {
     updateShoutout,
     type CreateShoutoutDto,
     type UpdateShoutoutDto,
-} from "../../api/ShoutoutsApi";
+} //from "../../api/ShoutoutsApi";
+from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 import { getCurrentUser } from "../../api/LoginApi";
 

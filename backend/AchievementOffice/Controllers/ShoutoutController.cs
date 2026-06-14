@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -112,6 +113,22 @@ namespace AchievementOffice.Controllers
                 return result.ErrorMessage == "Not found" ? NotFound() : BadRequest(new { message = result.ErrorMessage });
 
             return Ok(result.Value);
+        }
+
+        [HttpGet("receiver/{userId:guid}")]
+        public async Task<ActionResult<List<ShoutoutResponse>>> GetReceivedShoutouts(Guid userId)
+        {
+            var shoutouts = await _shoutoutService.GetReceivedShoutoutsAsync(userId);
+
+            if (!shoutouts.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    message = shoutouts.ErrorMessage
+                });
+            }
+
+            return Ok(shoutouts.Value);
         }
     }
 }
