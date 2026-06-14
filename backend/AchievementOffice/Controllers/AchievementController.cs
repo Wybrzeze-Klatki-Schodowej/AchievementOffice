@@ -1,8 +1,9 @@
-using System.Security.Claims;
+using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AchievementOffice.Controllers;
 
@@ -11,10 +12,12 @@ namespace AchievementOffice.Controllers;
 public class AchievementController : ControllerBase
 {
     private readonly IAchievementService _achievementService;
+    private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService)
+    public AchievementController(IAchievementService achievementService, IRankingService raningService)
     {
         _achievementService = achievementService;
+        _rankingService = raningService;
     }
 
     [HttpGet]
@@ -98,6 +101,20 @@ public class AchievementController : ControllerBase
             return Unauthorized(new { message = "Invalid user ID in token." });
             
         var approve = await _achievementService.ApproveAsync(id, userId, dto);
+
+        if (approve is null) return NotFound(new { message = "Achievement not found" });
+
+        if (approve.IsApproved == true)
+            await _rankingService.AddPointsFromAchievement(userId, approve.OwnerId);
+        else if (approve.IsApproved == false)
+            await _rankingService.SubtractPointsFromAchievement(userId, approve.OwnerId);
+        else
+        {
+            if (dto.IsApproved == true)
+                await _rankingService.UndoPointsFromAchievement(userId, approve.OwnerId);
+            else
+                await _rankingService.UndoSubtractPointsFromAchievement(userId, approve.OwnerId);
+        }
 
         return Ok(approve);
     }

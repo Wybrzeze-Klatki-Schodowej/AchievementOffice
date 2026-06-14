@@ -156,6 +156,11 @@ public class AchievementService : IAchievementService
                 a.AchievementId == achievementId && 
                 a.UserId == userId);
 
+        var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
+
+        if (achievement != null) return null;
+        var ownerId = achievement.UserId;
+
         if (existing is null)
         {
             var approve = new AchievementApprove
@@ -170,7 +175,7 @@ public class AchievementService : IAchievementService
             _context.AchievementApproves.Add(approve);
             await _context.SaveChangesAsync();
 
-            return MapApproveToDto(approve);
+            return MapApproveToDto(approve, ownerId);
         }
             
         if (existing.DeletedAt != null)
@@ -180,7 +185,7 @@ public class AchievementService : IAchievementService
             existing.ApprovedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            return MapApproveToDto(existing);
+            return MapApproveToDto(existing, ownerId);
         }
         
         if (existing.IsApproved == dto.IsApproved)
@@ -193,6 +198,7 @@ public class AchievementService : IAchievementService
                 AchievementApproveId = existing.AchievementApproveId,
                 AchievementId = existing.AchievementId,
                 UserId = existing.UserId,
+                OwnerId = achievement.UserId,
                 IsApproved = null,
                 ApprovedAt = existing.ApprovedAt
             };
@@ -203,7 +209,7 @@ public class AchievementService : IAchievementService
 
         await _context.SaveChangesAsync();
 
-        return MapApproveToDto(existing);
+        return MapApproveToDto(existing, ownerId);
     }
 
     public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)
@@ -211,16 +217,20 @@ public class AchievementService : IAchievementService
         var approvals = await _context.AchievementApproves
             .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
             .ToListAsync();
-        return approvals.Select( MapApproveToDto ).ToList();
+
+        var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
+
+        return approvals.Select( a => MapApproveToDto(a, achievement?.UserId ?? Guid.Empty) ).ToList();
     }
 
-    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve)
+    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve, Guid ownerId)
     {
         return new AchievementApproveResponseDto
         {
             AchievementApproveId = approve.AchievementApproveId,
             AchievementId = approve.AchievementId,
             UserId = approve.UserId,
+            OwnerId = ownerId,
             IsApproved = approve.IsApproved,
             ApprovedAt = approve.ApprovedAt
         };
