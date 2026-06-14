@@ -3,7 +3,7 @@ import {
     createShoutout,
     updateShoutout,
     type CreateShoutoutDto,
-} from "../../api/ShoutoutsApi";
+} from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 
 interface Props {
@@ -46,43 +46,6 @@ export default function ShoutoutFormProfile({
             setLoading(false);
         }
     };
-
-    // return (
-    //     <form onSubmit={handleSubmit}>
-    //         <h2>{shoutout ? "Edit shoutout" : "Add shoutout"}</h2>
-
-    //         <div>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Title"
-    //                 value={title}
-    //                 onChange={(e) => setTitle(e.target.value)}
-    //                 required
-    //                 maxLength={100}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         <div>
-    //             <textarea
-    //                 placeholder="Description"
-    //                 value={description}
-    //                 onChange={(e) => setDescription(e.target.value)}
-    //                 required
-    //                 maxLength={500}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         {error && <div className="error-message">{error}</div>}
-
-    //         <button type="submit" disabled={loading}>
-    //             {loading
-    //                 ? shoutout ? "Saving..." : "Adding..."
-    //                 : shoutout ? "Save changes" : "Add shoutout"}
-    //         </button>
-    //     </form>
-    // );
 
         return (
         <form onSubmit={handleSubmit} className="shoutout-form">

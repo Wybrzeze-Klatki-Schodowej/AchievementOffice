@@ -3,7 +3,7 @@ import {
     createShoutout,
     updateShoutout,
     type CreateShoutoutDto,
-} from "../../api/ShoutoutsApi";
+} from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 import { getCurrentUser } from "../../api/LoginApi";
 
@@ -109,65 +109,6 @@ export default function ShoutoutForm({
             setLoading(false);
         }
     };
-
-    // return (
-    //     <form onSubmit={handleSubmit}>
-    //         <h2>{shoutout ? "Edit shoutout" : "Add shoutout"}</h2>
-
-    //         {!shoutout && (
-    //             <div>
-    //                 <select
-    //                     value={receiverId}
-    //                     onChange={(e) => setReceiverId(e.target.value)}
-    //                     required
-    //                 >
-    //                     <option value="">Select user</option>
-
-    //                     {users.map((user) => (
-    //                         <option key={user.userId} value={user.userId}>
-    //                             {user.login}
-    //                         </option>
-    //                     ))}
-    //                 </select>
-    //             </div>
-    //         )}
-
-    //         <div>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Title"
-    //                 value={title}
-    //                 onChange={(e) => setTitle(e.target.value)}
-    //                 required
-    //                 maxLength={100}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         <div>
-    //             <textarea
-    //                 placeholder="Description"
-    //                 value={description}
-    //                 onChange={(e) => setDescription(e.target.value)}
-    //                 required
-    //                 maxLength={500}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         {error && <div className="error-message">{error}</div>}
-
-    //         <button type="submit" disabled={loading}>
-    //             {loading
-    //                 ? shoutout
-    //                     ? "Saving..."
-    //                     : "Adding..."
-    //                 : shoutout
-    //                     ? "Save changes"
-    //                     : "Add shoutout"}
-    //         </button>
-    //     </form>
-    // );
 
         return (
         <form onSubmit={handleSubmit} className="shoutout-form">

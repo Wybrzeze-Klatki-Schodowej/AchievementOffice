@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addReaction, removeReaction } from "../../api/ShoutoutsApi";
+import { addReaction, removeReaction } from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 import "./ShoutoutCard.css";
 
@@ -24,7 +24,10 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
     const [isReacting, setIsReacting] = useState(false);
 
     const senderName = `${shoutout.senderFirstname} ${shoutout.senderLastname}`.trim() || shoutout.senderLogin;
-    const receiverName = `${shoutout.receiverFirstname} ${shoutout.receiverLastname}`.trim() || shoutout.receiverLogin;
+    const senderDisplayName = 
+        shoutout.senderFirstname && shoutout.senderLastname
+            ? `${shoutout.senderFirstname} ${shoutout.senderLastname} (@${shoutout.senderLogin})`
+            : shoutout.senderLogin;
 
     const handleReactionClick = async (reactionType: number) => {
         if (!currentUserId || isReacting) return;
@@ -49,9 +52,16 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
             <div className="shoutout-header">
                 <h3>{shoutout.title}</h3>
                 <div className="shoutout-meta">
-                    <strong>{senderName}</strong>
-                    <span className="arrow">→</span>
-                    <strong>{receiverName}</strong>
+                    <span className="meta-label">From</span>
+                    <span className="sender-name">
+                        {senderName}
+                    </span>
+
+                    {shoutout.senderFirstname && shoutout.senderLastname && (
+                        <span className="sender-login">
+                            @{shoutout.senderLogin}
+                        </span>
+                    )}
                 </div>
             </div>
 

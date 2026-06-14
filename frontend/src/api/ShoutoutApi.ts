@@ -135,3 +135,18 @@ export const removeReaction = async (shoutoutId: string): Promise<Shoutout> => {
 
     return response.json();
 };
+
+export async function getReceivedShoutouts(userId: string) {
+    const response = await fetch(
+        `${API_URL}/receiver/${userId}`,
+        {
+            credentials: "include",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch shoutouts");
+    }
+
+    return await response.json();
+}

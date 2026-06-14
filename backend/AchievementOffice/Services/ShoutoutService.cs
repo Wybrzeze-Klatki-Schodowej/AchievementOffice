@@ -203,6 +203,27 @@ namespace AchievementOffice.Services
             return await GetShoutoutByIdAsync(shoutoutId);
         }
 
+        public async Task<Result<List<ShoutoutResponse>>> GetReceivedShoutoutsAsync(Guid receiverId)
+        {
+            var shoutouts = await _appDbContext.Shoutouts
+                .Include(s => s.Sender)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Kudos)
+                .Where(s =>
+                    s.DeletedAt == null &&
+                    s.ReceiverId == receiverId)
+                .OrderByDescending(s => s.CreatedAt)
+                .ToListAsync();
+
+            var result = shoutouts
+                .Select(MapToDto)
+                .ToList();
+
+            return Result<List<ShoutoutResponse>>.Success(result);
+        }
+
         private ShoutoutResponse MapToDto(Shoutout shoutout)
         {
             var currentUserId = GetUserId();

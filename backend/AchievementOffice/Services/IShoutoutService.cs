@@ -1,4 +1,5 @@
 using AchievementOffice.Models;
+using AchievementOffice.Entities;
 
 namespace AchievementOffice.Services
 {
@@ -9,7 +10,9 @@ namespace AchievementOffice.Services
         Task<Result<bool>> DeleteAsync(Guid shoutoutId);
         Task<Result<ShoutoutResponse>> GetShoutoutByIdAsync(Guid shoutoutId);
         Task<Result<List<ShoutoutResponse>>> GetAllShoutoutsAsync();
-        Task<Result<ShoutoutResponse>> ReactAsync(Guid shoutoutId, AchievementOffice.Entities.ReactionType reaction);
+        Task<Result<ShoutoutResponse>> ReactAsync(Guid shoutoutId, ReactionType reaction);
         Task<Result<ShoutoutResponse>> UnreactAsync(Guid shoutoutId);
+
+        Task<Result<List<ShoutoutResponse>>> GetReceivedShoutoutsAsync(Guid receiverId);
     }
 }
