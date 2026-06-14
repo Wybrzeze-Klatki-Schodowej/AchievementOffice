@@ -23,7 +23,7 @@ export default function ShoutoutList({ refreshTrigger, userId }: Props) {
             //setLoading(true);
             const data = await getShoutouts();
             const sorted = [...data]
-                .filter(s => s.senderId === userId || s.receiverId === userId)
+                .filter(s => s.receiverId === userId)
                 .sort((a, b) =>
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
