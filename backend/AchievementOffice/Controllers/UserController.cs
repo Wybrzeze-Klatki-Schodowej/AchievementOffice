@@ -1,8 +1,9 @@
+using System.Security.Claims;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 
 namespace AchievementOffice.Controllers
 {
@@ -36,7 +37,7 @@ namespace AchievementOffice.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);

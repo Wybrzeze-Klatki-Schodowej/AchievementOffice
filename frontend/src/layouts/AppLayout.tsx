@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import AchievementModal from "../components/achievements/AchievementModal";
+import ShoutoutModal from "../components/shoutouts/ShoutoutModal";
 import UserList from "../components/users/UserList";
 
 export default function AppLayout() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
+    const [isShoutoutModalOpen, setIsShoutoutModalOpen] = useState(false);
+
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
-    
-    const handleAchievementCreated = () => {
+
+    const handleContentCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
@@ -17,14 +20,31 @@ export default function AppLayout() {
         <>
             <Navbar 
                 onAddAchievementClick={() =>
-                    setIsModalOpen(true)
+                    setIsAchievementModalOpen(true)
+                }
+
+                onAddShoutoutClick={() =>
+                    setIsShoutoutModalOpen(true)
                 }
             />
 
+
             <AchievementModal 
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onAchievementCreated={handleAchievementCreated}
+                open={isAchievementModalOpen}
+                onClose={() => setIsAchievementModalOpen(false)}
+                onAchievementCreated={handleContentCreated}
+            />
+
+            <ShoutoutModal 
+                open={isShoutoutModalOpen}
+                onClose={() => setIsShoutoutModalOpen(false)}
+                onShoutoutCreated={handleContentCreated}
+            />
+
+            <ShoutoutModal 
+                open={isShoutoutModalOpen}
+                onClose={() => setIsShoutoutModalOpen(false)}
+                onShoutoutCreated={handleContentCreated}
             />
 
             <div 
@@ -61,7 +81,8 @@ export default function AppLayout() {
                         context={{ 
                             refreshTrigger,
                             refreshUsers: () =>
-                                setUsersRefreshTrigger(prev => prev + 1)
+                            setUsersRefreshTrigger(prev => prev + 1),
+                            onAddShoutoutClick: () => setIsShoutoutModalOpen(true)
                         }}
                     />
                 </main>
