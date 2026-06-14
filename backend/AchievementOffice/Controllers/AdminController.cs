@@ -54,12 +54,21 @@ namespace AchievementOffice.Controllers
         [HttpPatch("users/{id:guid}/rank")]
         public async Task<IActionResult> UpdateUserRank(Guid id, [FromBody] UpdateUserRankRequest request)
         {
-            var result = await _adminService.UpdateUserRankAsync(id, request.Rank);
+            var result = await _adminService.UpdateUserRankAsync(id, request.RankId);
             if (!result.IsSuccess)
             {
                 return NotFound(new { message = result.ErrorMessage });
             }
             return Ok(new { message = "User rank updated successfully" });
+        }
+
+        [HttpDelete("comments/{id:guid}")]
+        public async Task<IActionResult> DeleteComment(Guid id)
+        {
+            var result = await _adminService.DeleteCommentAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return Ok(new { message = "Comment deleted successfully" });
         }
     }
 }
