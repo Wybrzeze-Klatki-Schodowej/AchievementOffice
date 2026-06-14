@@ -43,5 +43,23 @@ namespace AchievementOffice.Controllers
             var stats = await _adminService.GetStatsAsync();
             return Ok( stats );
         }
+
+        [HttpGet("ranks")]
+        public async Task<IActionResult> GetRanks()
+        {
+            var ranks = await _adminService.GetRanksAsync();
+            return Ok( ranks );
+        }
+
+        [HttpPatch("users/{id:guid}/rank")]
+        public async Task<IActionResult> UpdateUserRank(Guid id, [FromBody] UpdateUserRankRequest request)
+        {
+            var result = await _adminService.UpdateUserRankAsync(id, request.Rank);
+            if (!result.IsSuccess)
+            {
+                return NotFound(new { message = result.ErrorMessage });
+            }
+            return Ok(new { message = "User rank updated successfully" });
+        }
     }
 }
