@@ -7,11 +7,15 @@ export interface CreateShoutoutDto {
     receiverId: string;
     title: string;
     description?: string;
+    visibilityId: number;
+    groupIds?: string[];
 }
 
 export interface UpdateShoutoutDto {
     title: string;
     description?: string;
+    visibilityId: number;
+    groupIds?: string[];
 }
 
 export const getShoutouts = async (): Promise<Shoutout[]> => {

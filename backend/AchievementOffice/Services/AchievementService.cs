@@ -30,11 +30,29 @@ public class AchievementService : IAchievementService
             UserId = GetUserId(),
             Title = dto.Title,
             Description = dto.Description,
+            VisibilityId = dto.VisibilityId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
         _context.Achievements.Add(achievement);
+
+        if (dto.VisibilityId == (int)VisibilityMode.Group)
+        {
+            if (dto.GroupIds == null || !dto.GroupIds.Any())
+                return Result<AchievementResponse>.Fail("At least one group is required when visibility is set to Groups");
+
+            var groups = dto.GroupIds.Distinct().Select(gId => new AchievementGroup
+            {
+                AchievementId = achievement.AchievementId,
+                GroupId = gId
+            });
+            _context.AchievementGroups.AddRange(groups);
+        }
+        else if (dto.GroupIds?.Any() == true)
+        {
+            return Result<AchievementResponse>.Fail("GroupIds can only be provided when visibility is set to Groups");
+        }
 
         await _context.SaveChangesAsync();
 
@@ -43,18 +61,41 @@ public class AchievementService : IAchievementService
 
     public async Task<Result<List<AchievementResponse>>> GetAllAsync()
     {
-        var achievements = await _context.Achievements
-            .Where(a => a.DeletedAt == null)
+        var userId = GetUserId();
+        var role = GetRole();
+        var isAdmin = role == "Admin";
+
+        var query = _context.Achievements
+            .AsQueryable()
+            .Where(a => a.DeletedAt == null);
+
+        if (!isAdmin)
+        {
+            query = query.Where(a =>
+                a.UserId == userId ||
+                a.VisibilityId == (int)VisibilityMode.Public ||
+                (a.VisibilityId == (int)VisibilityMode.Group &&
+                    a.AchievementGroups.Any(g =>
+                        _context.GroupUsers.Any(ug =>
+                            ug.UserId == userId && ug.GroupId == g.GroupId
+                        )
+                    )
+                )
+            );
+        }
+
+        var achievements = await query
+            .Include(a => a.AchievementGroups)
             .ToListAsync();
 
         var result = achievements.Select(MapToDto).ToList();
-
         return Result<List<AchievementResponse>>.Success(result);
     }
 
     public async Task<Result<AchievementResponse>> GetByIdAsync(Guid id)
     {
         var achievement = await _context.Achievements
+            .Include(a => a.AchievementGroups)
             .FirstOrDefaultAsync(a => a.AchievementId == id && a.DeletedAt == null);
 
         if (achievement == null)
@@ -66,11 +107,12 @@ public class AchievementService : IAchievementService
     public async Task<Result<AchievementResponse>> UpdateAsync(Guid id, UpdateAchievementRequest dto)
     {
         var achievement = await _context.Achievements
+            .Include(a => a.AchievementGroups)
             .FirstOrDefaultAsync(a => a.AchievementId == id && a.DeletedAt == null);
 
         if (achievement == null)
             return Result<AchievementResponse>.Fail("Achievement not found.");
-        
+
         if (string.IsNullOrWhiteSpace(dto.Title))
             return Result<AchievementResponse>.Fail("Title is required.");
 
@@ -85,7 +127,27 @@ public class AchievementService : IAchievementService
 
         achievement.Title = dto.Title;
         achievement.Description = dto.Description;
+        achievement.VisibilityId = dto.VisibilityId;
         achievement.UpdatedAt = DateTime.UtcNow;
+
+        _context.AchievementGroups.RemoveRange(achievement.AchievementGroups);
+
+        if (dto.VisibilityId == (int)VisibilityMode.Group)
+        {
+            if (dto.GroupIds == null || !dto.GroupIds.Any())
+                return Result<AchievementResponse>.Fail("At least one group is required when visibility is set to Groups");
+
+            var groups = dto.GroupIds.Distinct().Select(gId => new AchievementGroup
+            {
+                AchievementId = achievement.AchievementId,
+                GroupId = gId
+            });
+            _context.AchievementGroups.AddRange(groups);
+        }
+        else if (dto.GroupIds?.Any() == true)
+        {
+            return Result<AchievementResponse>.Fail("GroupIds can only be provided when visibility is set to Groups");
+        }
 
         await _context.SaveChangesAsync();
 
@@ -141,6 +203,10 @@ public class AchievementService : IAchievementService
             UserId = achievement.UserId,
             Title = achievement.Title,
             Description = achievement.Description,
+            VisibilityId = achievement.VisibilityId,
+            GroupIds = achievement.AchievementGroups
+                .Select(g => g.GroupId)
+                .ToList(),
             CreatedAt = achievement.CreatedAt,
             UpdatedAt = achievement.UpdatedAt
         };
@@ -251,6 +317,7 @@ public class AchievementService : IAchievementService
     public async Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId)
     {
         var achievements = await _context.Achievements
+            .Include(a => a.AchievementGroups)
             .Where(a => a.UserId == userId && a.DeletedAt == null)
             .ToListAsync();
 

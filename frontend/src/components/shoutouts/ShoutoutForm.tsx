@@ -3,6 +3,7 @@ import {
     createShoutout,
     updateShoutout,
     type CreateShoutoutDto,
+    type UpdateShoutoutDto,
 } from "../../api/ShoutoutsApi";
 import type { Shoutout } from "../../types/shoutout";
 import { getCurrentUser } from "../../api/LoginApi";
@@ -27,6 +28,30 @@ export default function ShoutoutForm({
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [visibilityId, setVisibilityId] = useState<number>(
+        shoutout?.visibilityId ?? 1
+    );
+    const [groupIds, setGroupIds] = useState<string[]>(shoutout?.groupIds ?? []);
+    const [groups, setGroups] = useState<{ groupId: string; name: string }[]>([]);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const res = await fetch(import.meta.env.VITE_API_URL + "/groups", {
+                    credentials: "include",
+                });
+
+                if (!res.ok) throw new Error("Failed to fetch groups");
+
+                const data = await res.json();
+                setGroups(data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetchGroups();
+    }, []);
 
     useEffect(() => {
         if (shoutout) return;
@@ -77,15 +102,20 @@ export default function ShoutoutForm({
             }
 
             if (shoutout) {
-                await updateShoutout(shoutout.shoutoutId, {
+                const updateDto: UpdateShoutoutDto = {
                     title,
                     description,
-                });
+                    visibilityId,
+                    groupIds: visibilityId === 3 ? groupIds : [],
+                };
+                await updateShoutout(shoutout.shoutoutId, updateDto);
             } else {
                 const dto: CreateShoutoutDto = {
                     receiverId,
                     title,
                     description,
+                    visibilityId,
+                    groupIds: visibilityId === 3 ? groupIds : undefined,
                 };
 
                 console.log("Creating shoutout:", dto);
@@ -109,65 +139,6 @@ export default function ShoutoutForm({
             setLoading(false);
         }
     };
-
-    // return (
-    //     <form onSubmit={handleSubmit}>
-    //         <h2>{shoutout ? "Edit shoutout" : "Add shoutout"}</h2>
-
-    //         {!shoutout && (
-    //             <div>
-    //                 <select
-    //                     value={receiverId}
-    //                     onChange={(e) => setReceiverId(e.target.value)}
-    //                     required
-    //                 >
-    //                     <option value="">Select user</option>
-
-    //                     {users.map((user) => (
-    //                         <option key={user.userId} value={user.userId}>
-    //                             {user.login}
-    //                         </option>
-    //                     ))}
-    //                 </select>
-    //             </div>
-    //         )}
-
-    //         <div>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Title"
-    //                 value={title}
-    //                 onChange={(e) => setTitle(e.target.value)}
-    //                 required
-    //                 maxLength={100}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         <div>
-    //             <textarea
-    //                 placeholder="Description"
-    //                 value={description}
-    //                 onChange={(e) => setDescription(e.target.value)}
-    //                 required
-    //                 maxLength={500}
-    //                 className={error ? "error" : ""}
-    //             />
-    //         </div>
-
-    //         {error && <div className="error-message">{error}</div>}
-
-    //         <button type="submit" disabled={loading}>
-    //             {loading
-    //                 ? shoutout
-    //                     ? "Saving..."
-    //                     : "Adding..."
-    //                 : shoutout
-    //                     ? "Save changes"
-    //                     : "Add shoutout"}
-    //         </button>
-    //     </form>
-    // );
 
         return (
         <form onSubmit={handleSubmit} className="shoutout-form">
@@ -219,6 +190,42 @@ export default function ShoutoutForm({
                     className={error ? "error" : ""}
                 />
             </div>
+
+            <div className="form-group">
+                <label htmlFor="visibility">Visibility</label>
+                <select
+                    id="visibility"
+                    value={visibilityId}
+                    onChange={(e) => setVisibilityId(Number(e.target.value))}
+                >
+                    <option value={1}>Public</option>
+                    <option value={2}>Private</option>
+                    <option value={3}>Groups</option>
+                </select>
+            </div>
+
+            {visibilityId === 3 && (
+                <div className="form-group">
+                    <label>Allowed groups</label>
+
+                    {groups.map((g) => (
+                        <label key={g.groupId} style={{ display: "block" }}>
+                            <input
+                                type="checkbox"
+                                checked={groupIds.includes(g.groupId)}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setGroupIds([...groupIds, g.groupId]);
+                                    } else {
+                                        setGroupIds(groupIds.filter(id => id !== g.groupId));
+                                    }
+                                }}
+                            />
+                            {g.name}
+                        </label>
+                    ))}
+                </div>
+            )}
 
             {error && <div className="error-message">{error}</div>}
 

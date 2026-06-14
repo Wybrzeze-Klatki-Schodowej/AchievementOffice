@@ -30,5 +30,8 @@ namespace AchievementOffice.Models
 
         public Dictionary<string, int> Reactions { get; set; } = new();
         public string? CurrentUserReaction { get; set; }
+
+        public int VisibilityId { get; set; }
+        public List<Guid> GroupIds { get; set; } = new();
     }
 }
