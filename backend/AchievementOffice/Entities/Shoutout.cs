@@ -5,7 +5,6 @@ namespace AchievementOffice.Entities
     [Table("Shoutouts")]
     public class Shoutout
     {
-        // Konieczne może być zaktualizowanie encji User lub Shoutout lub KudosShoutout. 
         [Column("shoutout_id")]
         public Guid ShoutoutId { get; set; }
 

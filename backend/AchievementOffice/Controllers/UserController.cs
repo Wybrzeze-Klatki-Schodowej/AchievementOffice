@@ -35,17 +35,9 @@ namespace AchievementOffice.Controllers
 
             return Ok(user);
         }
-        
-        // [HttpGet]
-        // public async Task<ActionResult<List<UserDto>>> GetAllUsers()
-        // {
-        //     var users = await _userService.GetAllUsersAsync2();
-
-        //     return Ok(users);
-        // }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
@@ -118,23 +110,3 @@ namespace AchievementOffice.Controllers
         }
     }
 }
-
-/*
-public class UserController : ControllerBase
-    {
-        private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
-        {
-            var users = await _userService.GetAllUsersAsync2();
-
-            return Ok(users);
-        }
-    }
-*/

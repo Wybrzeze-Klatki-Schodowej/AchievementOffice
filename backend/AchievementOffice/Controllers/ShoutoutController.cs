@@ -27,12 +27,11 @@ namespace AchievementOffice.Controllers
             if (!shoutout.IsSuccess)
                 return BadRequest(new { message = shoutout.ErrorMessage });
 
-           /* return CreatedAtAction(
+            return CreatedAtAction(
                 nameof(GetShoutoutById),
                 new { shoutoutId = shoutout.Value!.ShoutoutId },
                 shoutout.Value
-            );*/
-            return Ok(shoutout.Value);
+            );
         }
 
         [Authorize]
