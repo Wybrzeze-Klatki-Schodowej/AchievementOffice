@@ -30,34 +30,21 @@ namespace AchievementOffice.Services
             return Result.Success();
         }
 
-        public async Task<Result> AddPointsFromAchievement(Guid reactingUserId, Guid ownerId)
+        public async Task<Result> ApplypAchievementPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
         {
-            return await AddPoints(reactingUserId, ownerId, _rankingSettings.AchievementApprovedBasePoints);
-        }
+            if (isApproved == true)
+                return await AddPoints(reactingUserId, ownerId, _rankingSettings.AchievementApprovedBasePoints);
+            else if (isApproved == false)
+                return await AddPoints(reactingUserId, ownerId, _rankingSettings.DisapprovalPoints);
 
-        public async Task<Result> AddPointsFromShoutOut(Guid reactingUserId, Guid ownerId)
-        {
-            return await AddPoints(reactingUserId, ownerId, _rankingSettings.ReactionShoutOutPoints);
-        }
-
-        public async Task<Result> SubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId)
-        {
-            return await AddPoints(reactingUserId, ownerId, _rankingSettings.DisapprovalPoints);
-        }
-
-        public async Task<Result> UndoPointsFromAchievement(Guid reactingUserId, Guid ownerId)
-        {
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.AchievementApprovedBasePoints);
-        }
-
-        public async Task<Result> UndoPointsFromShoutOut(Guid reactingUserId, Guid ownerId)
-        {
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ReactionShoutOutPoints);
-        }
-
-        public async Task<Result> UndoSubtractPointsFromAchievement(Guid reactingUserId, Guid ownerId)
-        {
+            if (dtoApproved == true)
+                return await AddPoints(reactingUserId, ownerId, -_rankingSettings.AchievementApprovedBasePoints);
             return await AddPoints(reactingUserId, ownerId, -_rankingSettings.DisapprovalPoints);
+        }
+
+        public Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
+        {
+            throw new NotImplementedException();
         }
     }
 }
