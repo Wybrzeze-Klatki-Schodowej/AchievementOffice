@@ -2,6 +2,7 @@ import type { Achievement, AchievementApprovalSummary } from "../../types/achiev
 import { approveAchievement, getApprovalSummary } from "../../api/achievementApi";
 import { useState, useEffect, useCallback } from "react";
 import SelectReviewerModal from "./SelectReviewerModal";
+import AchievementApprovalsModal from "./AchievementApprovalsModal";
 
 interface Props {
     achievement: Achievement;
@@ -23,6 +24,7 @@ export default function AchievementCard({
 
     const [loading, setLoading] = useState(false);
     const [showReviewerModal, setShowReviewerModal] = useState(false);
+    const [showApprovals, setShowApprovals] = useState(false);
 
     const [summary, setSummary] = 
         useState<AchievementApprovalSummary>({ 
@@ -85,8 +87,16 @@ export default function AchievementCard({
                 Updated: {new Date(achievement.updatedAt).toLocaleString()}
             </small>
 
-            <div style={{ marginTop: "8px", fontSize: "14px" }}>
-                 {summary.approved} approves &nbsp;  {summary.denied} denies
+            <div
+                style={{
+                    marginTop: "8px",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    textDecoration: "underline"
+                }}
+                onClick={() => setShowApprovals(true)}
+            >
+                {summary.approved} approves · {summary.denied} denies (view details)
             </div>
 
             {!isOwner && (
@@ -145,6 +155,13 @@ export default function AchievementCard({
                     achievementId={achievement.achievementId}
                     onClose={() => setShowReviewerModal(false)}
                     onSuccess={fetchSummary}
+                />
+            )}
+
+            {showApprovals && (
+                <AchievementApprovalsModal 
+                    achievementId={achievement.achievementId}
+                    onClose={() => setShowApprovals(false)}
                 />
             )}
         </div>
