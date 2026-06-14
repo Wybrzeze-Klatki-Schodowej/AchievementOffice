@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-//import { deleteShoutout, getShoutouts } from "../../api/ShoutoutsApi";
-import { deleteShoutout, getReceivedShoutouts } from "../../api/ShoutoutApi";
+import { deleteShoutout, getShoutouts } from "../../api/ShoutoutsApi";
+//import { deleteShoutout, getReceivedShoutouts } from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 import ShoutoutModal from "./ShoutoutModal";
 import { getCurrentUser } from "../../api/LoginApi";
@@ -20,18 +20,17 @@ export default function ShoutoutList({ refreshTrigger, userId }: Props) {
 
     const loadShoutouts = async () => {
         try {
-            // //setLoading(true);
-            // const data = await getShoutouts();
-            // const sorted = [...data]
-            //     .filter(s => s.senderId === userId || s.receiverId === userId)
-            //     .sort((a, b) =>
-            //         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            //     );
-            // setShoutouts(sorted);
-            setLoading(true);
-            const data = await getReceivedShoutouts(userId);
-            
-            setShoutouts(data);
+            //setLoading(true);
+            const data = await getShoutouts();
+            const sorted = [...data]
+                .filter(s => s.senderId === userId || s.receiverId === userId)
+                .sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+            setShoutouts(sorted);
+            // setLoading(true);
+            // const data = await getReceivedShoutouts(userId);            
+            // setShoutouts(data);
         } catch (error) {
             console.error(error);
         } finally {

@@ -620,16 +620,6 @@ namespace AchievementOffice.Migrations
                     b.HasIndex("VisibilityId");
 
                     b.ToTable("UserDetails", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
-                            Firstname = "Jan",
-                            JobTitle = "Admin",
-                            Lastname = "Kowalski",
-                            VisibilityId = 1
-                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
@@ -916,9 +906,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Shoutout");
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
