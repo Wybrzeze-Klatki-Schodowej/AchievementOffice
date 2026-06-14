@@ -44,12 +44,25 @@ namespace AchievementOffice.Services
             _appDbContext.Shoutouts.Add(shoutout);
             await _appDbContext.SaveChangesAsync();
 
+            var createdShoutout = await _appDbContext.Shoutouts
+                .Include(s => s.Sender)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Kudos)
+                .FirstAsync(s => s.ShoutoutId == shoutout.ShoutoutId);
+
             return Result<ShoutoutResponse>.Success(MapToDto(shoutout));
         }
 
         public async Task<Result<ShoutoutResponse>> UpdateAsync(Guid shoutoutId, UpdateShoutoutRequest updateDto)
         {
             var shoutout = await _appDbContext.Shoutouts
+                .Include(s => s.Sender)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Receiver)
+                    .ThenInclude(u => u.UserDetails)
+                .Include(s => s.Kudos)
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
@@ -197,13 +210,6 @@ namespace AchievementOffice.Services
             {
                 ShoutoutId = shoutout.ShoutoutId,
                 SenderId = shoutout.SenderId,
-                // SenderLogin = shoutout.Sender?.Login ?? string.Empty,
-                // SenderFirstname = shoutout.Sender?.UserDetails?.Firstname ?? string.Empty,
-                // SenderLastname = shoutout.Sender?.UserDetails?.Lastname ?? string.Empty,
-                // ReceiverId = shoutout.ReceiverId,
-                // ReceiverLogin = shoutout.Receiver?.Login ?? string.Empty,
-                // ReceiverFirstname = shoutout.Receiver?.UserDetails?.Firstname ?? string.Empty,
-                // ReceiverLastname = shoutout.Receiver?.UserDetails?.Lastname ?? string.Empty,
                 SenderLogin = shoutout.Sender.Login,
                 SenderFirstname = shoutout.Sender.UserDetails.Firstname,
                 SenderLastname = shoutout.Sender.UserDetails.Lastname,
