@@ -25,7 +25,7 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
     const [isReacting, setIsReacting] = useState(false);
 
     const senderName = `${shoutout.senderFirstname} ${shoutout.senderLastname}`.trim() || shoutout.senderLogin;
-    const receiverName = `${shoutout.receiverFirstname} ${shoutout.receiverLastname}`.trim() || shoutout.receiverLogin;
+    //const receiverName = `${shoutout.receiverFirstname} ${shoutout.receiverLastname}`.trim() || shoutout.receiverLogin;
 
     const handleReactionClick = async (reactionType: number) => {
         if (!currentUserId || isReacting) return;

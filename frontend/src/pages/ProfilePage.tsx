@@ -19,7 +19,7 @@ interface OutletContext {
 }
 
 export default function ProfilePage() {
-    const { 
+    const {
         refreshTrigger,
         refreshUsers,
     } = useOutletContext<OutletContext>();
@@ -84,6 +84,8 @@ export default function ProfilePage() {
     const isAdmin = currentUserRole === "Admin";
     const canManageUser = isAdmin && !isOwnProfile;
 
+    const canViewProfileMeta = !user.isProfileRestricted;
+
     return (
         <div className={`
             profile-container 
@@ -99,108 +101,111 @@ export default function ProfilePage() {
                             {" "}
                             {user.lastName}
                         </h1>
-                    <div className="profile-username">
-                        @{user.login}
-                    </div>
+                        <div className="profile-username">
+                            @{user.login}
+                        </div>
 
-                    {isOwnProfile && (
-                        <div className="profile-badge">
-                            Your profile
-                        </div>
-                    )}
-                    {!user.isActive && (
-                        <div className="profile-badge-inactive">
-                            Inactive user
-                        </div>
-                    )}
-                    {isOwnProfile && (
-                        <button onClick={() => setIsEditOpen(true)}>
-                            Edit profile
-                        </button>
-                    )}
-                    {isOwnProfile && (
-                        <button onClick={() => setIsPasswordOpen(true)}>
-                            Change password
-                        </button>
-                    )}
-                    {canManageUser && (
-                        <button 
-                            onClick={() => setIsManageUserOpen(true)}
-                        >
-                            Manage user
-                        </button>
-                    )}
-                    {!isOwnProfile && (
-                        <div className="shout-out-user">
-                            <button 
-                                onClick={() => setIsShoutoutModalOpen(true)}
-                            >
-                                Shout-out user
+                        {isOwnProfile && (
+                            <div className="profile-badge">
+                                Your profile
+                            </div>
+                        )}
+                        {!user.isActive && (
+                            <div className="profile-badge-inactive">
+                                Inactive user
+                            </div>
+                        )}
+                        {isOwnProfile && (
+                            <button onClick={() => setIsEditOpen(true)}>
+                                Edit profile
                             </button>
+                        )}
+                        {isOwnProfile && (
+                            <button onClick={() => setIsPasswordOpen(true)}>
+                                Change password
+                            </button>
+                        )}
+                        {canManageUser && (
+                            <button
+                                onClick={() => setIsManageUserOpen(true)}
+                            >
+                                Manage user
+                            </button>
+                        )}
+                        {!isOwnProfile && (
+                            <div className="shout-out-user">
+                                <button
+                                    onClick={() => setIsShoutoutModalOpen(true)}
+                                >
+                                    Shout-out user
+                                </button>
+                            </div>
+                        )}
+
+
+                    </div>
+                </div>
+
+                {canViewProfileMeta && (
+                    <div className="profile-meta">
+                        <div><b>Email:</b> {user.email}</div>
+                        <div><b>Job Title:</b> {user.jobTitle}</div>
+                        <div><b>Bio:</b> {user.bio}</div>
+                        <div>
+                            <b>User since:</b>{" "}
+                            {new Date(user.createdAt).toLocaleDateString()}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    
-                </div>
             </div>
 
-            <div className="profile-meta">
-                <div><b>Email:</b> {user.email}</div>
-                <div><b>Job Title:</b> {user.jobTitle}</div>
-                <div><b>Bio:</b> {user.bio}</div>
-                <div>
-                    <b>User since:</b>{" "}
-                    {new Date(user.createdAt).toLocaleDateString()}
-                </div>
+            <div className="profile-card">
+
+                <AchievementList
+                    userId={userId!}
+                    refreshTrigger={refreshTrigger}
+                />
+                <ShoutoutList
+                    userId={userId!}
+                    refreshTrigger={refreshTrigger + localRefreshTrigger}
+                />
+
             </div>
+
+            <CommentSection
+                profileUserId={userId!}
+            />
+
+            {(isAdmin || isOwnProfile) && isEditOpen && user && (
+                <EditProfileModal
+                    user={user}
+                    onClose={() => setIsEditOpen(false)}
+                    onUpdated={handleUpdated}
+                />
+            )}
+
+            {isOwnProfile && isPasswordOpen && (
+                <ChangePasswordModal
+                    onClose={() => setIsPasswordOpen(false)}
+                />
+            )}
+
+            {canManageUser && isManageUserOpen && (
+                <ManageUserModal
+                    userId={user.userId}
+                    isActive={user.isActive}
+                    onClose={() => setIsManageUserOpen(false)}
+                    onUpdated={refreshProfile}
+                />
+            )}
+
+            <ShoutoutModal
+                open={isShoutoutModalOpen}
+                receiverId={userId!}
+                onClose={() => setIsShoutoutModalOpen(false)}
+                onShoutoutCreated={() => setLocalRefreshTrigger(prev => prev + 1)}
+            />
         </div>
-
-        <div className="profile-card">
-
-            <AchievementList
-                userId={userId!}
-                refreshTrigger={refreshTrigger}
-            />
-            <ShoutoutList
-                userId={userId!}
-                refreshTrigger={refreshTrigger + localRefreshTrigger}
-            />
-
-        </div>
-
-        <CommentSection 
-            profileUserId={userId!}
-        />
-
-        {(isAdmin || isOwnProfile) && isEditOpen && user && (
-            <EditProfileModal
-                user={user}
-                onClose={() => setIsEditOpen(false)}
-                onUpdated={handleUpdated}
-            />
-        )}
-
-        {isOwnProfile && isPasswordOpen && (
-            <ChangePasswordModal
-                onClose={() => setIsPasswordOpen(false)}
-            />
-        )}
-
-        {canManageUser && isManageUserOpen && (
-            <ManageUserModal 
-                userId={user.userId}
-                isActive={user.isActive}
-                onClose={() => setIsManageUserOpen(false)}
-                onUpdated={refreshProfile}
-            />
-        )}
-
-        <ShoutoutModal
-            open={isShoutoutModalOpen}
-            receiverId={userId!}
-            onClose={() => setIsShoutoutModalOpen(false)}
-            onShoutoutCreated={() => setLocalRefreshTrigger(prev => prev + 1)}
-        />
-    </div>
     );
 }

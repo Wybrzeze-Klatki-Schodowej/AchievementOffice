@@ -24,5 +24,9 @@ namespace AchievementOffice.Models
         public string? Bio { get; set; }
 
         public string? AvatarUrl { get; set; }
+
+        public int VisibilityId { get; set; } = 1;
+        public List<Guid>? GroupIds { get; set; }
+        public bool IsProfileRestricted { get; set; } = false;
     }
 }
