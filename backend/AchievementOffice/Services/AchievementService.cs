@@ -260,9 +260,9 @@ public class AchievementService : IAchievementService
             AchievementApproveId = approve.AchievementApproveId,
             AchievementId = approve.AchievementId,
             UserId = approve.UserId,
-            UserLogin = approve.User.Login,
-            UserFirstName = approve.User.UserDetails.Firstname,
-            UserLastName = approve.User.UserDetails.Lastname,
+            UserLogin = approve.User?.Login,
+            UserFirstName = approve.User?.UserDetails?.Firstname,
+            UserLastName = approve.User?.UserDetails?.Lastname,
             IsApproved = approve.IsApproved,
             ApprovedAt = approve.ApprovedAt
         };
