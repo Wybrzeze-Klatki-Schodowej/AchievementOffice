@@ -136,7 +136,7 @@ public class AdminService : IAdminService
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
-            Multiplier = request.Multiplier
+            Multiplier = request.Multiplier ?? 1.0m
         };
         _context.Ranks.Add(rank);
         await _context.SaveChangesAsync();

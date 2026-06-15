@@ -3,6 +3,7 @@ import {
     getAllUsers, updateUserStatus, getRanks, updateUserRank,
     type AdminUserProfile, type RankResponse
 } from "../api/AdminApi";
+import CreateRankModal from "../components/admin/CreateRankModal";
 import "./AdminUsersPage.css";
 
 type sortField = "login" | "firstName" | "email" | "role" | "isActive";
@@ -15,6 +16,8 @@ export default function AdminUsersPage() {
 
     const [sortField, setSortField] = useState<sortField>("login");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -99,22 +102,24 @@ export default function AdminUsersPage() {
             <table className="admin-table">
                 <thead>
                     <tr>
-                        <th onClick={() => handleSort("login")} className="sortable-header">
-                            Login
+                        <th onClick={() => handleSort("login")} className="sortable-header">Login</th>
+                        <th onClick={() => handleSort("firstName")} className="sortable-header">Name</th>
+                        <th onClick={() => handleSort("email")} className="sortable-header">Email</th>
+                        <th onClick={() => handleSort("role")} className="sortable-header">Role</th>
+                        <th>
+                            <div className="rank-header-cell">
+                                <span>Rank</span>
+                                <button
+                                    type="button"
+                                    className="add-rank-btn"
+                                    onClick={() => setIsModalOpen(true)}
+                                    title="Add new rank"
+                                >
+                                    +
+                                </button>
+                            </div>
                         </th>
-                        <th onClick={() => handleSort("firstName")} className="sortable-header">
-                            Name
-                        </th>
-                        <th onClick={() => handleSort("email")} className="sortable-header">
-                            Email
-                        </th>
-                        <th onClick={() => handleSort("role")} className="sortable-header">
-                            Role
-                        </th>
-                        <th> Rank </th>
-                        <th onClick={() => handleSort("isActive")} className="sortable-header">
-                            Status
-                        </th>
+                        <th onClick={() => handleSort("isActive")} className="sortable-header">Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -174,6 +179,12 @@ export default function AdminUsersPage() {
                     ))}
                 </tbody>
             </table>
+
+            <CreateRankModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={fetchUsers}
+            />
         </div>
     );
 }

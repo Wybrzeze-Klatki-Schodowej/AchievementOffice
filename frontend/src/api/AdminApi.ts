@@ -124,3 +124,23 @@ export async function adminDeleteComment(commentId: string): Promise<void> {
         throw new Error(`Failed to delete comment: ${response.status}`);
     }
 }
+
+export interface CreateRankRequest {
+    name: string;
+    multiplier: number;
+}
+
+export async function createRank(request: CreateRankRequest): Promise<void> {
+    const response = await fetch(`${ADMIN_API_URL}/ranks`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request),
+        credentials: "include"
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to create rank: ${response.status}`);
+    }
+    return response.json();
+}
