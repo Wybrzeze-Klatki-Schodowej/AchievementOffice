@@ -121,11 +121,24 @@ public class AdminService : IAdminService
     public async Task<Result> DeleteAchievementAsync(Guid achievementId)
     {
         var achievement = await _context.Achievements
-            .FirstOrDefaultAsync(a => a.Id == achievementId && a.DeletedAt == null);
+            .FirstOrDefaultAsync(a => a.AchievementId == achievementId && a.DeletedAt == null);
         if (achievement == null)
             return Result.Fail("Achievement not found");
         achievement.DeletedAt = DateTime.UtcNow;
         achievement.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> CreateRankAsync(CreateRankRequest request)
+    {
+        var rank = new Entities.Rank
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            Multiplier = request.Multiplier
+        };
+        _context.Ranks.Add(rank);
         await _context.SaveChangesAsync();
         return Result.Success();
     }

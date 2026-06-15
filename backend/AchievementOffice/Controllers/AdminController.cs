@@ -79,5 +79,14 @@ namespace AchievementOffice.Controllers
                 return NotFound(new { message = result.ErrorMessage });
             return Ok(new { message = "Achievement deleted successfully" });
         }
+
+        [HttpPost("ranks")]
+        public async Task<IActionResult> CreateRank([FromBody] CreateRankRequest request)
+        {
+            var result = await _adminService.CreateRankAsync(request);
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+            return Ok(new { message = "Rank created successfully" });
+        }
     }
 }
