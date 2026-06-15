@@ -10,4 +10,5 @@ public interface IAdminService
     Task<List<RankResponse>> GetRanksAsync();
     Task<Result> UpdateUserRankAsync(Guid userId, Guid? rankId);
     Task<Result> DeleteCommentAsync(Guid commentId);
+    Task<Result> DeleteAchievementAsync(Guid achievementId);
 }

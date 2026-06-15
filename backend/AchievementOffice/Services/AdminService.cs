@@ -117,4 +117,16 @@ public class AdminService : IAdminService
 
         return Result.Success();
     }
+
+    public async Task<Result> DeleteAchievementAsync(Guid achievementId)
+    {
+        var achievement = await _context.Achievements
+            .FirstOrDefaultAsync(a => a.Id == achievementId && a.DeletedAt == null);
+        if (achievement == null)
+            return Result.Fail("Achievement not found");
+        achievement.DeletedAt = DateTime.UtcNow;
+        achievement.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Result.Success();
+    }
 }

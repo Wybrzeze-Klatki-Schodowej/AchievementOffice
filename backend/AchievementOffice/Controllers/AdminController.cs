@@ -70,5 +70,14 @@ namespace AchievementOffice.Controllers
                 return NotFound(new { message = result.ErrorMessage });
             return Ok(new { message = "Comment deleted successfully" });
         }
+
+        [HttpDelete("achievements/{id:guid}")]
+        public async Task<IActionResult> DeleteAchievement(Guid id)
+        {
+            var result = await _adminService.DeleteAchievementAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return Ok(new { message = "Achievement deleted successfully" });
+        }
     }
 }
