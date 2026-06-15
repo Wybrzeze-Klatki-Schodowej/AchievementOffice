@@ -1,0 +1,51 @@
+.achievement-card {
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.achievement-approvals-link {
+    margin-top: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.achievement-vote-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.achievement-action-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.achievement-request-verification {
+    margin-top: 12px;
+}
+
+.vote-button {
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.vote-button-active-approve {
+    background: green;
+    color: white;
+}
+
+.vote-button-active-deny {
+    background: red;
+    color: white;
+}
+
+.vote-button-inactive {
+    background: #eee;
+    color: black;
+}

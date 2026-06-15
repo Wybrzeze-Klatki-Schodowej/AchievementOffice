@@ -10,18 +10,15 @@ public class AchievementService : IAchievementService
 {
     private readonly AppDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IAchievementVerificationRequestService _verificationRequestService;
     private readonly INotificationService _notificationService;
 
     public AchievementService(
         AppDbContext context, 
         IHttpContextAccessor httpContextAccessor,
-        IAchievementVerificationRequestService verificationRequestService,
         INotificationService notificationService)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
-        _verificationRequestService = verificationRequestService;
         _notificationService = notificationService;
     }
 
