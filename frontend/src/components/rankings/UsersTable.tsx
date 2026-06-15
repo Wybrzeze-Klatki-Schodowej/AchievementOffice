@@ -15,8 +15,8 @@ export default function UsersTable() {
         loadList();
     }, []);
 
-    return (<div>
-        <table>
+    return (<div className="ranking-container">
+        <table className="ranking-table">
             <thead>
                 <tr>
                     <th>Place</th>
