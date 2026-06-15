@@ -76,6 +76,8 @@ export default function Navbar({
                     Profile
                 </button>
 
+                <button onClick={() => navigate('/rankings')}> Rankings </button>
+
                 <button onClick={onAddAchievementClick}>
                     Add achievement
                 </button>
