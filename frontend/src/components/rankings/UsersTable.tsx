@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getUserRanking } from "../../api/RankingApi"
 import { type UserRanking } from "../../types/RankingTypes"
-import "./UsersTable.css"
+import "./RankingTable.css"
 
 export default function UsersTable() {
     const [usersList, setUsersList] = useState<UserRanking[]>([]);
