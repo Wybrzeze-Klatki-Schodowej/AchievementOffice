@@ -5,7 +5,7 @@
 namespace AchievementOffice.Migrations
 {
     /// <inheritdoc />
-    public partial class UserFieldInApprove : Migration
+    public partial class RepairMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
