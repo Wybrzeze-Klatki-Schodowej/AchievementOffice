@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAchievementApprovalsDetails } from "../../api/achievementApi";
 import type { AchievementApprove } from "../../types/achievement";
+import "./AchievementApprovalsModal.css";
 
 interface Props {
     achievementId: string;
@@ -36,44 +37,85 @@ export default function AchievementApprovalsModal({
     }
 
     return (
-        <div style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-        }}>
-            <div style={{
-                background: "white",
-                padding: 20,
-                borderRadius: 8,
-                width: 500,
-                maxHeight: "80vh",
-                overflowY: "auto"
-            }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div 
+            className="approval-modal-overlay"
+            onClick={onClose}
+        >
+            <div 
+                className="approval-modal"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="approval-modal-header">
                     <h3>Approvals</h3>
-                    <button onClick={onClose}>X</button>
+                    <button 
+                        className="approval-modal-close"
+                        onClick={onClose}
+                    >
+                        X
+                    </button>
                 </div>
 
-                {loading && <p>Loading...</p>}
+                {loading && (
+                    <p className="approval-loading">
+                        Loading...
+                    </p>
+                )}
 
                 {!loading && data && (
                     <>
-                        <h4 style={{ color: "green" }}>Approved</h4>
-                        {data.approved.map(u => (
-                            <div key={u.achievementApproveId}>
-                                {u.userLogin} ({u.userFirstName} {u.userLastName})
-                            </div>
-                        ))}
+                        <div className="approval-section">
+                            <h4 className="approval-title approved">
+                                Approved ({data.approved.length})
+                            </h4>
 
-                        <h4 style={{ color: "red" }}>Denied</h4>
-                        {data.denied.map(u => (
-                            <div key={u.achievementApproveId}>
-                                {u.userLogin} ({u.userFirstName} {u.userLastName})
-                            </div>
-                        ))}
+                            {data.approved.length === 0 ? (
+                                <p className="approval-empty">
+                                    No approvals yet.
+                                </p>
+                            ) : (
+                                data.approved.map((u) => (
+                                    <div
+                                        key={u.achievementApproveId}
+                                        className="approval-user"
+                                    >
+                                        <div className="approval-name">
+                                            {u.userFirstName} {u.userLastName}
+                                        </div>
+
+                                        <div className="approval-login">
+                                            @{u.userLogin}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="approval-section">
+                            <h4 className="approval-title denied">
+                                Denied ({data.denied.length})
+                            </h4>
+
+                            {data.denied.length === 0 ? (
+                                <p className="approval-empty">
+                                    No denials.
+                                </p>
+                            ) : (
+                                data.denied.map((u) => (
+                                    <div
+                                        key={u.achievementApproveId}
+                                        className="approval-user"
+                                    >
+                                        <div className="approval-name">
+                                            {u.userFirstName} {u.userLastName}
+                                        </div>
+
+                                        <div className="approval-login">
+                                            @{u.userLogin}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </>
                 )}
             </div>
