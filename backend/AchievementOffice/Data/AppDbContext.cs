@@ -1,4 +1,4 @@
-﻿using AchievementOffice.Entities;
+using AchievementOffice.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<GroupUserRole> GroupUserRoles => Set<GroupUserRole>();
     public DbSet<Rank> Ranks => Set<Rank>();
     public DbSet<Comment> Comments => Set<Comment>();
+    public DbSet<Shoutout> Shoutouts => Set<Shoutout>();
+    public DbSet<KudosShoutout> KudosShoutouts => Set<KudosShoutout>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AchievementVerificationRequest> AchievementVerificationRequests 
         => Set<AchievementVerificationRequest>();
@@ -23,7 +25,7 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

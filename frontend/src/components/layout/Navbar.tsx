@@ -7,6 +7,7 @@ import NotificationBell from "../notifications/NotificationBell";
 
 interface Props {
     onAddAchievementClick?: () => void;
+    onAddShoutoutClick?: () => void;
     notificationsRefreshTrigger: number;
 }
 
@@ -18,6 +19,7 @@ interface User {
 
 export default function Navbar({
     onAddAchievementClick,
+    onAddShoutoutClick,
     notificationsRefreshTrigger
 }: Props) {
     const navigate = useNavigate();
@@ -80,6 +82,10 @@ export default function Navbar({
 
                 <button onClick={onAddAchievementClick}>
                     Add achievement
+                </button>
+
+                <button onClick={onAddShoutoutClick}>
+                    Add shout-out
                 </button>
 
                 <button className="logout-button" onClick={() => logout()}>Logout</button>
