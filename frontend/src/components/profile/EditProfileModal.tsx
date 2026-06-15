@@ -79,6 +79,7 @@ export default function EditProfileModal({
                 avatarUrl: form.avatarUrl,
                 visibilityId: visibilityId,
                 groupIds: visibilityId === 3 ? groupIds : [],
+                isProfileRestricted: false,
             });
 
             onUpdated(updated);
