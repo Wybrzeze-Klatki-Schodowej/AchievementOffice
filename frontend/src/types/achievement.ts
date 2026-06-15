@@ -5,6 +5,8 @@ export interface Achievement {
     description?: string;
     createdAt: string;
     updatedAt: string;
+    visibilityId: number; // 1=Public, 2=Private, 3=Group
+    groupIds: string[];
 }
 
 export interface AchievementApprove {

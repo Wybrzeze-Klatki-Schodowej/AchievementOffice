@@ -316,9 +316,32 @@ public class AchievementService : IAchievementService
 
     public async Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId)
     {
-        var achievements = await _context.Achievements
+        var currentUserId = GetUserId();
+        var role = GetRole();
+        var isAdmin = role == "Admin";
+
+        var query = _context.Achievements
+            .AsQueryable()
+            .Where(a => a.UserId == userId && a.DeletedAt == null);
+            
+
+        if (!isAdmin)
+        {
+            query = query.Where(a =>
+                a.UserId == currentUserId ||
+                a.VisibilityId == (int)VisibilityMode.Public ||
+                (a.VisibilityId == (int)VisibilityMode.Group &&
+                    a.AchievementGroups.Any(g =>
+                        _context.GroupUsers.Any(ug =>
+                            ug.UserId == currentUserId && ug.GroupId == g.GroupId
+                        )
+                    )
+                )
+            );
+        }
+
+        var achievements = await query
             .Include(a => a.AchievementGroups)
-            .Where(a => a.UserId == userId && a.DeletedAt == null)
             .ToListAsync();
 
         return achievements.Select(MapToDto).ToList();

@@ -5,11 +5,15 @@ const API_URL = import.meta.env.VITE_API_URL + "/achievements";
 export interface CreateAchievementDto {
     title: string;
     description?: string;
+    visibilityId: number;
+    groupIds?: string[];
 }
 
 export interface UpdateAchievementDto {
     title: string;
     description?: string;
+    visibilityId: number;
+    groupIds?: string[];
 }
 
 export const getAchievements = async (): Promise<Achievement[]> => {
