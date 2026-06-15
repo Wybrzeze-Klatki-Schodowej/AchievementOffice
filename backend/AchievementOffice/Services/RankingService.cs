@@ -1,8 +1,10 @@
 ﻿using AchievementOffice.Configuration;
 using AchievementOffice.Data;
+using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Validation;
 
 namespace AchievementOffice.Services
 {
@@ -54,6 +56,61 @@ namespace AchievementOffice.Services
             if (addPoints)
                 return await AddPoints(reactingUserId, ownerId, _rankingSettings.ShoutoutBase);
             return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ShoutoutBase);
+        }
+
+        public async Task<Result<List<UserRankingResponse>>> GetUserRanking()
+        {
+            var usersEntities = await _context.Users
+                .Include(u => u.UserDetails)
+                .Where(u => u.DeletedAt == null)
+                .OrderByDescending(u => u.RankingPoints)
+                .ToListAsync();
+
+            var users = usersEntities.
+                Select(u => MapToDto(u))
+                .ToList();
+
+            return Result<List<UserRankingResponse>>.Success(users);
+        }
+
+        public async Task<Result<List<GroupRankingResponse>>> GetGroupRanking()
+        {
+            var groupsEntity = await _context.Groups
+                .Where(g => g.DeletedAt == null)
+                .Include(g => g.GroupUsers)
+                .ThenInclude(gu => gu.User)
+                .ToListAsync();
+
+            var groups = groupsEntity
+                .Select(g => MapToDto(g, g.GroupUsers.Sum(gu => gu.User.RankingPoints)))
+                .OrderByDescending(g => g.RankingPoints)
+                .ToList();
+
+            return Result<List<GroupRankingResponse>>.Success(groups);
+        }
+
+        private UserRankingResponse MapToDto(User user)
+        {
+            return new UserRankingResponse
+            {
+                UserId = user.Id,
+                UserName = user.Login,
+                Firstname = user.UserDetails?.Firstname ?? string.Empty,
+                Lastname = user.UserDetails?.Lastname ?? string.Empty,
+                Avatar = user.UserDetails?.AvatarUrl,
+                RankingPoints = user.RankingPoints
+            };
+        }
+
+        private GroupRankingResponse MapToDto(Group group, decimal points)
+        {
+            return new GroupRankingResponse
+            {
+                GroupId = group.GroupId,
+                GroupName = group.Name,
+                Avatar = group.AvatarUrl,
+                RankingPoints = points
+            };
         }
     }
 }
