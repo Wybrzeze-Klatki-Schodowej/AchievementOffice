@@ -204,32 +204,6 @@ namespace AchievementOffice.Services
 
         public async Task<Result<List<ShoutoutResponse>>> GetAllShoutoutsAsync()
         {
-            // var role = GetRole();
-            // var isAdmin = role == "Admin";
-
-            // var userId = GetUserId();
-            // var shoutouts = await _appDbContext.Shoutouts
-            //     .Include(s => s.Sender).ThenInclude(u => u.UserDetails)
-            //     .Include(s => s.Receiver).ThenInclude(u => u.UserDetails)
-            //     .Include(s => s.Kudos)
-            //     .Include(s => s.ShoutoutGroups)
-            //     .Where(s => s.DeletedAt == null)
-            //     .OrderByDescending(s => s.CreatedAt)
-            //     .ToListAsync();
-
-            // var filtered = shoutouts
-            //     .Where(s =>
-            //         isAdmin ||
-            //         s.SenderId == userId ||
-            //         s.ReceiverId == userId ||
-            //         IsUserInShoutoutGroups(s, userId)
-            //     )
-            //     .Select(MapToDto)
-            //     .ToList();
-
-            // var result = filtered.OrderByDescending(s => s.CreatedAt).ToList();
-            // return Result<List<ShoutoutResponse>>.Success(result);
-
             var userId = GetUserId();
             var role = GetRole();
             var isAdmin = role == "Admin";
@@ -241,12 +215,9 @@ namespace AchievementOffice.Services
             if (!isAdmin)
             {
                 query = query.Where(s =>
-                    // Always visible to sender and receiver regardless of visibility setting
                     s.SenderId == userId ||
                     s.ReceiverId == userId ||
-                    // Public shoutouts are visible to everyone
                     s.VisibilityId == (int)VisibilityMode.Public ||
-                    // Group shoutouts are visible to members of the allowed groups
                     (s.VisibilityId == (int)VisibilityMode.Group &&
                         s.ShoutoutGroups.Any(g =>
                             _appDbContext.GroupUsers.Any(ug =>
@@ -305,7 +276,6 @@ namespace AchievementOffice.Services
             {
                 if (existingReaction.Reaction == reaction)
                 {
-                    // If same reaction, remove it (toggle behavior)
                     _appDbContext.KudosShoutouts.Remove(existingReaction);
                 }
                 else

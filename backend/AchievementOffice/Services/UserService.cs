@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using AchievementOffice.Data;
 using AchievementOffice.Entities;
 using AchievementOffice.Models;
@@ -103,22 +103,6 @@ public class UserService : IUserService
                 .ThenInclude(ud => ud.ProfileGroups)
             .Include(u => u.UserRole)
             .Where(u => u.Id == userId)
-//             .Select(u => new UserProfileResponse
-//             {
-//                 UserId = u.Id,
-//                 Login = u.Login,
-//                 Email = u.Email,
-//                 FirstName = u.UserDetails.Firstname,
-//                 LastName = u.UserDetails.Lastname,
-//                 JobTitle = u.UserDetails.JobTitle,
-//                 IsActive = u.IsActive,
-//                 Bio = u.UserDetails.Bio,
-//                 AvatarUrl = u.UserDetails.AvatarUrl,
-//                 Role = u.UserRole.Name,
-//                 CreatedAt = u.CreatedAt,
-//                 UpdatedAt = u.UpdatedAt,
-//                 RankingPoints = u.RankingPoints
-//             })
             .FirstOrDefaultAsync();
 
         if (user == null)
@@ -257,14 +241,13 @@ public class UserService : IUserService
 
         await _context.SaveChangesAsync();
 
-        // Re-evaluate visibility for the requester (could be admin, owner, or other user)
         var requestingUserId = GetUserId();
         var requestingUserRole = GetRole();
         bool isOwnProfile = requestingUserId == userId;
         bool isAdmin = requestingUserRole == "Admin";
         bool isGroupMember = false;
         var allowedGroupIds = user.UserDetails.ProfileGroups.Select(pg => pg.GroupId).ToList();
-        if (user.UserDetails.VisibilityId == 3) // Group visibility
+        if (user.UserDetails.VisibilityId == 3)
         {
             isGroupMember = await _context.GroupUsers
                 .AnyAsync(gu => gu.UserId == requestingUserId && allowedGroupIds.Contains(gu.GroupId));

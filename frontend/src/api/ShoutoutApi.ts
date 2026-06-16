@@ -3,7 +3,6 @@ import type { Shoutout, User } from "../types/shoutout";
 const API_URL = import.meta.env.VITE_API_URL + "/shoutouts";
 
 export interface CreateShoutoutDto {
-    // senderId: string; // bierzemy z tokena po stronie backendu
     receiverId: string;
     title: string;
     description?: string;

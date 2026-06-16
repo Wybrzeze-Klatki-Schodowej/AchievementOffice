@@ -4,8 +4,7 @@ import {
     updateShoutout,
     type CreateShoutoutDto,
     type UpdateShoutoutDto,
-} //from "../../api/ShoutoutsApi";
-from "../../api/ShoutoutApi";
+} from "../../api/ShoutoutApi";
 import type { Shoutout } from "../../types/shoutout";
 
 interface Props {
