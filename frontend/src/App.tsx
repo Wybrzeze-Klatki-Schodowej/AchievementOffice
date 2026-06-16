@@ -10,6 +10,7 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import NotificationDetailsPage from './pages/NotificationDetailsPage';
 import GroupsPage from './pages/GroupsPage';
 import GroupPage from './pages/GroupPage';
+import RankingPage from './pages/RankingPage';
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -54,6 +55,7 @@ function App() {
             path="/groups/:groupId"
             element={isLoggedIn ? <GroupPage /> : <LoginPage onLogin={() => checkLoggedIn()} />}
           />
+          <Route path="/rankings" element={isLoggedIn ? <RankingPage/> : <LoginPage onLogin={() => checkLoggedIn()} />} />
         </Route>
         <Route 
           path="/verification-requests/:requestId"
