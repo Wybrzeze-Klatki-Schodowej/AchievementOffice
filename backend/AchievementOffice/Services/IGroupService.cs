@@ -10,5 +10,6 @@ namespace AchievementOffice.Services
         Task<Result<GroupResponse>> GetGroupByIdAsync(Guid groupId);
         Task<Result<List<GroupMemberResponse>>> GetGroupMembersAsync(Guid groupId);
         Task<Result<List<GroupRoleResponse>>> GetGroupRolesAsync(Guid groupId);
+        Task<Result> RemoveUserFromGroupAsync(Guid groupId, Guid userIdToRemove, Guid currentUserId, bool isGlobalAdmin);
     }
 }

@@ -99,7 +99,7 @@ export default function GroupPage() {
                                 </td>
                                 {isGroupAdmin && (
                                     <td>
-                                        {member.userId !== currentUserId && (
+                                        {(
                                             <button className="deactivate-button" onClick={() => handleRemoveMember(member.userId)}>
                                                 Remove
                                             </button>
