@@ -12,13 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-<<<<<<<< HEAD:backend/AchievementOffice/Migrations/20260615235910_ResetMigration.Designer.cs
-    [Migration("20260615235910_ResetMigration")]
+    [Migration("20260616003415_ResetMigration")]
     partial class ResetMigration
-========
-    [Migration("20260615010417_RepairAgain")]
-    partial class RepairAgain
->>>>>>>> dev:backend/AchievementOffice/Migrations/20260615010417_RepairAgain.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
