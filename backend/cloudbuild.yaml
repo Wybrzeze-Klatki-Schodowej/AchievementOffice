@@ -1,4 +1,14 @@
 steps:
+  - name: 'mcr.microsoft.com/dotnet/sdk:10.0'
+    dir: 'backend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        dotnet tool install --global dotnet-ef
+        export PATH="$$PATH:$$HOME/.dotnet/tools"
+        dotnet ef database update --connection "$_DB_CONNECTION_STRING"
+        
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -12,16 +22,6 @@ steps:
     args:
       - 'push'
       - '$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/$_SERVICE_NAME:$TAG_NAME'
-
-  - name: 'mcr.microsoft.com/dotnet/sdk:10.0'
-    dir: 'backend'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        dotnet tool install --global dotnet-ef
-        export PATH="$PATH:/builder/home/.dotnet/tools"
-        dotnet ef database update --connection "$_DB_CONNECTION_STRING"
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
