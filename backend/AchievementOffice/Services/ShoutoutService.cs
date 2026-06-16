@@ -272,6 +272,8 @@ namespace AchievementOffice.Services
             var existingReaction = await _appDbContext.KudosShoutouts
                 .FirstOrDefaultAsync(r => r.ShoutoutId == shoutoutId && r.UserId == userId);
 
+            bool? prevState = existingReaction != null ? true : null;
+
             if (existingReaction != null)
             {
                 if (existingReaction.Reaction == reaction)
@@ -295,7 +297,13 @@ namespace AchievementOffice.Services
             }
 
             await _appDbContext.SaveChangesAsync();
-            return await GetShoutoutByIdAsync(shoutoutId);
+
+            var result = await GetShoutoutByIdAsync(shoutoutId);
+
+            if (result.IsSuccess && result.Value != null)
+                result.Value.PrevReactionState = prevState;
+
+            return result;
         }
 
         public async Task<Result<ShoutoutResponse>> UnreactAsync(Guid shoutoutId)
@@ -306,13 +314,19 @@ namespace AchievementOffice.Services
             var reaction = await _appDbContext.KudosShoutouts
                 .FirstOrDefaultAsync(r => r.ShoutoutId == shoutoutId && r.UserId == userId);
 
+            bool? prevState = reaction != null ? true : null;
+
             if (reaction != null)
             {
                 _appDbContext.KudosShoutouts.Remove(reaction);
                 await _appDbContext.SaveChangesAsync();
             }
 
-            return await GetShoutoutByIdAsync(shoutoutId);
+            var result = await GetShoutoutByIdAsync(shoutoutId);
+            if (result.IsSuccess && result.Value != null)
+                result.Value.PrevReactionState = prevState;
+
+            return result;
         }
 
         public async Task<Result<List<ShoutoutResponse>>> GetReceivedShoutoutsAsync(Guid receiverId)

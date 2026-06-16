@@ -31,7 +31,7 @@ namespace AchievementOffice.Controllers
 
             var shoutoutValue = shoutout.Value;
 
-            await _rankingService.ApplyShoutOutPointsCreate(shoutoutValue!.SenderId, shoutoutValue!.ReceiverId, true);
+            await _rankingService.ApplyShoutOutPointsCreate(shoutoutValue!.SenderId, shoutoutValue!.ReceiverId, null, true);
 
             return CreatedAtAction(
                 nameof(GetShoutoutById),
@@ -75,7 +75,7 @@ namespace AchievementOffice.Controllers
                     _ => BadRequest(new { message = deleted.ErrorMessage })
                 };
 
-            await _rankingService.ApplyShoutOutPointsCreate(shoutout.Value!.SenderId, shoutout.Value!.ReceiverId, false);
+            await _rankingService.ApplyShoutOutPointsCreate(shoutout.Value!.SenderId, shoutout.Value!.ReceiverId, true, null);
             return NoContent();
         }
 
@@ -106,12 +106,17 @@ namespace AchievementOffice.Controllers
         [HttpPost("{shoutoutId:guid}/react")]
         public async Task<ActionResult<ShoutoutResponse>> React(Guid shoutoutId, [FromBody] AchievementOffice.Entities.ReactionType reaction)
         {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message= "Invalid user ID in token." });
+
             var result = await _shoutoutService.ReactAsync(shoutoutId, reaction);
 
             if (!result.IsSuccess)
                 return result.ErrorMessage == "Not found" ? NotFound() : BadRequest(new { message = result.ErrorMessage });
 
-            await _rankingService.ApplyShoutOutPoints(result.Value!.SenderId, result.Value!.ReceiverId, true);
+            bool? newState = result.Value!.CurrentUserReaction != null ? true : null;
+            await _rankingService.ApplyShoutOutPoints(userId, result.Value!.ReceiverId, result.Value!.PrevReactionState, newState);
 
             return Ok(result.Value);
         }
@@ -120,12 +125,16 @@ namespace AchievementOffice.Controllers
         [HttpDelete("{shoutoutId:guid}/react")]
         public async Task<ActionResult<ShoutoutResponse>> Unreact(Guid shoutoutId)
         {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message = "Invalid user ID in token." });
+
             var result = await _shoutoutService.UnreactAsync(shoutoutId);
 
             if (!result.IsSuccess)
                 return result.ErrorMessage == "Not found" ? NotFound() : BadRequest(new { message = result.ErrorMessage });
 
-            await _rankingService.ApplyShoutOutPoints(result.Value!.SenderId, result.Value!.ReceiverId, false);
+            await _rankingService.ApplyShoutOutPoints(userId, result.Value!.ReceiverId, result.Value!.PrevReactionState, null);
 
             return Ok(result.Value);
         }

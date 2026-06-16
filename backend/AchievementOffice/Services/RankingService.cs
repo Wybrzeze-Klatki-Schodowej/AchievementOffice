@@ -54,18 +54,42 @@ namespace AchievementOffice.Services
             return await AddPoints(reactingUserId, ownerId, delta);
         }
 
-        public async Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool addPoints)
+        public async Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
         {
-            if (addPoints)
-                return await AddPoints(reactingUserId, ownerId, _rankingSettings.ReactionShoutOutPoints);
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ReactionShoutOutPoints);
+            if (newState == prevState)
+                return Result.Success();
+
+            decimal delta = 0m;
+
+            if (prevState == true)
+                delta -= _rankingSettings.ReactionShoutOutPoints;
+
+            if (newState == true)
+                delta += _rankingSettings.ReactionShoutOutPoints;
+
+            if (delta == 0)
+                return Result.Success();
+
+            return await AddPoints(reactingUserId, ownerId, delta);
         }
 
-        public async Task<Result> ApplyShoutOutPointsCreate(Guid reactingUserId, Guid ownerId, bool addPoints)
+        public async Task<Result> ApplyShoutOutPointsCreate(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
         {
-            if (addPoints)
-                return await AddPoints(reactingUserId, ownerId, _rankingSettings.ShoutoutBase);
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ShoutoutBase);
+            if (newState == prevState)
+                return Result.Success();
+
+            decimal delta = 0m;
+
+            if (prevState == true)
+                delta -= _rankingSettings.ShoutoutBase;
+
+            if (newState == true)
+                delta += _rankingSettings.ShoutoutBase;
+
+            if (delta == 0)
+                return Result.Success();
+
+            return await AddPoints(reactingUserId, ownerId, delta);
         }
 
         public async Task<Result<List<UserRankingResponse>>> GetUserRanking()
