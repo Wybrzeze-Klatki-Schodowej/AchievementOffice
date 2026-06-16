@@ -9,4 +9,9 @@ public class UserDetails
     public required string JobTitle { get; set; }
     public string? Bio { get; set; }
     public string? AvatarUrl { get; set; }
+
+    public int VisibilityId { get; set; } = (int)VisibilityMode.Public;
+    public Visibility Visibility { get; set; } = null!;
+
+    public ICollection<ProfileGroup> ProfileGroups { get; set; } = new List<ProfileGroup>();
 }

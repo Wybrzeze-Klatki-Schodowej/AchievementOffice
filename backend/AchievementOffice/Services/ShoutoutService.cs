@@ -37,11 +37,38 @@ namespace AchievementOffice.Services
                 ReceiverId = createDto.ReceiverId,
                 Title = createDto.Title,
                 Description = createDto.Description,
+                VisibilityId = createDto.VisibilityId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
 
             _appDbContext.Shoutouts.Add(shoutout);
+
+            if (createDto.VisibilityId == (int)VisibilityMode.Group)
+            {
+                if (createDto.GroupIds == null || !createDto.GroupIds.Any())
+                {
+                    return Result<ShoutoutResponse>.Fail(
+                        "At least one group is required when visibility is set to Groups");
+                }
+
+                if (createDto.GroupIds?.Any() == true)
+                {
+                    var shoutoutGroups = createDto.GroupIds.Select(groupId => new ShoutoutGroup
+                    {
+                        ShoutoutId = shoutout.ShoutoutId,
+                        GroupId = groupId
+                    });
+
+                    _appDbContext.ShoutoutGroups.AddRange(shoutoutGroups);
+                }
+            }
+            else if (createDto.GroupIds?.Any() == true)
+            {
+                return Result<ShoutoutResponse>.Fail(
+                    "GroupIds can only be provided when visibility is set to Groups");
+            }
+
             await _appDbContext.SaveChangesAsync();
 
             var createdShoutout = await _appDbContext.Shoutouts
@@ -58,6 +85,7 @@ namespace AchievementOffice.Services
         public async Task<Result<ShoutoutResponse>> UpdateAsync(Guid shoutoutId, UpdateShoutoutRequest updateDto)
         {
             var shoutout = await _appDbContext.Shoutouts
+                .Include(s => s.ShoutoutGroups)
                 .Include(s => s.Sender)
                     .ThenInclude(u => u.UserDetails)
                 .Include(s => s.Receiver)
@@ -82,11 +110,39 @@ namespace AchievementOffice.Services
 
             shoutout.Title = updateDto.Title;
             shoutout.Description = updateDto.Description;
+            shoutout.VisibilityId = updateDto.VisibilityId;
             shoutout.UpdatedAt = DateTime.UtcNow;
+
+            _appDbContext.ShoutoutGroups.RemoveRange(shoutout.ShoutoutGroups);
+
+            if (updateDto.VisibilityId == (int)VisibilityMode.Group)
+            {
+                if (updateDto.GroupIds == null || !updateDto.GroupIds.Any())
+                {
+                    return Result<ShoutoutResponse>.Fail(
+                        "At least one group is required when visibility is set to Groups");
+                }
+
+                var shoutoutGroups = updateDto.GroupIds
+                    .Distinct()
+                    .Select(groupId => new ShoutoutGroup
+                    {
+                        ShoutoutId = shoutout.ShoutoutId,
+                        GroupId = groupId
+                    });
+
+                _appDbContext.ShoutoutGroups.AddRange(shoutoutGroups);
+            }
+            else if (updateDto.GroupIds?.Any() == true)
+            {
+                return Result<ShoutoutResponse>.Fail(
+                    "GroupIds can only be provided when visibility is set to Groups");
+            }
+
 
             await _appDbContext.SaveChangesAsync();
 
-            return Result<ShoutoutResponse>.Success(MapToDto(shoutout));
+            return Result<ShoutoutResponse>.Success(MapToDto(shoutout)); 
         }
 
         public async Task<Result<bool>> DeleteAsync(Guid shoutoutId)
@@ -122,27 +178,84 @@ namespace AchievementOffice.Services
                 .Include(s => s.Sender).ThenInclude(u => u.UserDetails)
                 .Include(s => s.Receiver).ThenInclude(u => u.UserDetails)
                 .Include(s => s.Kudos)
+                .Include(s => s.ShoutoutGroups)
                 .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
 
             if (shoutout == null)
                 return Result<ShoutoutResponse>.Fail("Not found");
+            
+            var role = GetRole();
+            var isAdmin = role == "Admin";
 
-            return Result<ShoutoutResponse>.Success(MapToDto(shoutout));
+            var hasAccess =
+                isAdmin ||
+                shoutout.SenderId == userId ||
+                shoutout.ReceiverId == userId ||
+                shoutout.VisibilityId == (int)VisibilityMode.Public ||
+                (shoutout.VisibilityId == (int)VisibilityMode.Group && IsUserInShoutoutGroups(shoutout, userId));
+
+            if (hasAccess)
+            {
+                return Result<ShoutoutResponse>.Success(MapToDto(shoutout));
+            }
+
+            return Result<ShoutoutResponse>.Fail("Forbidden");
         }
 
         public async Task<Result<List<ShoutoutResponse>>> GetAllShoutoutsAsync()
         {
             var userId = GetUserId();
-            var shoutouts = await _appDbContext.Shoutouts
+            var role = GetRole();
+            var isAdmin = role == "Admin";
+
+            var query = _appDbContext.Shoutouts
+                .AsQueryable()
+                .Where(s => s.DeletedAt == null);
+
+            if (!isAdmin)
+            {
+                query = query.Where(s =>
+                    s.SenderId == userId ||
+                    s.ReceiverId == userId ||
+                    s.VisibilityId == (int)VisibilityMode.Public ||
+                    (s.VisibilityId == (int)VisibilityMode.Group &&
+                        s.ShoutoutGroups.Any(g =>
+                            _appDbContext.GroupUsers.Any(ug =>
+                                ug.UserId == userId &&
+                                ug.GroupId == g.GroupId
+                            )
+                        )
+                    )
+                );
+            }
+
+            var shoutouts = await query
                 .Include(s => s.Sender).ThenInclude(u => u.UserDetails)
                 .Include(s => s.Receiver).ThenInclude(u => u.UserDetails)
                 .Include(s => s.Kudos)
-                .Where(s => s.DeletedAt == null)
+                .Include(s => s.ShoutoutGroups)
                 .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
-            var result = shoutouts.Select(s => MapToDto(s)).ToList();
+            var result = shoutouts.Select(MapToDto).ToList();
             return Result<List<ShoutoutResponse>>.Success(result);
+        }
+
+        private bool IsUserInShoutoutGroups(Shoutout shoutout, Guid userId)
+        {
+            var shoutoutGroupIds = shoutout.ShoutoutGroups
+                .Select(g => g.GroupId)
+                .ToList();
+
+            if (!shoutoutGroupIds.Any())
+                return false;
+
+            var userGroupIds = _appDbContext.GroupUsers
+                .Where(ug => ug.UserId == userId)
+                .Select(ug => ug.GroupId)
+                .ToList();
+
+            return shoutoutGroupIds.Intersect(userGroupIds).Any();
         }
 
         public async Task<Result<ShoutoutResponse>> ReactAsync(Guid shoutoutId, ReactionType reaction)
@@ -163,7 +276,6 @@ namespace AchievementOffice.Services
             {
                 if (existingReaction.Reaction == reaction)
                 {
-                    // If same reaction, remove it (toggle behavior)
                     _appDbContext.KudosShoutouts.Remove(existingReaction);
                 }
                 else
@@ -240,8 +352,12 @@ namespace AchievementOffice.Services
                 ReceiverLastname = shoutout.Receiver.UserDetails.Lastname,
                 Title = shoutout.Title,
                 Description = shoutout.Description,
+                VisibilityId = shoutout.VisibilityId,
+                GroupIds = shoutout.ShoutoutGroups?
+                    .Select(x => x.GroupId)
+                    .ToList() ?? [],
                 CreatedAt = shoutout.CreatedAt,
-                UpdatedAt = shoutout.UpdatedAt
+                UpdatedAt = shoutout.UpdatedAt,
             };
 
             if (shoutout.Kudos != null)

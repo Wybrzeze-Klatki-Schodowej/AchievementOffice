@@ -32,5 +32,10 @@ namespace AchievementOffice.Entities
         public DateTime? DeletedAt { get; set; }
 
         public ICollection<KudosShoutout> Kudos { get; set; } = new List<KudosShoutout>();
+
+        [Column("visibility_id")]
+        public int VisibilityId { get; set; } = (int)VisibilityMode.Public;
+        public Visibility Visibility { get; set; } = null!;
+        public ICollection<ShoutoutGroup> ShoutoutGroups { get; set; } = new List<ShoutoutGroup>();
     }
 }

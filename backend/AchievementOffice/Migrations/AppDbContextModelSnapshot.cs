@@ -58,7 +58,15 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<int>("VisibilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("visibility_id");
+
                     b.HasKey("AchievementId");
+
+                    b.HasIndex("VisibilityId");
 
                     b.ToTable("Achievements", (string)null);
                 });
@@ -98,6 +106,23 @@ namespace AchievementOffice.Migrations
                         .IsUnique();
 
                     b.ToTable("AchievementApprove", (string)null);
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementGroup", b =>
+                {
+                    b.Property<Guid>("AchievementId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("achievement_id");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.HasKey("AchievementId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("AchievementGroups", (string)null);
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>
@@ -357,6 +382,23 @@ namespace AchievementOffice.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.ProfileGroup", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.HasKey("UserId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("ProfileGroups", (string)null);
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.Rank", b =>
                 {
                     b.Property<Guid>("Id")
@@ -421,13 +463,38 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<int>("VisibilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("visibility_id");
+
                     b.HasKey("ShoutoutId");
 
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
+                    b.HasIndex("VisibilityId");
+
                     b.ToTable("Shoutouts", (string)null);
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.ShoutoutGroup", b =>
+                {
+                    b.Property<Guid>("ShoutoutId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shoutout_id");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("group_id");
+
+                    b.HasKey("ShoutoutId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("ShoutoutGroups", (string)null);
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -551,7 +618,15 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("lastname");
 
+                    b.Property<int>("VisibilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("visibility_id");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("VisibilityId");
 
                     b.ToTable("UserDetails", (string)null);
                 });
@@ -587,6 +662,54 @@ namespace AchievementOffice.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.Visibility", b =>
+                {
+                    b.Property<int>("VisibilityModeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("visibility_mode_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("VisibilityModeId"));
+
+                    b.Property<string>("VisibilityModeName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("visibility_mode_name");
+
+                    b.HasKey("VisibilityModeId");
+
+                    b.ToTable("Visibility", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            VisibilityModeId = 1,
+                            VisibilityModeName = "Public"
+                        },
+                        new
+                        {
+                            VisibilityModeId = 2,
+                            VisibilityModeName = "Private"
+                        },
+                        new
+                        {
+                            VisibilityModeId = 3,
+                            VisibilityModeName = "Group"
+                        });
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.Achievement", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.Visibility", "Visibility")
+                        .WithMany("Achievements")
+                        .HasForeignKey("VisibilityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Visibility");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.User", "User")
@@ -596,6 +719,25 @@ namespace AchievementOffice.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementGroup", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.Achievement", "Achievement")
+                        .WithMany("AchievementGroups")
+                        .HasForeignKey("AchievementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AchievementOffice.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Achievement");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>
@@ -721,6 +863,25 @@ namespace AchievementOffice.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.ProfileGroup", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AchievementOffice.Entities.UserDetails", "UserDetails")
+                        .WithMany("ProfileGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("UserDetails");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.User", "Receiver")
@@ -735,9 +896,36 @@ namespace AchievementOffice.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AchievementOffice.Entities.Visibility", "Visibility")
+                        .WithMany("Shoutouts")
+                        .HasForeignKey("VisibilityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+
+                    b.Navigation("Visibility");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.ShoutoutGroup", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AchievementOffice.Entities.Shoutout", "Shoutout")
+                        .WithMany("ShoutoutGroups")
+                        .HasForeignKey("ShoutoutId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Shoutout");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -769,7 +957,20 @@ namespace AchievementOffice.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_user_details_user");
 
+                    b.HasOne("AchievementOffice.Entities.Visibility", "Visibility")
+                        .WithMany("UserDetailsList")
+                        .HasForeignKey("VisibilityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("User");
+
+                    b.Navigation("Visibility");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.Achievement", b =>
+                {
+                    b.Navigation("AchievementGroups");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.Group", b =>
@@ -787,6 +988,8 @@ namespace AchievementOffice.Migrations
             modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
                 {
                     b.Navigation("Kudos");
+
+                    b.Navigation("ShoutoutGroups");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -799,9 +1002,23 @@ namespace AchievementOffice.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.UserDetails", b =>
+                {
+                    b.Navigation("ProfileGroups");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.Visibility", b =>
+                {
+                    b.Navigation("Achievements");
+
+                    b.Navigation("Shoutouts");
+
+                    b.Navigation("UserDetailsList");
                 });
 #pragma warning restore 612, 618
         }

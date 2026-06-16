@@ -15,6 +15,9 @@
     padding: 24px;
     border-radius: 12px;
     min-width: 500px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }

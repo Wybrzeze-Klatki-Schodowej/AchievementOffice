@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTime.Now.AddHours(1)
+            Expires = DateTime.Now.AddHours(1)            
         };
         Response.Cookies.Append("X-jwt-token", result.Token! , opts);
 

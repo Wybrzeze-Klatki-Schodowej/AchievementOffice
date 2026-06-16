@@ -25,5 +25,8 @@ public class UserProfileResponse
 
     public DateTime UpdatedAt { get; set; }
 
+    public int VisibilityId { get; set; } = 1;
+    public List<Guid> GroupIds { get; set; } = new();
+    public bool IsProfileRestricted { get; set; } = true;
     public decimal RankingPoints { get; set; }
 }

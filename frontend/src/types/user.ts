@@ -6,7 +6,7 @@ export interface UserProfile {
     email: string;
 
     firstName: string;
-    
+
     lastName: string;
 
     jobTitle: string;
@@ -22,4 +22,8 @@ export interface UserProfile {
     createdAt: string;
 
     updatedAt: string;
+
+    visibilityId: number; // 1=Public, 2=Private, 3=Group
+    groupIds: string[];
+    isProfileRestricted: boolean;
 }

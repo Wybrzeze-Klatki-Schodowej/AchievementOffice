@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     createAchievement,
     updateAchievement,
@@ -23,6 +23,30 @@ export default function AchievementForm({
     );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+        const [visibilityId, setVisibilityId] = useState<number>(
+        achievement?.visibilityId ?? 1
+    );
+    const [groupIds, setGroupIds] = useState<string[]>(achievement?.groupIds ?? []);
+    const [groups, setGroups] = useState<{ groupId: string; name: string }[]>([]);
+    
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const res = await fetch(import.meta.env.VITE_API_URL + "/groups", {
+                    credentials: "include",
+                });
+
+                if (!res.ok) throw new Error("Failed to fetch groups");
+
+                const data = await res.json();
+                setGroups(data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetchGroups();
+    }, []);
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
@@ -38,13 +62,17 @@ export default function AchievementForm({
                     achievement.achievementId, 
                     {
                         title,
-                        description
+                        description,
+                        visibilityId,
+                        groupIds: visibilityId === 3 ? groupIds : [],
                     }
                 );
             } else {
                 const dto: CreateAchievementDto = {
                     title,
-                    description
+                    description,
+                    visibilityId,
+                    groupIds: visibilityId === 3 ? groupIds : [],
                 };
 
                 await createAchievement(dto);
@@ -82,6 +110,42 @@ export default function AchievementForm({
                     onChange={(e) => setDescription(e.target.value)}
                 />
             </div>
+
+            <div className="form-group">
+                <label htmlFor="visibility">Visibility</label>
+                <select
+                    id="visibility"
+                    value={visibilityId}
+                    onChange={(e) => setVisibilityId(Number(e.target.value))}
+                >
+                    <option value={1}>Public</option>
+                    <option value={2}>Private</option>
+                    <option value={3}>Groups</option>
+                </select>
+            </div>
+
+            {visibilityId === 3 && (
+                <div className="form-group">
+                    <label>Allowed groups</label>
+
+                    {groups.map((g) => (
+                        <label key={g.groupId} style={{ display: "block" }}>
+                            <input
+                                type="checkbox"
+                                checked={groupIds.includes(g.groupId)}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setGroupIds([...groupIds, g.groupId]);
+                                    } else {
+                                        setGroupIds(groupIds.filter(id => id !== g.groupId));
+                                    }
+                                }}
+                            />
+                            {g.name}
+                        </label>
+                    ))}
+                </div>
+            )}
 
             {error && (
                 <p style={{ color: "red", marginTop: "8px" }}>
