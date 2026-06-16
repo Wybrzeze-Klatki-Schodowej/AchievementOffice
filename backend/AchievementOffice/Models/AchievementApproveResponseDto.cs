@@ -10,5 +10,6 @@ public class AchievementApproveResponseDto
     public string? UserFirstName { get; set; }
     public string? UserLastName { get; set; }
     public bool? IsApproved { get; set; }
+    public bool? PrevApproved { get; set; }
     public DateTime ApprovedAt { get; set; }
 }
