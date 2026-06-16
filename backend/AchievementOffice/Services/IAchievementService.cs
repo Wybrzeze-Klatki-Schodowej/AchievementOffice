@@ -20,5 +20,7 @@ public interface IAchievementService
 
     Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId);
 
+    Task<AchievementApprovalsGroupedDto> GetApprovalsGroupedAsync(Guid achievementId);
+
     Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId);
 }
