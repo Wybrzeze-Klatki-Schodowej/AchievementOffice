@@ -31,16 +31,27 @@ namespace AchievementOffice.Services
             return Result.Success();
         }
 
-        public async Task<Result> ApplyAchievementPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
+        public async Task<Result> ApplyAchievementPoints(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
         {
-            if (isApproved == true)
-                return await AddPoints(reactingUserId, ownerId, _rankingSettings.AchievementApprovedBasePoints);
-            else if (isApproved == false)
-                return await AddPoints(reactingUserId, ownerId, _rankingSettings.DisapprovalPoints);
+            if (newState == prevState)
+                return Result.Success();
 
-            if (dtoApproved == true)
-                return await AddPoints(reactingUserId, ownerId, -_rankingSettings.AchievementApprovedBasePoints);
-            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.DisapprovalPoints);
+            decimal delta = 0m;
+
+            if (prevState == true)
+                delta -= _rankingSettings.AchievementApprovedBasePoints;
+            else if (prevState == false)
+                delta -= _rankingSettings.DisapprovalPoints;
+
+            if (newState == true)
+                delta += _rankingSettings.AchievementApprovedBasePoints;
+            else if (newState == false)
+                delta += _rankingSettings.DisapprovalPoints;
+
+            if (delta == 0)
+                return Result.Success();
+
+            return await AddPoints(reactingUserId, ownerId, delta);
         }
 
         public async Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool addPoints)
