@@ -14,10 +14,10 @@ public class AchievementController : ControllerBase
     private readonly IAchievementService _achievementService;
     private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService, IRankingService raningService)
+    public AchievementController(IAchievementService achievementService, IRankingService rankingService)
     {
         _achievementService = achievementService;
-        _rankingService = raningService;
+        _rankingService = rankingService;
     }
 
     [HttpGet]
