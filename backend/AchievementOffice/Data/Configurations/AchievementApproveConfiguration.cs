@@ -36,5 +36,9 @@ public class AchievementApproveConfiguration : IEntityTypeConfiguration<Achievem
 
         builder.HasIndex(a => new { a.AchievementId, a.UserId })
             .IsUnique();
+
+        builder.HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
     }
 }
