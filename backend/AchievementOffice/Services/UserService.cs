@@ -183,7 +183,7 @@ public class UserService : IUserService
                 Role = u.UserRole.Name,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
-                IsProfileRestricted = false //?
+                IsProfileRestricted = false, //?
                 RankingPoints = u.RankingPoints
             })
             .ToListAsync();
@@ -289,7 +289,7 @@ public class UserService : IUserService
                     UpdatedAt = user.UpdatedAt,
                     VisibilityId = user.UserDetails.VisibilityId,
                     GroupIds = allowedGroupIds,
-                    IsProfileRestricted = !canViewProfileMeta
+                    IsProfileRestricted = !canViewProfileMeta,
                     RankingPoints = user.RankingPoints
                 }
             );
