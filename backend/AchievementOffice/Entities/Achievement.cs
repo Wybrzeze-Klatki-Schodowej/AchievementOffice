@@ -19,4 +19,8 @@ public class Achievement
     public DateTime UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
+
+    public int VisibilityId { get; set; } = (int)VisibilityMode.Public;
+    public Visibility Visibility { get; set; } = null!;
+    public ICollection<AchievementGroup> AchievementGroups { get; set; } = new List<AchievementGroup>();
 }

@@ -10,6 +10,8 @@ steps:
         
         cd AchievementOffice
 
+        dotnet restore
+
         dotnet ef database update --connection "$_DB_CONNECTION_STRING"
         
   - name: 'gcr.io/cloud-builders/docker'

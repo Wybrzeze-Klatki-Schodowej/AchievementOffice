@@ -3,6 +3,8 @@ using AchievementOffice.Data;
 using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace AchievementOffice.Services;
 
@@ -10,12 +12,15 @@ public class UserService : IUserService
 {
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<UserService> _logger;
 
-
-    public UserService(AppDbContext context, ITokenService tokenService)
+    public UserService(AppDbContext context, ITokenService tokenService, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger)
     {
         _context = context;
         _tokenService = tokenService;
+        _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
     public async Task<LoginResult> LoginAsync(LoginRequest request)
@@ -86,27 +91,60 @@ public class UserService : IUserService
 
     public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
     {
-        return await _context.Users
+        var requestingUserId = GetUserId();
+        var requestingUserRole = GetRole();
+
+        _logger.LogInformation(
+            "[GetUserProfile] Target={TargetUserId}, Requester={RequestingUserId}, Role={Role}",
+            userId, requestingUserId, requestingUserRole ?? "(null)");
+
+        var user = await _context.Users
             .Include(u => u.UserDetails)
+                .ThenInclude(ud => ud.ProfileGroups)
             .Include(u => u.UserRole)
             .Where(u => u.Id == userId)
-            .Select(u => new UserProfileResponse
-            {
-                UserId = u.Id,
-                Login = u.Login,
-                Email = u.Email,
-                FirstName = u.UserDetails.Firstname,
-                LastName = u.UserDetails.Lastname,
-                JobTitle = u.UserDetails.JobTitle,
-                IsActive = u.IsActive,
-                Bio = u.UserDetails.Bio,
-                AvatarUrl = u.UserDetails.AvatarUrl,
-                Role = u.UserRole.Name,
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt,
-                RankingPoints = u.RankingPoints
-            })
             .FirstOrDefaultAsync();
+
+        if (user == null)
+            return null;
+
+        var allowedGroupIds = user.UserDetails.ProfileGroups.Select(pg => pg.GroupId).ToList();
+        
+        bool isOwnProfile = requestingUserId == userId;
+        bool isAdmin = requestingUserRole == "Admin";
+        bool isGroupMember = false;
+
+        if (user.UserDetails.VisibilityId == 3) // Group
+        {
+            isGroupMember = await _context.GroupUsers
+                .AnyAsync(gu => gu.UserId == requestingUserId && allowedGroupIds.Contains(gu.GroupId));
+        }
+
+        bool canViewProfileMeta = isAdmin || isOwnProfile || user.UserDetails.VisibilityId == 1 || (user.UserDetails.VisibilityId == 3 && isGroupMember);
+
+        _logger.LogInformation(
+            "[GetUserProfile] VisibilityId={Visibility}, isOwnProfile={OwnProfile}, isAdmin={Admin}, isGroupMember={GroupMember}, canViewProfileMeta={CanView}, IsProfileRestricted={Restricted}",
+            user.UserDetails.VisibilityId, isOwnProfile, isAdmin, isGroupMember, canViewProfileMeta, !canViewProfileMeta);
+
+        return new UserProfileResponse
+        {
+            UserId = user.Id,
+            Login = user.Login,
+            Email = canViewProfileMeta ? user.Email : "",
+            FirstName = user.UserDetails.Firstname,
+            LastName = user.UserDetails.Lastname,
+            JobTitle = canViewProfileMeta ? user.UserDetails.JobTitle : "",
+            IsActive = user.IsActive,
+            Bio = canViewProfileMeta ? user.UserDetails.Bio : null,
+            AvatarUrl = user.UserDetails.AvatarUrl,
+            Role = user.UserRole.Name,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            VisibilityId = user.UserDetails.VisibilityId,
+            GroupIds = allowedGroupIds,
+            IsProfileRestricted = !canViewProfileMeta,
+            RankingPoints = user.RankingPoints
+        };
     }
 
     public async Task<List<UserProfileResponse>> GetAllUsersAsync()
@@ -129,6 +167,7 @@ public class UserService : IUserService
                 Role = u.UserRole.Name,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
+                IsProfileRestricted = false, //?
                 RankingPoints = u.RankingPoints
             })
             .ToListAsync();
@@ -142,6 +181,7 @@ public class UserService : IUserService
     {
         var user = await _context.Users
             .Include(u => u.UserDetails)
+                .ThenInclude(ud => ud.ProfileGroups)
             .Include(u => u.UserRole)
             .FirstOrDefaultAsync(
                 u => u.Id == userId &&
@@ -189,8 +229,30 @@ public class UserService : IUserService
         user.UserDetails.Bio = request.Bio;
         user.UserDetails.AvatarUrl = request.AvatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
+        user.UserDetails.VisibilityId = request.VisibilityId;
+        user.UserDetails.ProfileGroups.Clear();
+        if (request.GroupIds != null)
+        {
+            foreach (var groupId in request.GroupIds)
+            {
+                user.UserDetails.ProfileGroups.Add(new ProfileGroup { GroupId = groupId, UserId = userId });
+            }
+        }
 
         await _context.SaveChangesAsync();
+
+        var requestingUserId = GetUserId();
+        var requestingUserRole = GetRole();
+        bool isOwnProfile = requestingUserId == userId;
+        bool isAdmin = requestingUserRole == "Admin";
+        bool isGroupMember = false;
+        var allowedGroupIds = user.UserDetails.ProfileGroups.Select(pg => pg.GroupId).ToList();
+        if (user.UserDetails.VisibilityId == 3)
+        {
+            isGroupMember = await _context.GroupUsers
+                .AnyAsync(gu => gu.UserId == requestingUserId && allowedGroupIds.Contains(gu.GroupId));
+        }
+        bool canViewProfileMeta = isAdmin || isOwnProfile || user.UserDetails.VisibilityId == 1 || (user.UserDetails.VisibilityId == 3 && isGroupMember);
 
         return Result<UserProfileResponse>
             .Success(
@@ -198,16 +260,19 @@ public class UserService : IUserService
                 {
                     UserId = user.Id,
                     Login = user.Login,
-                    Email = user.Email,
+                    Email = canViewProfileMeta ? user.Email : "",
                     FirstName = user.UserDetails.Firstname,
                     LastName = user.UserDetails.Lastname,
-                    JobTitle = user.UserDetails.JobTitle,
+                    JobTitle = canViewProfileMeta ? user.UserDetails.JobTitle : "",
                     IsActive = user.IsActive,
-                    Bio = user.UserDetails.Bio,
+                    Bio = canViewProfileMeta ? user.UserDetails.Bio : "",
                     AvatarUrl = user.UserDetails.AvatarUrl,
                     Role = user.UserRole.Name,
                     CreatedAt = user.CreatedAt,
                     UpdatedAt = user.UpdatedAt,
+                    VisibilityId = user.UserDetails.VisibilityId,
+                    GroupIds = allowedGroupIds,
+                    IsProfileRestricted = !canViewProfileMeta,
                     RankingPoints = user.RankingPoints
                 }
             );
@@ -273,5 +338,18 @@ public class UserService : IUserService
         await _context.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    private Guid GetUserId()
+    {
+        var context = _httpContextAccessor.HttpContext;
+        if (context == null) return Guid.Empty;
+        var claim = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(claim, out var id) ? id : Guid.Empty;
+    }
+    
+    private string? GetRole()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
     }
 }

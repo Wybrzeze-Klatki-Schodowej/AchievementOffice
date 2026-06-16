@@ -16,16 +16,14 @@
     border-color: #ccc;
 }
 
-.shoutout-header {
-    margin-bottom: 16px;
-}
-
 .shoutout-header h3 {
     margin: 0 0 10px 0;
     color: #111;
     font-size: 1.3rem;
     font-weight: 700;
     line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .shoutout-meta {
@@ -36,6 +34,9 @@
     margin-bottom: 14px;
     font-size: 0.95rem;
 }
+
+
+
 
 .meta-label {
     color: #666;
@@ -55,6 +56,10 @@
     color: #888;
     font-size: 0.85rem;
     font-weight: 500;
+}
+
+.shoutout-header {
+    margin-bottom: 16px;
 }
 
 .shoutout-meta strong {

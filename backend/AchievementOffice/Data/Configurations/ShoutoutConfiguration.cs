@@ -43,5 +43,15 @@ public class ShoutoutConfiguration : IEntityTypeConfiguration<Shoutout>
 
         builder.Property(s => s.DeletedAt)
             .HasColumnName("deleted_at");
+
+        builder.Property(s => s.VisibilityId)
+            .HasColumnName("visibility_id")
+            .HasDefaultValue(1) // Public
+            .IsRequired();
+
+        builder.HasOne(s => s.Visibility)
+            .WithMany(v => v.Shoutouts)
+            .HasForeignKey(s => s.VisibilityId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

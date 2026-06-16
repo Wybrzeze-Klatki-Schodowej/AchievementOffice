@@ -39,5 +39,15 @@ public class AchievementConfiguration : IEntityTypeConfiguration<Achievement>
 
         builder.Property(a => a.DeletedAt)
             .HasColumnName("deleted_at");
+
+        builder.Property(a => a.VisibilityId)
+            .HasColumnName("visibility_id")
+            .HasDefaultValue(1) // Public
+            .IsRequired();
+
+        builder.HasOne(a => a.Visibility)
+            .WithMany(v => v.Achievements)
+            .HasForeignKey(a => a.VisibilityId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

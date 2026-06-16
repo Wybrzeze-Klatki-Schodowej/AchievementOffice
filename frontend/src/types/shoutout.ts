@@ -10,6 +10,8 @@ export interface Shoutout {
     receiverLastname: string;
     title: string;
     description?: string;
+    visibilityId: number; // 1=Public, 2=Private, 3=Group
+    groupIds: string[];
     createdAt: string;
     updatedAt: string;
     reactions: Record<string, number>;

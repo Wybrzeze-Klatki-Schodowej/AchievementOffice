@@ -18,6 +18,9 @@ export interface UpdateUserRequest {
     jobTitle: string;
     bio?: string;
     avatarUrl?: string;
+    visibilityId: number;
+    groupIds: string[];
+    isProfileRestricted: boolean;
 }
 
 export interface ChangePasswordRequest {

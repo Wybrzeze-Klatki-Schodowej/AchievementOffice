@@ -1,4 +1,4 @@
-﻿using AchievementOffice.Entities;
+using AchievementOffice.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -41,5 +41,15 @@ public class UserDetailsConfiguration : IEntityTypeConfiguration<UserDetails>
         builder.Property(userD => userD.AvatarUrl)
             .HasColumnName("avatar_url")
             .HasMaxLength(255);
+
+        builder.Property(ud => ud.VisibilityId)
+            .HasColumnName("visibility_id")
+            .HasDefaultValue(1) // Public
+            .IsRequired();
+
+        builder.HasOne(ud => ud.Visibility)
+            .WithMany(v => v.UserDetailsList)
+            .HasForeignKey(ud => ud.VisibilityId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
