@@ -11,6 +11,9 @@ export interface AchievementApprove {
     achievementApproveId: string;
     achievementId: string;
     userId: string;
+    userLogin: string;
+    userFirstName: string;
+    userLastName: string;
     isApproved: boolean;
     approvedAt: string;
 }

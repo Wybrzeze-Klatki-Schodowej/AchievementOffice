@@ -12,11 +12,13 @@ import { getUserAchievements } from "../../api/UserApi";
 interface Props {
     userId?: string;
     refreshTrigger: number;
+    onNotificationsRefresh?: () => void;
 }
 
 export default function AchievementList({
     refreshTrigger,
-    userId
+    userId,
+    onNotificationsRefresh
 }: Props) {
     const [achievements, setAchievements] = useState<Achievement[]>([]);
     const [loading, setLoading] = useState(true);
@@ -99,6 +101,7 @@ export default function AchievementList({
                         currentUserRole={currentUserRole}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onVoteCompleted={onNotificationsRefresh}
                     />
                 </div>
             ))}

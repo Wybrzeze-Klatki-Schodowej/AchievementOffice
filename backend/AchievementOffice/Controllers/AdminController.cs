@@ -43,5 +43,50 @@ namespace AchievementOffice.Controllers
             var stats = await _adminService.GetStatsAsync();
             return Ok( stats );
         }
+
+        [HttpGet("ranks")]
+        public async Task<IActionResult> GetRanks()
+        {
+            var ranks = await _adminService.GetRanksAsync();
+            return Ok( ranks );
+        }
+
+        [HttpPatch("users/{id:guid}/rank")]
+        public async Task<IActionResult> UpdateUserRank(Guid id, [FromBody] UpdateUserRankRequest request)
+        {
+            var result = await _adminService.UpdateUserRankAsync(id, request.RankId);
+            if (!result.IsSuccess)
+            {
+                return NotFound(new { message = result.ErrorMessage });
+            }
+            return Ok(new { message = "User rank updated successfully" });
+        }
+
+        [HttpDelete("comments/{id:guid}")]
+        public async Task<IActionResult> DeleteComment(Guid id)
+        {
+            var result = await _adminService.DeleteCommentAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return Ok(new { message = "Comment deleted successfully" });
+        }
+
+        [HttpDelete("achievements/{id:guid}")]
+        public async Task<IActionResult> DeleteAchievement(Guid id)
+        {
+            var result = await _adminService.DeleteAchievementAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return Ok(new { message = "Achievement deleted successfully" });
+        }
+
+        [HttpPost("ranks")]
+        public async Task<IActionResult> CreateRank([FromBody] CreateRankRequest request)
+        {
+            var result = await _adminService.CreateRankAsync(request);
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.ErrorMessage });
+            return Ok(new { message = "Rank created successfully" });
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AchievementOffice.Services;
+using AchievementOffice.Services;
 
 namespace AchievementOffice.Extensions;
 
@@ -15,6 +15,21 @@ public static class ServicesConfigurationExtension
         services.AddScoped<IAchievementService, AchievementService>();
 
         services.AddScoped<IAdminService, AdminService>();
+
+        services.AddScoped<IShoutoutService, ShoutoutService>();
+
+        services.AddScoped<ICommentService, CommentService>();
+
+        services.AddScoped<INotificationService, NotificationService>();
+
+        services.AddScoped<IAchievementVerificationRequestService, 
+            AchievementVerificationRequestService>();
+        
+        services.AddScoped<IRankService, RankService>();
+
+        services.AddScoped<IGroupService, GroupService>();
+
+        services.AddScoped<IRankingService, RankingService>();
 
         return services;
     }

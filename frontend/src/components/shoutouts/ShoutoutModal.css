@@ -1,0 +1,123 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    min-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content input.error,
+.modal-content textarea.error {
+    border: 2px solid #ff4d4d !important;
+    background: rgba(255, 77, 77, 0.05);
+}
+
+.error-message {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.shoutout-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Wymusza równe rozciągnięcie dzieci */
+    gap: 18px;
+    margin-top: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.shoutout-form h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 700;
+    text-align: left; /* Wyrównanie nagłówka do lewej */
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Rozciąga kontrolki (input/select/textarea) na 100% szerokości */
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #555;
+    text-align: left; /* Etykieta zawsze do lewej krawędzi */
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    margin: 0; /* Reset domyślnych marginesów przeglądarki */
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    box-sizing: border-box; /* Zapewnia, że padding i border wliczają się do szerokości */
+    background-color: #fcfcfc;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #4facfe;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
+    outline: none;
+}
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+.submit-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(79, 172, 254, 0.2);
+    margin-top: 8px;
+}
+.submit-btn:hover:not(:disabled) {
+    opacity: 0.95;
+    box-shadow: 0 6px 10px rgba(79, 172, 254, 0.3);
+}
+.submit-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(79, 172, 254, 0.2);
+}
+.submit-btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+}

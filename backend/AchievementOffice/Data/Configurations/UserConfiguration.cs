@@ -57,6 +57,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConstraintName("fk_users_roles")
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(user => user.RankId)
+            .HasColumnName("rank_id")
+            .IsRequired(false);
+
+        builder.HasOne(u => u.Rank)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RankId)
+            .HasConstraintName("fk_rank")
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(u => u.IsActive)
             .HasColumnName("is_active");
 
@@ -71,17 +81,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("updated_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.HasData(
-            new User
-            {
-                Id = Guid.Parse("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
-                Login = "admin_test",
-                Email = "admin@example.com",
-                Password = "nihjcbweiij12",
-                UserRoleId = Guid.Parse("fb279f32-7235-4306-8968-380f76953e6b"),
-                CreatedAt = new DateTime(2026, 05, 10, 0, 0, 0, DateTimeKind.Utc),
-                UpdatedAt = new DateTime(2026, 05, 10, 0, 0, 0, DateTimeKind.Utc)
-            }
-        );
+        builder.Property(u => u.RankingPoints)
+            .HasColumnName("ranking_points")
+            .HasPrecision(18, 2)
+            .HasDefaultValue(0.0m);
     }
 }
