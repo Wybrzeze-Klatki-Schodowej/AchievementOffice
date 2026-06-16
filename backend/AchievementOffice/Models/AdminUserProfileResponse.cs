@@ -13,4 +13,6 @@ public class AdminUserProfileResponse
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public decimal RankingPoints { get; set; }
+    public Guid? RankId { get; set; }
+    public string? RankName { get; set; }
 }

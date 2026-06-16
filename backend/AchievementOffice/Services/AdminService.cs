@@ -18,6 +18,7 @@ public class AdminService : IAdminService
 		var query = _context.Users
 			.Include(u => u.UserDetails)
 			.Include(u => u.UserRole)
+			.Include(u => u.Rank)
 			.Where(u => u.DeletedAt == null);
 
 		if (isActiveFilter.HasValue)
@@ -35,6 +36,8 @@ public class AdminService : IAdminService
 			JobTitle = u.UserDetails.JobTitle,
 			Role = u.UserRole.Name,
 			IsActive = u.IsActive,
+			RankId = u.RankId,
+			RankName = u.Rank != null ? u.Rank.Name : null,
 			CreatedAt = u.CreatedAt,
 			UpdatedAt = u.UpdatedAt
 		}).ToListAsync();
@@ -67,4 +70,76 @@ public class AdminService : IAdminService
 
 		return Result.Success();
 	}
+
+    public async Task<List<RankResponse>> GetRanksAsync()
+    {
+        return await _context.Ranks
+            .Select(r => new RankResponse
+            {
+                Id = r.Id,
+                Name = r.Name,
+                Multiplier = r.Multiplier
+            }).ToListAsync();
+    }
+
+    public async Task<Result> UpdateUserRankAsync(Guid userId, Guid? rankId) {
+		var user = await _context.Users
+			.FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null);
+
+		if (user == null)
+            return Result.Fail("User not found");
+
+        if (rankId.HasValue)
+        {
+            var rankExists = await _context.Ranks.AnyAsync(r => r.Id == rankId.Value);
+            if (!rankExists)
+                return Result.Fail("Rank not found");
+        }
+
+        user.RankId = rankId;
+		user.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+		return Result.Success();
+    }
+
+    public async Task<Result> DeleteCommentAsync(Guid commentId)
+    {
+        var comment = await _context.Comments
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.DeletedAt == null);
+
+        if (comment == null)
+            return Result.Fail("Comment not found");
+
+        comment.DeletedAt = DateTime.UtcNow;
+        comment.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> DeleteAchievementAsync(Guid achievementId)
+    {
+        var achievement = await _context.Achievements
+            .FirstOrDefaultAsync(a => a.AchievementId == achievementId && a.DeletedAt == null);
+        if (achievement == null)
+            return Result.Fail("Achievement not found");
+        achievement.DeletedAt = DateTime.UtcNow;
+        achievement.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> CreateRankAsync(CreateRankRequest request)
+    {
+        var rank = new Entities.Rank
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            Multiplier = request.Multiplier ?? 1.0m
+        };
+        _context.Ranks.Add(rank);
+        await _context.SaveChangesAsync();
+        return Result.Success();
+    }
 }
