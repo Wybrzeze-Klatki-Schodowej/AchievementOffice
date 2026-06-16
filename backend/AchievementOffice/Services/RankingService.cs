@@ -30,7 +30,7 @@ namespace AchievementOffice.Services
             return Result.Success();
         }
 
-        public async Task<Result> ApplypAchievementPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
+        public async Task<Result> ApplyAchievementPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
         {
             if (isApproved == true)
                 return await AddPoints(reactingUserId, ownerId, _rankingSettings.AchievementApprovedBasePoints);
@@ -42,9 +42,18 @@ namespace AchievementOffice.Services
             return await AddPoints(reactingUserId, ownerId, -_rankingSettings.DisapprovalPoints);
         }
 
-        public Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool? isApproved, bool dtoApproved)
+        public async Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool addPoints)
         {
-            throw new NotImplementedException();
+            if (addPoints)
+                return await AddPoints(reactingUserId, ownerId, _rankingSettings.ReactionShoutOutPoints);
+            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ReactionShoutOutPoints);
+        }
+
+        public async Task<Result> ApplyShoutOutPointsCreate(Guid reactingUserId, Guid ownerId, bool addPoints)
+        {
+            if (addPoints)
+                return await AddPoints(reactingUserId, ownerId, _rankingSettings.ShoutoutBase);
+            return await AddPoints(reactingUserId, ownerId, -_rankingSettings.ShoutoutBase);
         }
     }
 }

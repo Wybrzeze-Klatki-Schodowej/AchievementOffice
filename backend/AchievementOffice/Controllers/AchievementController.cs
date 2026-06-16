@@ -14,10 +14,10 @@ public class AchievementController : ControllerBase
     private readonly IAchievementService _achievementService;
     private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService, IRankingService raningService)
+    public AchievementController(IAchievementService achievementService, IRankingService rankingService)
     {
         _achievementService = achievementService;
-        _rankingService = raningService;
+        _rankingService = rankingService;
     }
 
     [HttpGet]
@@ -104,7 +104,7 @@ public class AchievementController : ControllerBase
 
         if (approve is null) return NotFound(new { message = "Achievement not found" });
 
-        await _rankingService.ApplypAchievementPoints(userId, approve.OwnerId, approve.IsApproved, dto.IsApproved);
+        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.IsApproved, dto.IsApproved);
 
         return Ok(approve);
     }
