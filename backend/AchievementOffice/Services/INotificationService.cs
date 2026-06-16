@@ -13,4 +13,6 @@ public interface INotificationService
     Task<Result<List<NotificationResponse>>> GetUserNotificationsAsync(Guid userId);
 
     Task<Result> DeleteAsync(Guid notificationId);
+
+    Task<Result> DeleteByVerificationRequestIdAsync(Guid requestId);
 }

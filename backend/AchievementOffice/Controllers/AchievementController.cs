@@ -14,10 +14,10 @@ public class AchievementController : ControllerBase
     private readonly IAchievementService _achievementService;
     private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService, IRankingService raningService)
+    public AchievementController(IAchievementService achievementService, IRankingService rankingService)
     {
         _achievementService = achievementService;
-        _rankingService = raningService;
+        _rankingService = rankingService;
     }
 
     [HttpGet]
@@ -121,6 +121,14 @@ public class AchievementController : ControllerBase
     public async Task<ActionResult<AchievementApprovalSummaryDto>> GetApprovalSummary(Guid id)
     {
         var summary = await _achievementService.GetApprovalSummaryAsync( id );
-        return Ok( summary );
+        return Ok(summary);
+    }
+
+    [Authorize]
+    [HttpGet("{id:guid}/approvals/grouped")]
+    public async Task<ActionResult<AchievementApprovalsGroupedDto>> GetGroupedApprovals(Guid id)
+    {
+        var result = await _achievementService.GetApprovalsGroupedAsync(id);
+        return Ok(result);
     }
 }
