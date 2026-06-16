@@ -77,6 +77,21 @@ public class NotificationService : INotificationService
         return Result.Success();
     }
 
+    public async Task<Result> DeleteByVerificationRequestIdAsync(Guid requestId)
+    {
+        var notifications = await _context.Notifications
+            .Where(n => n.AchievementVerificationRequestId == requestId)
+            .ToListAsync();
+
+        if (!notifications.Any())
+            return Result.Success();
+
+        _context.Notifications.RemoveRange(notifications);
+        await _context.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
     private static NotificationResponse
         MapToResponse(Notification notification)
     {

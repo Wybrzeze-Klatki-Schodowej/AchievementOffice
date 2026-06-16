@@ -8,6 +8,7 @@ import NotificationBell from "../notifications/NotificationBell";
 interface Props {
     onAddAchievementClick?: () => void;
     onAddShoutoutClick?: () => void;
+    notificationsRefreshTrigger: number;
 }
 
 interface User {
@@ -19,6 +20,7 @@ interface User {
 export default function Navbar({
     onAddAchievementClick,
     onAddShoutoutClick,
+    notificationsRefreshTrigger
 }: Props) {
     const navigate = useNavigate();
 
@@ -56,7 +58,9 @@ export default function Navbar({
             </div>
 
             <div className="navbar-right">
-                <NotificationBell />
+                <NotificationBell 
+                    refreshTrigger={notificationsRefreshTrigger}
+                />
 
                 {!loading && user?.role === "Admin" && (
                     <button

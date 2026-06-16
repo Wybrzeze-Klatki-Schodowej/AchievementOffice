@@ -2,6 +2,8 @@ import type { Achievement, AchievementApprovalSummary } from "../../types/achiev
 import { approveAchievement, getApprovalSummary } from "../../api/achievementApi";
 import { useState, useEffect, useCallback } from "react";
 import SelectReviewerModal from "./SelectReviewerModal";
+import AchievementApprovalsModal from "./AchievementApprovalsModal";
+import "./AchievementCard.css";
 
 interface Props {
     achievement: Achievement;
@@ -9,6 +11,7 @@ interface Props {
     currentUserRole?: string | null;
     onEdit?: (achievement: Achievement) => void;
     onDelete?: (id: string) => void;
+    onVoteCompleted?: () => void;
 }
 
 export default function AchievementCard({ 
@@ -16,11 +19,13 @@ export default function AchievementCard({
     currentUserId, 
     currentUserRole, 
     onEdit, 
-    onDelete 
+    onDelete,
+    onVoteCompleted
 }: Props) {
 
     const [loading, setLoading] = useState(false);
     const [showReviewerModal, setShowReviewerModal] = useState(false);
+    const [showApprovals, setShowApprovals] = useState(false);
 
     const [summary, setSummary] = 
         useState<AchievementApprovalSummary>({ 
@@ -55,6 +60,8 @@ export default function AchievementCard({
             await approveAchievement(achievement.achievementId, isApproved);
 
             await fetchSummary();
+
+            onVoteCompleted?.();
         } catch (e) {
             console.error(e);
         } finally {
@@ -63,14 +70,7 @@ export default function AchievementCard({
     };
 
     return (
-        <div
-            style={{
-                border: "1px solid #ccc",
-                padding: "16px",
-                borderRadius: "8px",
-                marginBottom: "12px",
-            }}
-        >
+        <div className="achievement-card">
             <h3>{achievement.title}</h3>
 
             <p>{achievement.description}</p>
@@ -81,36 +81,33 @@ export default function AchievementCard({
                 Updated: {new Date(achievement.updatedAt).toLocaleString()}
             </small>
 
-            <div style={{ marginTop: "8px", fontSize: "14px" }}>
-                 {summary.approved} approves &nbsp;  {summary.denied} denies
+            <div
+                className="achievement-approvals-link"
+                onClick={() => setShowApprovals(true)}
+            >
+                {summary.approved} approves · {summary.denied} denies (view details)
             </div>
 
             {!isOwner && (
-                <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+                <div className="achievement-vote-buttons">
                     <button
                         onClick={() => handleVote(true)}
                         disabled={loading}
-                        style={{
-                            background: summary.currentUserVote === true ? "green" : "#eee",
-                            color: summary.currentUserVote === true ? "white" : "black",
-                            border: "1px solid #ccc",
-                            padding: "6px 12px",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                        }}
+                        className={`vote-button ${
+                            summary.currentUserVote === true
+                                ? "vote-button-active-approve"
+                                : "vote-button-inactive"
+                        }`}
                     >
                         Approve                    </button>
                     <button
                         onClick={() => handleVote(false)}
                         disabled={loading}
-                        style={{
-                            background: summary.currentUserVote === false ? "red" : "#eee",
-                            color: summary.currentUserVote === false ? "white" : "black",
-                            border: "1px solid #ccc",
-                            padding: "6px 12px",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                        }}
+                        className={`vote-button ${
+                            summary.currentUserVote === false
+                                ? "vote-button-active-deny"
+                                : "vote-button-inactive"
+                        }`}
                     >
                         Deny
                     </button>
@@ -118,7 +115,7 @@ export default function AchievementCard({
             )}
 
             {canEdit && (
-                <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+                <div className="achievement-action-buttons">
                     <button onClick={() => onEdit?.(achievement)}>
                         Edit
                     </button>
@@ -129,7 +126,7 @@ export default function AchievementCard({
             )}
 
             {isOwner && (
-                <div style={{ marginTop: 12 }}>
+                <div className="achievement-request-verification">
                     <button onClick={() => setShowReviewerModal(true)}>
                         Request verification
                     </button>
@@ -141,6 +138,13 @@ export default function AchievementCard({
                     achievementId={achievement.achievementId}
                     onClose={() => setShowReviewerModal(false)}
                     onSuccess={fetchSummary}
+                />
+            )}
+
+            {showApprovals && (
+                <AchievementApprovalsModal 
+                    achievementId={achievement.achievementId}
+                    onClose={() => setShowApprovals(false)}
                 />
             )}
         </div>

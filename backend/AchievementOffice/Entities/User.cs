@@ -1,4 +1,4 @@
-namespace AchievementOffice.Entities;
+﻿namespace AchievementOffice.Entities;
 
 public class User
 {

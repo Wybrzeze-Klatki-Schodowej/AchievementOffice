@@ -217,22 +217,13 @@ public class AchievementVerificationRequestService
 
         await _context.SaveChangesAsync();
 
-        var notification =
-            await _context.Notifications
-                .FirstOrDefaultAsync(n =>
-                n.AchievementVerificationRequestId ==
-                request.Id);
+        var deleteResult =
+            await _notificationService
+                .DeleteByVerificationRequestIdAsync(request.Id);
 
-        if (notification != null)
+        if (!deleteResult.IsSuccess)
         {
-            var deleteResult =
-                await _notificationService
-                    .DeleteAsync(notification.Id);
-
-            if (!deleteResult.IsSuccess)
-            {
-                return deleteResult;
-            }
+            return deleteResult;
         }
 
         return Result.Success();

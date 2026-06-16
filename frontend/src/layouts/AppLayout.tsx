@@ -11,9 +11,15 @@ export default function AppLayout() {
 
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [usersRefreshTrigger, setUsersRefreshTrigger] = useState(0);
+    const [notificationsRefreshTrigger, setNotificationsRefreshTrigger] = useState(0);
 
     const handleContentCreated = () => {
         setRefreshTrigger((prev) => prev + 1);
+        setNotificationsRefreshTrigger(prev => prev + 1);
+    };
+
+    const refreshNotifications = () => {
+        setNotificationsRefreshTrigger(prev => prev + 1);
     };
 
     return (
@@ -26,6 +32,7 @@ export default function AppLayout() {
                 onAddShoutoutClick={() =>
                     setIsShoutoutModalOpen(true)
                 }
+                notificationsRefreshTrigger={notificationsRefreshTrigger}
             />
 
 
@@ -81,7 +88,8 @@ export default function AppLayout() {
                         context={{ 
                             refreshTrigger,
                             refreshUsers: () =>
-                            setUsersRefreshTrigger(prev => prev + 1),
+                                setUsersRefreshTrigger(prev => prev + 1),
+                            refreshNotifications,
                             onAddShoutoutClick: () => setIsShoutoutModalOpen(true)
                         }}
                     />
