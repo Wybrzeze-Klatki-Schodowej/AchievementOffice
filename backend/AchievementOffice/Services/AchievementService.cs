@@ -10,11 +10,16 @@ public class AchievementService : IAchievementService
 {
     private readonly AppDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly INotificationService _notificationService;
 
-    public AchievementService(AppDbContext context, IHttpContextAccessor httpContextAccessor)
+    public AchievementService(
+        AppDbContext context, 
+        IHttpContextAccessor httpContextAccessor,
+        INotificationService notificationService)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
+        _notificationService = notificationService;
     }
 
     public async Task<Result<AchievementResponse>> CreateAsync(
@@ -151,6 +156,8 @@ public class AchievementService : IAchievementService
 
         await _context.SaveChangesAsync();
 
+        await ResetApprovalsAndRecreateRequestsAsync(id);
+
         return Result<AchievementResponse>.Success(MapToDto(achievement));
     }
 
@@ -212,7 +219,7 @@ public class AchievementService : IAchievementService
         };
     }
 
-    public async Task<AchievementApproveResponseDto> ApproveAsync(
+    public async Task<AchievementApproveResponseDto?> ApproveAsync(
         Guid achievementId, 
         Guid userId, 
         CreateAchievementApproveDto dto)
@@ -221,6 +228,11 @@ public class AchievementService : IAchievementService
             .FirstOrDefaultAsync(a => 
                 a.AchievementId == achievementId && 
                 a.UserId == userId);
+
+        var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
+
+        if (achievement is null) return null;
+        var ownerId = achievement.UserId;
 
         if (existing is null)
         {
@@ -234,9 +246,11 @@ public class AchievementService : IAchievementService
             };
 
             _context.AchievementApproves.Add(approve);
+
+            await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
 
-            return MapApproveToDto(approve);
+            return MapApproveToDto(approve, ownerId);
         }
             
         if (existing.DeletedAt != null)
@@ -245,13 +259,15 @@ public class AchievementService : IAchievementService
             existing.IsApproved = dto.IsApproved;
             existing.ApprovedAt = DateTime.UtcNow;
 
+            await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
-            return MapApproveToDto(existing);
+            return MapApproveToDto(existing, ownerId);
         }
         
         if (existing.IsApproved == dto.IsApproved)
         {
             existing.DeletedAt = DateTime.UtcNow;
+            await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
 
             return new AchievementApproveResponseDto
@@ -259,6 +275,7 @@ public class AchievementService : IAchievementService
                 AchievementApproveId = existing.AchievementApproveId,
                 AchievementId = existing.AchievementId,
                 UserId = existing.UserId,
+                OwnerId = achievement.UserId,
                 IsApproved = null,
                 ApprovedAt = existing.ApprovedAt
             };
@@ -267,26 +284,62 @@ public class AchievementService : IAchievementService
         existing.IsApproved = dto.IsApproved;
         existing.ApprovedAt = DateTime.UtcNow;
 
+        await RemoveVerificationNotificationAsync(achievementId, userId);
         await _context.SaveChangesAsync();
 
-        return MapApproveToDto(existing);
+        return MapApproveToDto(existing, ownerId);
     }
 
     public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)
     {
         var approvals = await _context.AchievementApproves
-            .Where( a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .Where(a => a.AchievementId == achievementId && a.DeletedAt == null )
+            .Include(a => a.User)
+                .ThenInclude(u => u.UserDetails)
             .ToListAsync();
-        return approvals.Select( MapApproveToDto ).ToList();
+
+        var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
+
+        return approvals.Select( a => MapApproveToDto(a, achievement?.UserId ?? Guid.Empty) ).ToList();
+    }
+    public async Task<AchievementApprovalsGroupedDto> GetApprovalsGroupedAsync(Guid achievementId)
+    {
+        var approvals = await _context.AchievementApproves
+            .Where(a => a.AchievementId == achievementId && a.DeletedAt == null)
+            .Include(a => a.User)
+                .ThenInclude(u => u.UserDetails)
+            .ToListAsync();
+
+        var achievement = await _context.Achievements
+            .FirstOrDefaultAsync(a => a.AchievementId == achievementId);
+
+        var ownerId = achievement?.UserId ?? Guid.Empty;
+
+        return new AchievementApprovalsGroupedDto
+        {
+            Approved = approvals
+                .Where(a => a.IsApproved == true)
+                .Select(a => MapApproveToDto(a, ownerId))
+                .ToList(),
+
+            Denied = approvals
+                .Where(a => a.IsApproved == false)
+                .Select(a => MapApproveToDto(a, ownerId))
+                .ToList()
+        };
     }
 
-    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve)
+    private static AchievementApproveResponseDto MapApproveToDto(AchievementApprove approve, Guid ownerId)
     {
         return new AchievementApproveResponseDto
         {
             AchievementApproveId = approve.AchievementApproveId,
             AchievementId = approve.AchievementId,
             UserId = approve.UserId,
+            OwnerId = ownerId,
+            UserLogin = approve.User?.Login,
+            UserFirstName = approve.User?.UserDetails?.Firstname,
+            UserLastName = approve.User?.UserDetails?.Lastname,
             IsApproved = approve.IsApproved,
             ApprovedAt = approve.ApprovedAt
         };
@@ -345,5 +398,80 @@ public class AchievementService : IAchievementService
             .ToListAsync();
 
         return achievements.Select(MapToDto).ToList();
+    }
+
+    private async Task ResetApprovalsAndRecreateRequestsAsync(Guid achievementId)
+    {
+        var achievement = await _context.Achievements
+            .FirstOrDefaultAsync(a => a.AchievementId == achievementId && a.DeletedAt == null);
+
+        if (achievement == null)
+            return;
+
+        var previousVoters = await _context.AchievementApproves
+            .Where(a => a.AchievementId == achievementId)
+            .Select(a => a.UserId)
+            .Distinct()
+            .ToListAsync();
+
+        _context.AchievementApproves.RemoveRange(
+            _context.AchievementApproves.Where(a => a.AchievementId == achievementId)
+        );
+
+        var pendingRequests = await _context.AchievementVerificationRequests
+            .Where(r => r.AchievementId == achievementId &&
+                r.Status == VerificationRequestStatus.Pending)
+            .ToListAsync();
+
+        _context.AchievementVerificationRequests.RemoveRange(pendingRequests);
+
+        await _context.SaveChangesAsync();
+
+        var requesterId = achievement.UserId;
+
+        foreach (var userId in previousVoters.Distinct())
+        {
+            if (userId == requesterId)
+                continue;
+
+            var request = new AchievementVerificationRequest
+            {
+                Id = Guid.NewGuid(),
+                AchievementId = achievementId,
+                RequesterUserId = requesterId,
+                TargetUserId = userId,
+                Status = VerificationRequestStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.AchievementVerificationRequests.Add(request);
+            await _context.SaveChangesAsync();
+
+            await _notificationService.CreateAchievementVerificationRequestNotificationAsync(
+                userId,
+                request.Id,
+                achievement.Title
+            );
+        }
+    }
+
+    private async Task RemoveVerificationNotificationAsync(Guid achievementId, Guid userId)
+    {
+        var request = await _context.AchievementVerificationRequests
+            .FirstOrDefaultAsync(r =>
+                r.AchievementId == achievementId &&
+                r.TargetUserId == userId);
+
+        if (request == null) 
+            return;
+
+        var notification = await _context.Notifications
+            .FirstOrDefaultAsync(n =>
+                n.AchievementVerificationRequestId == request.Id);
+
+        if (notification != null)
+        {
+            _context.Notifications.Remove(notification);
+        }
     }
 }

@@ -14,11 +14,13 @@ public interface IAchievementService
 
     Task<Result<bool>> DeleteAsync(Guid id);
 
-    Task<AchievementApproveResponseDto> ApproveAsync(Guid achievementId, Guid userId, CreateAchievementApproveDto dto);
+    Task<AchievementApproveResponseDto?> ApproveAsync(Guid achievementId, Guid userId, CreateAchievementApproveDto dto);
 
     Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId);
 
     Task<AchievementApprovalSummaryDto> GetApprovalSummaryAsync(Guid achievementId);
+
+    Task<AchievementApprovalsGroupedDto> GetApprovalsGroupedAsync(Guid achievementId);
 
     Task<List<AchievementResponse>> GetByUserIdAsync(Guid userId);
 }

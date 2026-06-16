@@ -16,6 +16,22 @@ export interface UpdateAchievementDto {
     groupIds?: string[];
 }
 
+export interface AchievementApprovalsDetails {
+    approved: AchievementApproveDetails[];
+    denied: AchievementApproveDetails[];
+}
+
+export interface AchievementApproveDetails {
+    achievementApproveId: string;
+    achievementId: string;
+    userId: string;
+    userLogin: string;
+    userFirstName: string;
+    userLastName: string;
+    isApproved: boolean;
+    approvedAt: string;
+}
+
 export const getAchievements = async (): Promise<Achievement[]> => {
     const response = await fetch(API_URL);
 
@@ -114,5 +130,22 @@ export const getApprovalSummary = async (
     if (!response.ok) {
         throw new Error("Failed to fetch approval summary");
     }
+    return response.json();
+};
+
+export const getAchievementApprovalsDetails = async (
+    achievementId: string
+): Promise<AchievementApprovalsDetails> => {
+    const response = await fetch(
+        `${API_URL}/${achievementId}/approvals/grouped`,
+        {
+            credentials: "include"
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch approvals details");
+    }
+
     return response.json();
 };

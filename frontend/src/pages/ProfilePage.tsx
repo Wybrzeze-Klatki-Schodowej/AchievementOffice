@@ -16,12 +16,14 @@ import ShoutoutModal from "../components/shoutouts/ShoutoutModal.tsx";
 interface OutletContext {
     refreshTrigger: number;
     refreshUsers: () => void;
+    refreshNotifications: () => void;
 }
 
 export default function ProfilePage() {
     const {
         refreshTrigger,
         refreshUsers,
+        refreshNotifications
     } = useOutletContext<OutletContext>();
     const { userId } = useParams();
 
@@ -159,6 +161,15 @@ export default function ProfilePage() {
                 )}
 
             </div>
+            <AchievementList
+                userId={userId!}
+                refreshTrigger={refreshTrigger}
+                onNotificationsRefresh={refreshNotifications}
+            />
+            <ShoutoutList
+                userId={userId!}
+                refreshTrigger={refreshTrigger + localRefreshTrigger}
+            />
 
             <div className="profile-card">
 

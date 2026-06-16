@@ -8,7 +8,13 @@ import type { Notification } from "../../types/notification";
 import NotificationDetails from "./NotificationDetails";
 import "./NotificationBell.css";
 
-export default function NotificationBell() {
+interface Props {
+    refreshTrigger: number;
+}
+
+export default function NotificationBell({
+    refreshTrigger
+}: Props) {
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +35,7 @@ export default function NotificationBell() {
 
     useEffect(() => {
         loadNotifications();
-    }, []);
+    }, [refreshTrigger]);
 
     return (
         <div className="notification-bell">

@@ -103,6 +103,22 @@ public class UserService : IUserService
                 .ThenInclude(ud => ud.ProfileGroups)
             .Include(u => u.UserRole)
             .Where(u => u.Id == userId)
+//             .Select(u => new UserProfileResponse
+//             {
+//                 UserId = u.Id,
+//                 Login = u.Login,
+//                 Email = u.Email,
+//                 FirstName = u.UserDetails.Firstname,
+//                 LastName = u.UserDetails.Lastname,
+//                 JobTitle = u.UserDetails.JobTitle,
+//                 IsActive = u.IsActive,
+//                 Bio = u.UserDetails.Bio,
+//                 AvatarUrl = u.UserDetails.AvatarUrl,
+//                 Role = u.UserRole.Name,
+//                 CreatedAt = u.CreatedAt,
+//                 UpdatedAt = u.UpdatedAt,
+//                 RankingPoints = u.RankingPoints
+//             })
             .FirstOrDefaultAsync();
 
         if (user == null)
@@ -142,7 +158,8 @@ public class UserService : IUserService
             UpdatedAt = user.UpdatedAt,
             VisibilityId = user.UserDetails.VisibilityId,
             GroupIds = allowedGroupIds,
-            IsProfileRestricted = !canViewProfileMeta
+            IsProfileRestricted = !canViewProfileMeta,
+            RankingPoints = user.RankingPoints
         };
     }
 
@@ -166,7 +183,8 @@ public class UserService : IUserService
                 Role = u.UserRole.Name,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
-                IsProfileRestricted = false
+                IsProfileRestricted = false //?
+                RankingPoints = u.RankingPoints
             })
             .ToListAsync();
 
@@ -272,6 +290,7 @@ public class UserService : IUserService
                     VisibilityId = user.UserDetails.VisibilityId,
                     GroupIds = allowedGroupIds,
                     IsProfileRestricted = !canViewProfileMeta
+                    RankingPoints = user.RankingPoints
                 }
             );
     }

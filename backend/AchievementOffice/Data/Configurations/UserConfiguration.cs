@@ -80,5 +80,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.UpdatedAt)
             .HasColumnName("updated_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(u => u.RankingPoints)
+            .HasColumnName("ranking_points")
+            .HasPrecision(18, 2)
+            .HasDefaultValue(0.0m);
     }
 }

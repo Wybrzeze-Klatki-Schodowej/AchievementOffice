@@ -1,8 +1,9 @@
-using System.Security.Claims;
+using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using AchievementOffice.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AchievementOffice.Controllers;
 
@@ -11,10 +12,12 @@ namespace AchievementOffice.Controllers;
 public class AchievementController : ControllerBase
 {
     private readonly IAchievementService _achievementService;
+    private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService)
+    public AchievementController(IAchievementService achievementService, IRankingService rankingService)
     {
         _achievementService = achievementService;
+        _rankingService = rankingService;
     }
 
     [HttpGet]
@@ -99,6 +102,10 @@ public class AchievementController : ControllerBase
             
         var approve = await _achievementService.ApproveAsync(id, userId, dto);
 
+        if (approve is null) return NotFound(new { message = "Achievement not found" });
+
+        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.IsApproved, dto.IsApproved);
+
         return Ok(approve);
     }
 
@@ -114,6 +121,14 @@ public class AchievementController : ControllerBase
     public async Task<ActionResult<AchievementApprovalSummaryDto>> GetApprovalSummary(Guid id)
     {
         var summary = await _achievementService.GetApprovalSummaryAsync( id );
-        return Ok( summary );
+        return Ok(summary);
+    }
+
+    [Authorize]
+    [HttpGet("{id:guid}/approvals/grouped")]
+    public async Task<ActionResult<AchievementApprovalsGroupedDto>> GetGroupedApprovals(Guid id)
+    {
+        var result = await _achievementService.GetApprovalsGroupedAsync(id);
+        return Ok(result);
     }
 }
