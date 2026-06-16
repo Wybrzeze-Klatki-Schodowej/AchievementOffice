@@ -7,6 +7,9 @@ steps:
       - |
         dotnet tool install --global dotnet-ef
         export PATH="$$PATH:$$HOME/.dotnet/tools"
+        
+        cd AchievementOffice
+
         dotnet ef database update --connection "$_DB_CONNECTION_STRING"
         
   - name: 'gcr.io/cloud-builders/docker'
