@@ -710,6 +710,17 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Visibility");
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.AchievementGroup", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.Achievement", "Achievement")
@@ -727,16 +738,6 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Achievement");
 
                     b.Navigation("Group");
-                });
-            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
-                {
-                    b.HasOne("AchievementOffice.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>

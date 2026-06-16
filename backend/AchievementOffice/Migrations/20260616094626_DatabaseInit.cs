@@ -9,27 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     /// <inheritdoc />
-    public partial class Visibility6 : Migration
+    public partial class DatabaseInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AchievementApprove",
-                columns: table => new
-                {
-                    achievement_approve_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    achievement_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    is_approved = table.Column<bool>(type: "boolean", nullable: false),
-                    approved_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AchievementApprove", x => x.achievement_approve_id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
@@ -121,7 +105,8 @@ namespace AchievementOffice.Migrations
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ranking_points = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false, defaultValue: 0.0m)
                 },
                 constraints: table =>
                 {
@@ -162,6 +147,28 @@ namespace AchievementOffice.Migrations
                         principalTable: "Visibility",
                         principalColumn: "visibility_mode_id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AchievementApprove",
+                columns: table => new
+                {
+                    achievement_approve_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    achievement_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    is_approved = table.Column<bool>(type: "boolean", nullable: false),
+                    approved_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AchievementApprove", x => x.achievement_approve_id);
+                    table.ForeignKey(
+                        name: "FK_AchievementApprove_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "user_id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -491,6 +498,11 @@ namespace AchievementOffice.Migrations
                 table: "AchievementApprove",
                 columns: new[] { "achievement_id", "user_id" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AchievementApprove_user_id",
+                table: "AchievementApprove",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AchievementGroups_group_id",

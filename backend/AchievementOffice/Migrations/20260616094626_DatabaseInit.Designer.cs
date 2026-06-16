@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260614205220_Visibility6")]
-    partial class Visibility6
+    [Migration("20260616094626_DatabaseInit")]
+    partial class DatabaseInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,6 +102,8 @@ namespace AchievementOffice.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("AchievementApproveId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("AchievementId", "UserId")
                         .IsUnique();
@@ -552,6 +554,13 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("rank_id");
 
+                    b.Property<decimal>("RankingPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasDefaultValue(0.0m)
+                        .HasColumnName("ranking_points");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -702,6 +711,17 @@ namespace AchievementOffice.Migrations
                         .IsRequired();
 
                     b.Navigation("Visibility");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementGroup", b =>
