@@ -1,8 +1,5 @@
 using AchievementOffice.Extensions;
 
-using AchievementOffice.Services;
-using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,6 +14,7 @@ builder.Services.AddSecurityConfiguration(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 builder.Services.SetupDatabase(builder.Configuration);
+builder.Services.AddRankingSettings(builder.Configuration);
 
 var app = builder.Build();
 

@@ -41,15 +41,5 @@ public class UserDetailsConfiguration : IEntityTypeConfiguration<UserDetails>
         builder.Property(userD => userD.AvatarUrl)
             .HasColumnName("avatar_url")
             .HasMaxLength(255);
-
-        builder.HasData(
-            new UserDetails
-            {
-                UserId = Guid.Parse("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
-                Firstname = "Jan",
-                Lastname = "Kowalski",
-                JobTitle = "Admin"
-            }
-        );
     }
 }

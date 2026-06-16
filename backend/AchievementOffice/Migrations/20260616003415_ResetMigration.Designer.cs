@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AchievementOffice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260611001817_AddGroups")]
-    partial class AddGroups
+    [Migration("20260616003415_ResetMigration")]
+    partial class ResetMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,6 +94,8 @@ namespace AchievementOffice.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("AchievementApproveId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("AchievementId", "UserId")
                         .IsUnique();
@@ -289,6 +291,27 @@ namespace AchievementOffice.Migrations
                     b.ToTable("GroupUserRole", (string)null);
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.KudosShoutout", b =>
+                {
+                    b.Property<Guid>("ShoutoutId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shoutout_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("Reaction")
+                        .HasColumnType("integer")
+                        .HasColumnName("reaction");
+
+                    b.HasKey("ShoutoutId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("KudosShoutouts", (string)null);
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -361,6 +384,55 @@ namespace AchievementOffice.Migrations
                     b.ToTable("Ranks", (string)null);
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
+                {
+                    b.Property<Guid>("ShoutoutId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("shoutout_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("receiver_id");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sender_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("ShoutoutId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Shoutouts", (string)null);
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -414,6 +486,13 @@ namespace AchievementOffice.Migrations
                     b.Property<Guid?>("RankId")
                         .HasColumnType("uuid")
                         .HasColumnName("rank_id");
+
+                    b.Property<decimal>("RankingPoints")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasDefaultValue(0.0m)
+                        .HasColumnName("ranking_points");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -478,15 +557,6 @@ namespace AchievementOffice.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserDetails", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = new Guid("a5e2f6d1-4b7c-4d8e-9f0a-1b2c3d4e5f6f"),
-                            Firstname = "Jan",
-                            JobTitle = "Admin",
-                            Lastname = "Kowalski"
-                        });
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.UserRole", b =>
@@ -518,6 +588,17 @@ namespace AchievementOffice.Migrations
                             Id = new Guid("7a610998-3843-4315-9923-92f7634f1981"),
                             Name = "User"
                         });
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.AchievementApprove", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.AchievementVerificationRequest", b =>
@@ -606,6 +687,25 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.KudosShoutout", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.Shoutout", "Shoutout")
+                        .WithMany("Kudos")
+                        .HasForeignKey("ShoutoutId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AchievementOffice.Entities.User", "User")
+                        .WithMany("ShoutoutReactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Shoutout");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.Notification", b =>
                 {
                     b.HasOne("AchievementOffice.Entities.AchievementVerificationRequest", "AchievementVerificationRequest")
@@ -622,6 +722,25 @@ namespace AchievementOffice.Migrations
                     b.Navigation("AchievementVerificationRequest");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
+                {
+                    b.HasOne("AchievementOffice.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AchievementOffice.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
@@ -668,9 +787,16 @@ namespace AchievementOffice.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
+                {
+                    b.Navigation("Kudos");
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.User", b =>
                 {
                     b.Navigation("GroupUsers");
+
+                    b.Navigation("ShoutoutReactions");
 
                     b.Navigation("UserDetails")
                         .IsRequired();
