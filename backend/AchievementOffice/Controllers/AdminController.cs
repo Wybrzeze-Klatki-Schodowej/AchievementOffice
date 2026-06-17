@@ -88,5 +88,14 @@ namespace AchievementOffice.Controllers
                 return BadRequest(new { message = result.ErrorMessage });
             return Ok(new { message = "Rank created successfully" });
         }
+
+        [HttpDelete("shoutouts/{id:guid}")]
+        public async Task<IActionResult> DeleteShoutout(Guid id)
+        {
+            var result = await _adminService.DeleteShoutoutAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return Ok(new { message = "Shoutout deleted successfully" });
+        }
     }
 }

@@ -187,5 +187,56 @@ namespace AchievementOffice.Services
 
             return Result<List<GroupRoleResponse>>.Success(roles);
         }
+
+        public async Task<Result> RemoveUserFromGroupAsync(
+            Guid groupId,
+            Guid userIdToRemove,
+            Guid currentUserId,
+            bool isGlobalAdmin)
+        {
+            bool isGroupAdmin = await _context.GroupUsers
+                .Include(x => x.GroupUserRole)
+                .AnyAsync(x =>
+                    x.GroupId == groupId &&
+                    x.UserId == currentUserId &&
+                    x.GroupUserRole.IsAdmin);
+
+            if (!isGlobalAdmin && !isGroupAdmin)
+            {
+                return Result.Fail("Forbidden");
+            }
+
+            var membership = await _context.GroupUsers
+                .Include(x => x.GroupUserRole)
+                .FirstOrDefaultAsync(x =>
+                    x.GroupId == groupId &&
+                    x.UserId == userIdToRemove);
+
+            if (membership == null)
+            {
+                return Result.Fail("User is not a member of this group");
+            }
+
+            if (membership.GroupUserRole.IsAdmin)
+            {
+                var adminCount = await _context.GroupUsers
+                    .Include(x => x.GroupUserRole)
+                    .CountAsync(x =>
+                        x.GroupId == groupId &&
+                        x.GroupUserRole.IsAdmin);
+
+                if (adminCount <= 1)
+                {
+                    return Result.Fail(
+                        "Cannot remove the last administrator");
+                }
+            }
+
+            _context.GroupUsers.Remove(membership);
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
     }
 }

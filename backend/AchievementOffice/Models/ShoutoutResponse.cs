@@ -33,5 +33,7 @@ namespace AchievementOffice.Models
 
         public int VisibilityId { get; set; }
         public List<Guid> GroupIds { get; set; } = new();
+        public bool? PrevState { get; set; }
+        public bool? PrevReactionState { get; set; }
     }
 }

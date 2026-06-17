@@ -104,7 +104,7 @@ public class AchievementController : ControllerBase
 
         if (approve is null) return NotFound(new { message = "Achievement not found" });
 
-        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.IsApproved, dto.IsApproved);
+        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.PrevApproved, approve.IsApproved);
 
         return Ok(approve);
     }

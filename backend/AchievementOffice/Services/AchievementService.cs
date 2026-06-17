@@ -234,6 +234,8 @@ public class AchievementService : IAchievementService
         if (achievement is null) return null;
         var ownerId = achievement.UserId;
 
+        bool? prevState = existing?.DeletedAt == null ? existing?.IsApproved : null;
+
         if (existing is null)
         {
             var approve = new AchievementApprove
@@ -250,7 +252,9 @@ public class AchievementService : IAchievementService
             await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
 
-            return MapApproveToDto(approve, ownerId);
+            var resDto = MapApproveToDto(approve, ownerId);
+            resDto.PrevApproved = prevState;
+            return resDto;
         }
             
         if (existing.DeletedAt != null)
@@ -261,7 +265,9 @@ public class AchievementService : IAchievementService
 
             await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
-            return MapApproveToDto(existing, ownerId);
+            var resDto = MapApproveToDto(existing, ownerId);
+            resDto.PrevApproved = prevState;
+            return resDto;
         }
         
         if (existing.IsApproved == dto.IsApproved)
@@ -277,6 +283,7 @@ public class AchievementService : IAchievementService
                 UserId = existing.UserId,
                 OwnerId = achievement.UserId,
                 IsApproved = null,
+                PrevApproved = prevState,
                 ApprovedAt = existing.ApprovedAt
             };
         }
@@ -287,7 +294,9 @@ public class AchievementService : IAchievementService
         await RemoveVerificationNotificationAsync(achievementId, userId);
         await _context.SaveChangesAsync();
 
-        return MapApproveToDto(existing, ownerId);
+        var finalDto = MapApproveToDto(existing, ownerId);
+        finalDto.PrevApproved = prevState;
+        return finalDto;
     }
 
     public async Task<List<AchievementApproveResponseDto>> GetApprovalsAsync(Guid achievementId)

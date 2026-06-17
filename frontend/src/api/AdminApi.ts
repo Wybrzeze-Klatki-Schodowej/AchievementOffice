@@ -125,6 +125,19 @@ export async function adminDeleteComment(commentId: string): Promise<void> {
     }
 }
 
+export async function adminDeleteShoutout(shoutoutId: string): Promise<void> {
+    const response = await fetch(
+        `${ADMIN_API_URL}/shoutouts/${shoutoutId}`,
+        {
+            method: "DELETE",
+            credentials: "include"
+        }
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to delete shoutout: ${response.status}`);
+    }
+}
+
 export interface CreateRankRequest {
     name: string;
     multiplier: number;

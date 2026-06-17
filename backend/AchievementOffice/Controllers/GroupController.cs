@@ -121,5 +121,41 @@ namespace AchievementOffice.Controllers
 
             return Ok(result.Value);
         }
+
+        [HttpDelete("{groupId}/members/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> RemoveUserFromGroup(
+            [FromRoute] Guid groupId,
+            [FromRoute] Guid userId)
+        {
+            var currentUserIdString = 
+                User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(currentUserIdString, out Guid currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            var isGlobalAdmin = User.IsInRole("Admin");
+
+            var result = await _groupService.RemoveUserFromGroupAsync(
+                groupId,
+                userId,
+                currentUserId,
+                isGlobalAdmin);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorMessage == "Forbidden")
+                    return Forbid();
+
+                return BadRequest(new
+                {
+                    error = result.ErrorMessage
+                });
+            }
+
+            return NoContent();
+        }
     }
 }
