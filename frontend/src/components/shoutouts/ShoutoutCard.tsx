@@ -6,6 +6,7 @@ import "./ShoutoutCard.css";
 interface Props {
     shoutout: Shoutout;
     currentUserId: string | null;
+    currentUserRole?: string | null;
     onEdit: (shoutout: Shoutout) => void;
     onDelete: (id: string) => void;
     onReaction?: () => void;
@@ -20,14 +21,23 @@ const REACTION_MAP = [
     { type: 5, emoji: "😠", label: "Angry" },
 ];
 
-export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete, onReaction }: Props) {
+export default function ShoutoutCard({
+    shoutout,
+    currentUserId,
+    currentUserRole,
+    onEdit,
+    onDelete,
+    onReaction
+}: Props) {
     const [isReacting, setIsReacting] = useState(false);
 
     const senderName = `${shoutout.senderFirstname} ${shoutout.senderLastname}`.trim() || shoutout.senderLogin;
 
+    const isOwner = currentUserId === shoutout.senderId;
+    const isAdmin = currentUserRole === "Admin";
+
     const handleReactionClick = async (reactionType: number) => {
         if (!currentUserId || isReacting) return;
-
         try {
             setIsReacting(true);
             if (shoutout.currentUserReaction && REACTION_MAP.find(r => r.emoji === shoutout.currentUserReaction)?.type === reactionType) {
@@ -49,14 +59,9 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
                 <h3>{shoutout.title}</h3>
                 <div className="shoutout-meta">
                     <span className="meta-label">From</span>
-                    <span className="sender-name">
-                        {senderName}
-                    </span>
-
+                    <span className="sender-name">{senderName}</span>
                     {shoutout.senderFirstname && shoutout.senderLastname && (
-                        <span className="sender-login">
-                            @{shoutout.senderLogin}
-                        </span>
+                        <span className="sender-login">@{shoutout.senderLogin}</span>
                     )}
                 </div>
             </div>
@@ -87,9 +92,11 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
                     ))}
                 </div>
 
-                {currentUserId === shoutout.senderId && (
+                {(isOwner || isAdmin) && (
                     <div className="actions">
-                        <button className="edit-btn" onClick={() => onEdit(shoutout)}>Edit</button>
+                        {isOwner && (
+                            <button className="edit-btn" onClick={() => onEdit(shoutout)}>Edit</button>
+                        )}
                         <button className="delete-btn" onClick={() => onDelete(shoutout.shoutoutId)}>
                             Delete
                         </button>
@@ -99,4 +106,3 @@ export default function ShoutoutCard({ shoutout, currentUserId, onEdit, onDelete
         </div>
     );
 }
-

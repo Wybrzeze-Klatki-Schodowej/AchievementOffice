@@ -142,4 +142,16 @@ public class AdminService : IAdminService
         await _context.SaveChangesAsync();
         return Result.Success();
     }
+
+	public async Task<Result> DeleteShoutoutAsync(Guid shoutoutId)
+    {
+        var shoutout = await _context.Shoutouts
+            .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
+        if (shoutout == null)
+            return Result.Fail("Shoutout not found");
+        shoutout.DeletedAt = DateTime.UtcNow;
+        shoutout.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Result.Success();
+    }
 }
