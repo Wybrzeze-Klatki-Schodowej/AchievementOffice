@@ -15,13 +15,15 @@ public class AchievementServiceTests
 {
     private readonly AppDbContext _context;
     private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
+    private readonly Mock<INotificationService> _mockNotificationService;
     private readonly AchievementService _service;
 
     public AchievementServiceTests()
     {
         _context = CreateInMemoryContext();
         _mockHttpContextAccessor = CreateMockHttpContextAccessor();
-        _service = new AchievementService(_context, _mockHttpContextAccessor.Object);
+        _mockNotificationService = CreateMockNotificationService();
+        _service = new AchievementService(_context, _mockHttpContextAccessor.Object, _mockNotificationService.Object);
     }
 
     private AppDbContext CreateInMemoryContext()
@@ -35,6 +37,11 @@ public class AchievementServiceTests
     private Mock<IHttpContextAccessor> CreateMockHttpContextAccessor()
     {
         return new Mock<IHttpContextAccessor>();
+    }
+
+    private Mock<INotificationService> CreateMockNotificationService()
+    {
+        return new Mock<INotificationService>();
     }
 
     [Fact]
