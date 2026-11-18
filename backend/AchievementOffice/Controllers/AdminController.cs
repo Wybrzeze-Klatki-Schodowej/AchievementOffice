@@ -1,8 +1,6 @@
-using AchievementOffice.Data;
 using AchievementOffice.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AchievementOffice.Services;
 
 namespace AchievementOffice.Controllers

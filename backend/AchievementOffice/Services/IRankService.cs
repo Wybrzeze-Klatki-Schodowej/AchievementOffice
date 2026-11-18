@@ -1,5 +1,4 @@
-﻿using AchievementOffice.Entities;
-using AchievementOffice.Models;
+﻿using AchievementOffice.Models;
 
 namespace AchievementOffice.Services
 {
