@@ -1,4 +1,3 @@
-using Xunit;
 using Microsoft.EntityFrameworkCore;
 using AchievementOffice.Data;
 using AchievementOffice.Services;
@@ -27,7 +26,7 @@ namespace AchievementOffice.Tests.Services
             DeletedAt = deletedAt
         };
 
-        [Fact]
+        [Test]
         public async Task GetAllUsersAsync_NoFilter_ReturnsAllNonDeletedUsers()
         {
             // Arrange
@@ -54,13 +53,13 @@ namespace AchievementOffice.Tests.Services
             var result = await service.GetAllUsersAsync();
 
             // Assert
-            Assert.Equal( 2, result.Count );
-            Assert.Contains( result, u => u.Login == activeUser.Login );
-            Assert.Contains( result, u => u.Login == inactiveUser.Login );
-            Assert.DoesNotContain( result, u => u.Login == deletedUser.Login );
+            await Assert.That(result.Count).IsEqualTo(2);
+            await Assert.That(result.Any(u => u.Login == activeUser.Login)).IsTrue();
+            await Assert.That(result.Any(u => u.Login == inactiveUser.Login)).IsTrue();
+            await Assert.That(result.Any(u => u.Login == deletedUser.Login)).IsFalse();
         }
 
-        [Fact]
+        [Test]
         public async Task GetAllUsersAsync_WithActiveFilter_ReturnsOnlyActiveUsers()
         {
             // Arrange
@@ -83,11 +82,11 @@ namespace AchievementOffice.Tests.Services
             var result = await service.GetAllUsersAsync( isActiveFilter: true );
 
             // Assert
-            Assert.Single( result );
-            Assert.Equal( activeUser.Login, result[0].Login );
+            await Assert.That(result).Count().IsEqualTo(1);
+            await Assert.That(result[0].Login).IsEqualTo(activeUser.Login);
         }
 
-        [Fact]
+        [Test]
         public async Task GetStatsAsync_ReturnsCorrectCounts()
         {
             // Arrange
@@ -106,12 +105,12 @@ namespace AchievementOffice.Tests.Services
             var stats = await service.GetStatsAsync();
 
             // Assert
-            Assert.Equal( 3, stats.TotalUsers );
-            Assert.Equal( 2, stats.ActiveUsers );
-            Assert.Equal( 1, stats.InactiveUsers );
+            await Assert.That(stats.TotalUsers).IsEqualTo(3);
+            await Assert.That(stats.ActiveUsers).IsEqualTo(2);
+            await Assert.That(stats.InactiveUsers).IsEqualTo(1);
         }
 
-        [Fact]
+        [Test]
         public async Task UpdateUserStatusAsync_ExistingUser_UpdatesStatusAndReturnsSuccess()
         {
             // Arrange
@@ -126,12 +125,12 @@ namespace AchievementOffice.Tests.Services
             var result = await service.UpdateUserStatusAsync( user.Id, true );
 
             // Assert
-            Assert.True( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsTrue();
             var updated = await context.Users.FindAsync( user.Id );
-            Assert.True( updated!.IsActive );
+            await Assert.That(updated!.IsActive).IsTrue();
         }
 
-        [Fact]
+        [Test]
         public async Task UpdateUserStatusAsync_NonExistingUser_ReturnsFail()
         {
             // Arrange
@@ -142,11 +141,11 @@ namespace AchievementOffice.Tests.Services
             var result = await service.UpdateUserStatusAsync( Guid.NewGuid(), true );
 
             // Assert
-            Assert.False( result.IsSuccess );
-            Assert.Equal( "User not found", result.ErrorMessage );
+            await Assert.That(result.IsSuccess).IsFalse();
+            await Assert.That(result.ErrorMessage).IsEqualTo("User not found");
         }
 
-        [Fact]
+        [Test]
         public async Task GetRanksAsync_ReturnsAllRanks()
         {
             // Arrange
@@ -163,12 +162,12 @@ namespace AchievementOffice.Tests.Services
             var results = await service.GetRanksAsync();
 
             // Assert
-            Assert.Equal( 2, results.Count );
-            Assert.Contains( results, r => r.Name == "Bronze" );
-            Assert.Contains( results, r => r.Name == "Silver" );
+            await Assert.That(results.Count).IsEqualTo(2);
+            await Assert.That(results.Any(r => r.Name == "Bronze")).IsTrue();
+            await Assert.That(results.Any(r => r.Name == "Silver")).IsTrue();
         }
 
-        [Fact]
+        [Test]
         public async Task UpdateUserRankAsync_ValidUserAndRank_UpdatesRankAndReturnsSuccess()
         {
             // Arrange
@@ -185,12 +184,12 @@ namespace AchievementOffice.Tests.Services
             var result = await service.UpdateUserRankAsync( user.Id, rank.Id );
 
             // Assert
-            Assert.True( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsTrue();
             var updated = await context.Users.FindAsync( user.Id );
-            Assert.Equal( rank.Id, updated!.RankId );
+            await Assert.That(updated!.RankId).IsEqualTo(rank.Id);
         }
 
-        [Fact]
+        [Test]
         public async Task UpdateUserRankAsync_NullRankId_ClearsUserRankAndReturnsSuccess()
         {
             // Arrange
@@ -206,12 +205,12 @@ namespace AchievementOffice.Tests.Services
             var result = await service.UpdateUserRankAsync( user.Id, null );
 
             // Assert
-            Assert.True( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsTrue();
             var updated = await context.Users.FindAsync( user.Id );
-            Assert.Null( updated!.RankId );
+            await Assert.That(updated!.RankId).IsNull();
         }
 
-        [Fact]
+        [Test]
         public async Task UpdateUserRankAsync_InvalidRank_ReturnsFail()
         {
             // Arrange
@@ -226,10 +225,10 @@ namespace AchievementOffice.Tests.Services
             var result = await service.UpdateUserRankAsync( user.Id, Guid.NewGuid() );
 
             // Assert
-            Assert.False( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsFalse();
         }
 
-        [Fact]
+        [Test]
         public async Task DeleteCommentAsync_ExistingComment_SetsDeletedAtAndReturnsSuccess()
         {
             // Arrange
@@ -255,12 +254,12 @@ namespace AchievementOffice.Tests.Services
             var result = await service.DeleteCommentAsync( comment.Id );
 
             // Assert
-            Assert.True( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsTrue();
             var deleted = await context.Comments.FindAsync( comment.Id );
-            Assert.NotNull( deleted!.DeletedAt );
+            await Assert.That(deleted!.DeletedAt).IsNotNull();
         }
 
-        [Fact]
+        [Test]
         public async Task DeleteAchievementAsync_ExistingAchievement_SetsDeletedAtAndReturnsSuccess()
         {
             // Arrange
@@ -282,9 +281,9 @@ namespace AchievementOffice.Tests.Services
             var result = await service.DeleteAchievementAsync( achievement.AchievementId );
 
             // Assert
-            Assert.True( result.IsSuccess );
+            await Assert.That(result.IsSuccess).IsTrue();
             var deleted = await context.Achievements.FindAsync( achievement.AchievementId );
-            Assert.NotNull( deleted!.DeletedAt );
+            await Assert.That(deleted!.DeletedAt).IsNotNull();
         }
     }
 }

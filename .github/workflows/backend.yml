@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "backend/**"
+      - "global.json"
+      - ".github/workflows/backend.yml"
 
 jobs:
   backend:
@@ -16,12 +18,12 @@ jobs:
       
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: backend/AchievementOffice
+        working-directory: backend
 
       - name: Build
         run: dotnet build --no-restore
-        working-directory: backend/AchievementOffice
+        working-directory: backend
 
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
-        working-directory: backend/AchievementOffice
+        run: dotnet test --no-build
+        working-directory: backend

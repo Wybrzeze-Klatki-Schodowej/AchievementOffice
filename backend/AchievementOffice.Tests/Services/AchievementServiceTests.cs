@@ -1,4 +1,3 @@
-using Xunit;
 using Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +52,7 @@ public class AchievementServiceTests
         return new Mock<IHttpContextAccessor>();
     }
 
-    [Fact]
+    [Test]
     public async Task ApproveAsync_FirstVote_ReturnsDtoWithCorrectStatus()
     {
         // Arrange
@@ -70,16 +69,14 @@ public class AchievementServiceTests
         var result = await _service.ApproveAsync(achievementId, userId, dto);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Multiple(
-            () => Assert.Equal(achievementId, result.AchievementId),
-            () => Assert.Equal(userId, result.UserId),
-            () => Assert.True(result.IsApproved)
-        );
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.AchievementId).IsEqualTo(achievementId);
+        await Assert.That(result.UserId).IsEqualTo(userId);
+        await Assert.That(result.IsApproved).IsTrue();
 
     }
 
-    [Fact]
+    [Test]
     public async Task ApproveAsync_SecondSameVote_PerformsSoftDeleteAndReturnsNullApproved()
     {
         // Arrange
@@ -98,15 +95,15 @@ public class AchievementServiceTests
         var result = await _service.ApproveAsync(achievementId, userId, dto);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Null(result.IsApproved);
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.IsApproved).IsNull();
 
         var dbRecord = await _context.AchievementApproves.IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.AchievementId == achievementId && a.UserId == userId);
-        Assert.NotNull(dbRecord!.DeletedAt);
+        await Assert.That(dbRecord!.DeletedAt).IsNotNull();
     }
 
-    [Fact]
+    [Test]
     public async Task ApproveAsync_DifferentUsers_Success()
     {
         // Arrange
@@ -123,20 +120,17 @@ public class AchievementServiceTests
         var result2 = await _service.ApproveAsync(achievementId, userId2, dto2);
 
         // Assert
-        Assert.NotNull(result1);
-        Assert.NotNull(result2);
-        Assert.Multiple(() =>
-        {
-            Assert.Equal(achievementId, result1.AchievementId);
-            Assert.Equal(achievementId, result2.AchievementId);
-            Assert.Equal(userId1, result1.UserId);
-            Assert.Equal(userId2, result2.UserId);
-            Assert.True(result1.IsApproved);
-            Assert.False(result2.IsApproved);
-        });
+        await Assert.That(result1).IsNotNull();
+        await Assert.That(result2).IsNotNull();
+        await Assert.That(result1.AchievementId).IsEqualTo(achievementId);
+        await Assert.That(result2.AchievementId).IsEqualTo(achievementId);
+        await Assert.That(result1.UserId).IsEqualTo(userId1);
+        await Assert.That(result2.UserId).IsEqualTo(userId2);
+        await Assert.That(result1.IsApproved).IsTrue();
+        await Assert.That(result2.IsApproved).IsFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task GetApprovalSummaryAsync_NoVotes_ReturnsZeros()
     {
         // Arrange
@@ -147,12 +141,12 @@ public class AchievementServiceTests
         var summary = await _service.GetApprovalSummaryAsync(achievementId);
 
         // Assert
-        Assert.NotNull(summary);
-        Assert.Equal(0, summary.Approved);
-        Assert.Equal(0, summary.Denied);
+        await Assert.That(summary).IsNotNull();
+        await Assert.That(summary.Approved).IsEqualTo(0);
+        await Assert.That(summary.Denied).IsEqualTo(0);
     }
 
-    [Fact]
+    [Test]
     public async Task GetApprovalSummaryAsync_WithVotes_ReturnsCorrectCounts()
     {
         // Arrange
@@ -167,12 +161,12 @@ public class AchievementServiceTests
         var result = await _service.GetApprovalSummaryAsync(achievementId);
 
         // Assert
-        Assert.Equal(2, result.Approved);
-        Assert.Equal(1, result.Denied);
+        await Assert.That(result.Approved).IsEqualTo(2);
+        await Assert.That(result.Denied).IsEqualTo(1);
     }
 
 
-    [Fact]
+    [Test]
     public async Task CreateAsync_ValidDto_ReturnsAchievement()
     {
         // Arrange
@@ -187,12 +181,12 @@ public class AchievementServiceTests
         var result = await _service.CreateAsync(dto);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.True(result.IsSuccess);
-        Assert.Equal(dto.Title, result.Value!.Title);
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.IsSuccess).IsTrue();
+        await Assert.That(result.Value!.Title).IsEqualTo(dto.Title);
     }
 
-    [Fact]
+    [Test]
     public async Task DeleteAsync_ExistingAchievement_ReturnsTrueAndSetsDeletedAt()
     {
         // Arrange
@@ -206,13 +200,13 @@ public class AchievementServiceTests
         var result = await _service.DeleteAsync(createdResult.Value!.AchievementId);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        await Assert.That(result.IsSuccess).IsTrue();
         var deleted = await _context.Achievements
             .FirstOrDefaultAsync(a => a.AchievementId == createdResult.Value!.AchievementId);
-        Assert.NotNull(deleted!.DeletedAt);
+        await Assert.That(deleted!.DeletedAt).IsNotNull();
     }
 
-    [Fact]
+    [Test]
     public async Task DeleteAsync_NonExistingAchievement_ReturnsFalse()
     {
         // Arrange
@@ -222,10 +216,10 @@ public class AchievementServiceTests
         var result = await _service.DeleteAsync(Guid.NewGuid());
 
         // Assert
-        Assert.False(result.IsSuccess);
+        await Assert.That(result.IsSuccess).IsFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task GetAllAsync_ReturnsOnlyNonDeleted()
     {
         // Arrange
@@ -244,8 +238,8 @@ public class AchievementServiceTests
         var result = await _service.GetAllAsync();
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Single(result.Value!);
-        Assert.Equal("Active", result.Value![0].Title);
+        await Assert.That(result.IsSuccess).IsTrue();
+        await Assert.That(result.Value!).Count().IsEqualTo(1);
+        await Assert.That(result.Value![0].Title).IsEqualTo("Active");
     }
 }
