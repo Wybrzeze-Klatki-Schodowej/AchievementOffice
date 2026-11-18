@@ -5,7 +5,7 @@ using AchievementOffice.Services;
 using AchievementOffice.Models;
 using AchievementOffice.Entities;
 
-namespace AchievementOffice.Tests
+namespace AchievementOffice.Tests.Services
 {
     public class AdminServiceTests
     {

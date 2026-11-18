@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AchievementOffice.Data;
+using AchievementOffice.Entities;
 using AchievementOffice.Services;
 using AchievementOffice.Models;
 
@@ -21,7 +22,22 @@ public class AchievementServiceTests
     {
         _context = CreateInMemoryContext();
         _mockHttpContextAccessor = CreateMockHttpContextAccessor();
-        _service = new AchievementService(_context, _mockHttpContextAccessor.Object);
+        _service = new AchievementService(
+            _context,
+            _mockHttpContextAccessor.Object,
+            Mock.Of<INotificationService>(),
+            Mock.Of<IRankingService>());
+    }
+
+    private async Task SeedAchievementAsync(Guid achievementId)
+    {
+        _context.Achievements.Add(new Achievement
+        {
+            AchievementId = achievementId,
+            UserId = Guid.NewGuid(),
+            Title = "Test achievement"
+        });
+        await _context.SaveChangesAsync();
     }
 
     private AppDbContext CreateInMemoryContext()
@@ -44,6 +60,7 @@ public class AchievementServiceTests
 
         var userId = Guid.NewGuid();
         var achievementId = Guid.NewGuid();
+        await SeedAchievementAsync(achievementId);
         var dto = new CreateAchievementApproveDto
         {
             IsApproved = true
@@ -69,6 +86,7 @@ public class AchievementServiceTests
 
         var userId = Guid.NewGuid();
         var achievementId = Guid.NewGuid();
+        await SeedAchievementAsync(achievementId);
         var dto = new CreateAchievementApproveDto
         {
             IsApproved = true
@@ -94,6 +112,7 @@ public class AchievementServiceTests
         // Arrange
 
         var achievementId = Guid.NewGuid();
+        await SeedAchievementAsync(achievementId);
         var dto1 = new CreateAchievementApproveDto { IsApproved = true };
         var dto2 = new CreateAchievementApproveDto { IsApproved = false };
         var userId1 = Guid.NewGuid();
@@ -104,11 +123,8 @@ public class AchievementServiceTests
         var result2 = await _service.ApproveAsync(achievementId, userId2, dto2);
 
         // Assert
-        Assert.Multiple(() =>
-        {
-            Assert.NotNull(result1);
-            Assert.NotNull(result2);
-        });
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
         Assert.Multiple(() =>
         {
             Assert.Equal(achievementId, result1.AchievementId);
@@ -125,6 +141,7 @@ public class AchievementServiceTests
     {
         // Arrange
         var achievementId = Guid.NewGuid();
+        await SeedAchievementAsync(achievementId);
 
         // Act
         var summary = await _service.GetApprovalSummaryAsync(achievementId);
@@ -140,6 +157,7 @@ public class AchievementServiceTests
     {
         // Arrange
         var achievementId = Guid.NewGuid();
+        await SeedAchievementAsync(achievementId);
 
         await _service.ApproveAsync(achievementId, Guid.NewGuid(), new CreateAchievementApproveDto { IsApproved = true });
         await _service.ApproveAsync(achievementId, Guid.NewGuid(), new CreateAchievementApproveDto { IsApproved = true });
