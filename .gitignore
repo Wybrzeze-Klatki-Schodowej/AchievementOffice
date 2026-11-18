@@ -554,3 +554,6 @@ thumb
 sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,react,node
+
+# JetBrains IDE settings
+.idea/
