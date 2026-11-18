@@ -10,11 +10,13 @@ namespace AchievementOffice.Services
     {
         private readonly AppDbContext _appDbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRankingService _rankingService;
 
-        public ShoutoutService(AppDbContext appDbContext, IHttpContextAccessor httpContextAccessor)
+        public ShoutoutService(AppDbContext appDbContext, IHttpContextAccessor httpContextAccessor, IRankingService rankingService)
         {
             _appDbContext = appDbContext;
             _httpContextAccessor = httpContextAccessor;
+            _rankingService = rankingService;
         }
 
         public async Task<Result<ShoutoutResponse>> CreateAsync(CreateShoutoutRequest createDto)
@@ -69,6 +71,8 @@ namespace AchievementOffice.Services
                     "GroupIds can only be provided when visibility is set to Groups");
             }
 
+            shoutout.AwardedPoints = await _rankingService.CalculateAwardAsync(userId, RankingAction.Shoutout);
+            await _rankingService.ChangeScoreAsync(shoutout.ReceiverId, shoutout.AwardedPoints);
             await _appDbContext.SaveChangesAsync();
 
             var createdShoutout = await _appDbContext.Shoutouts
@@ -165,6 +169,8 @@ namespace AchievementOffice.Services
             if (!isOwner && !isAdmin)
                 return Result<bool>.Fail("Forbidden");
 
+            await _rankingService.ChangeScoreAsync(shoutout.ReceiverId, -shoutout.AwardedPoints);
+            shoutout.AwardedPoints = 0m;
             shoutout.DeletedAt = DateTime.UtcNow;
             await _appDbContext.SaveChangesAsync();
             
@@ -278,6 +284,7 @@ namespace AchievementOffice.Services
             {
                 if (existingReaction.Reaction == reaction)
                 {
+                    await _rankingService.ChangeScoreAsync(shoutout.ReceiverId, -existingReaction.AwardedPoints);
                     _appDbContext.KudosShoutouts.Remove(existingReaction);
                 }
                 else
@@ -293,6 +300,8 @@ namespace AchievementOffice.Services
                     UserId = userId,
                     Reaction = reaction
                 };
+                newReaction.AwardedPoints = await _rankingService.CalculateAwardAsync(userId, RankingAction.Reaction);
+                await _rankingService.ChangeScoreAsync(shoutout.ReceiverId, newReaction.AwardedPoints);
                 _appDbContext.KudosShoutouts.Add(newReaction);
             }
 
@@ -318,6 +327,8 @@ namespace AchievementOffice.Services
 
             if (reaction != null)
             {
+                var shoutout = await _appDbContext.Shoutouts.SingleAsync(s => s.ShoutoutId == shoutoutId);
+                await _rankingService.ChangeScoreAsync(shoutout.ReceiverId, -reaction.AwardedPoints);
                 _appDbContext.KudosShoutouts.Remove(reaction);
                 await _appDbContext.SaveChangesAsync();
             }

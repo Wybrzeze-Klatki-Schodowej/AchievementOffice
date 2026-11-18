@@ -14,6 +14,7 @@ namespace AchievementOffice.Entities
 
         [Column("sender_id")]
         public Guid SenderId { get; set; }
+        public decimal AwardedPoints { get; set; }
         public User Sender { get; set; } = null!;
 
         [Column("title")]

@@ -1,95 +1,38 @@
-﻿using AchievementOffice.Configuration;
-using AchievementOffice.Data;
+﻿using AchievementOffice.Data;
 using AchievementOffice.Entities;
 using AchievementOffice.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace AchievementOffice.Services
 {
     public class RankingService : IRankingService
     {
         private readonly AppDbContext _context;
-        private readonly RankingSettings _rankingSettings;
-        public RankingService(AppDbContext context, IOptions<RankingSettings> options)
+        public RankingService(AppDbContext context)
         {
             _context = context;
-            _rankingSettings = options.Value;
         }
 
-        private async Task<Result> AddPoints(Guid reactingUserId, Guid ownerId, decimal value)
+        // Stages score changes; the caller saves the action and score together.
+        public async Task<decimal> CalculateAwardAsync(Guid actorId, RankingAction action)
         {
-            var reactingUser = await _context.Users.Include(u => u.Rank).FirstOrDefaultAsync(u => u.Id == reactingUserId);
-            var owner = await _context.Users.FirstOrDefaultAsync(u => u.Id == ownerId);
-
-            if (reactingUser == null || owner == null) return Result.Fail("User have not been found");
-
-            decimal toAdd = reactingUser.Rank?.Multiplier ?? 1.0m;
-
-            owner.RankingPoints += value * toAdd;
-            await _context.SaveChangesAsync();
-            return Result.Success();
+            var settings = await _context.RankingConfigurations.AsNoTracking().SingleAsync(c => c.Id == 1);
+            var actor = await _context.Users.Include(u => u.Rank).SingleAsync(u => u.Id == actorId);
+            var amount = action switch
+            {
+                RankingAction.Approval => settings.AchievementApprovedBasePoints,
+                RankingAction.Disapproval => settings.DisapprovalPoints,
+                RankingAction.Shoutout => settings.ShoutoutBase,
+                RankingAction.Reaction => settings.ReactionShoutOutPoints,
+                _ => throw new ArgumentOutOfRangeException(nameof(action))
+            };
+            return decimal.Round(amount * (actor.Rank?.Multiplier ?? 1m), 2, MidpointRounding.AwayFromZero);
         }
 
-        public async Task<Result> ApplyAchievementPoints(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
+        public async Task ChangeScoreAsync(Guid ownerId, decimal delta)
         {
-            if (newState == prevState)
-                return Result.Success();
-
-            decimal delta = 0m;
-
-            if (prevState == true)
-                delta -= _rankingSettings.AchievementApprovedBasePoints;
-            else if (prevState == false)
-                delta -= _rankingSettings.DisapprovalPoints;
-
-            if (newState == true)
-                delta += _rankingSettings.AchievementApprovedBasePoints;
-            else if (newState == false)
-                delta += _rankingSettings.DisapprovalPoints;
-
-            if (delta == 0)
-                return Result.Success();
-
-            return await AddPoints(reactingUserId, ownerId, delta);
-        }
-
-        public async Task<Result> ApplyShoutOutPoints(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
-        {
-            if (newState == prevState)
-                return Result.Success();
-
-            decimal delta = 0m;
-
-            if (prevState == true)
-                delta -= _rankingSettings.ReactionShoutOutPoints;
-
-            if (newState == true)
-                delta += _rankingSettings.ReactionShoutOutPoints;
-
-            if (delta == 0)
-                return Result.Success();
-
-            return await AddPoints(reactingUserId, ownerId, delta);
-        }
-
-        public async Task<Result> ApplyShoutOutPointsCreate(Guid reactingUserId, Guid ownerId, bool? prevState, bool? newState)
-        {
-            if (newState == prevState)
-                return Result.Success();
-
-            decimal delta = 0m;
-
-            if (prevState == true)
-                delta -= _rankingSettings.ShoutoutBase;
-
-            if (newState == true)
-                delta += _rankingSettings.ShoutoutBase;
-
-            if (delta == 0)
-                return Result.Success();
-
-            return await AddPoints(reactingUserId, ownerId, delta);
+            var owner = await _context.Users.SingleAsync(u => u.Id == ownerId);
+            owner.RankingPoints += delta;
         }
 
         public async Task<Result<List<UserRankingResponse>>> GetUserRanking()

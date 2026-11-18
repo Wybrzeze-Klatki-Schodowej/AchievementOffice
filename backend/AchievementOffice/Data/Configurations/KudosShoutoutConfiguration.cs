@@ -10,6 +10,10 @@ public class KudosShoutoutConfiguration : IEntityTypeConfiguration<KudosShoutout
     {
         builder.ToTable("KudosShoutouts");
 
+        builder.Property(e => e.AwardedPoints)
+            .HasColumnName("awarded_points")
+            .HasColumnType("numeric(18,2)");
+
         builder.HasKey(ks => new { ks.ShoutoutId, ks.UserId });
 
         builder.Property(ks => ks.ShoutoutId)

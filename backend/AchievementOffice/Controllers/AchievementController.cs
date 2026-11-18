@@ -12,12 +12,10 @@ namespace AchievementOffice.Controllers;
 public class AchievementController : ControllerBase
 {
     private readonly IAchievementService _achievementService;
-    private readonly IRankingService _rankingService;
 
-    public AchievementController(IAchievementService achievementService, IRankingService rankingService)
+    public AchievementController(IAchievementService achievementService)
     {
         _achievementService = achievementService;
-        _rankingService = rankingService;
     }
 
     [HttpGet]
@@ -104,7 +102,6 @@ public class AchievementController : ControllerBase
 
         if (approve is null) return NotFound(new { message = "Achievement not found" });
 
-        await _rankingService.ApplyAchievementPoints(userId, approve.OwnerId, approve.PrevApproved, approve.IsApproved);
 
         return Ok(approve);
     }

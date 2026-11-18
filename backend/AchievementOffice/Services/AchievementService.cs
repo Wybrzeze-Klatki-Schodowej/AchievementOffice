@@ -10,15 +10,18 @@ public class AchievementService : IAchievementService
 {
     private readonly AppDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRankingService _rankingService;
     private readonly INotificationService _notificationService;
 
     public AchievementService(
         AppDbContext context, 
         IHttpContextAccessor httpContextAccessor,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IRankingService rankingService)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
+        _rankingService = rankingService;
         _notificationService = notificationService;
     }
 
@@ -231,7 +234,7 @@ public class AchievementService : IAchievementService
 
         var achievement = await _context.Achievements.FirstOrDefaultAsync(a => a.AchievementId == achievementId);
 
-        if (achievement is null) return null;
+        if (achievement is null || achievement.DeletedAt != null) return null;
         var ownerId = achievement.UserId;
 
         bool? prevState = existing?.DeletedAt == null ? existing?.IsApproved : null;
@@ -247,6 +250,8 @@ public class AchievementService : IAchievementService
                 ApprovedAt = DateTime.UtcNow
             };
 
+            approve.AwardedPoints = await _rankingService.CalculateAwardAsync(userId, dto.IsApproved ? RankingAction.Approval : RankingAction.Disapproval);
+            await _rankingService.ChangeScoreAsync(ownerId, approve.AwardedPoints);
             _context.AchievementApproves.Add(approve);
 
             await RemoveVerificationNotificationAsync(achievementId, userId);
@@ -259,6 +264,8 @@ public class AchievementService : IAchievementService
             
         if (existing.DeletedAt != null)
         {
+            existing.AwardedPoints = await _rankingService.CalculateAwardAsync(userId, dto.IsApproved ? RankingAction.Approval : RankingAction.Disapproval);
+            await _rankingService.ChangeScoreAsync(ownerId, existing.AwardedPoints);
             existing.DeletedAt = null;
             existing.IsApproved = dto.IsApproved;
             existing.ApprovedAt = DateTime.UtcNow;
@@ -272,6 +279,8 @@ public class AchievementService : IAchievementService
         
         if (existing.IsApproved == dto.IsApproved)
         {
+            await _rankingService.ChangeScoreAsync(ownerId, -existing.AwardedPoints);
+            existing.AwardedPoints = 0m;
             existing.DeletedAt = DateTime.UtcNow;
             await RemoveVerificationNotificationAsync(achievementId, userId);
             await _context.SaveChangesAsync();
@@ -288,6 +297,9 @@ public class AchievementService : IAchievementService
             };
         }
 
+        var newAward = await _rankingService.CalculateAwardAsync(userId, dto.IsApproved ? RankingAction.Approval : RankingAction.Disapproval);
+        await _rankingService.ChangeScoreAsync(ownerId, newAward - existing.AwardedPoints);
+        existing.AwardedPoints = newAward;
         existing.IsApproved = dto.IsApproved;
         existing.ApprovedAt = DateTime.UtcNow;
 
@@ -423,9 +435,9 @@ public class AchievementService : IAchievementService
             .Distinct()
             .ToListAsync();
 
-        _context.AchievementApproves.RemoveRange(
-            _context.AchievementApproves.Where(a => a.AchievementId == achievementId)
-        );
+        var approvals = await _context.AchievementApproves.Where(a => a.AchievementId == achievementId).ToListAsync();
+        await _rankingService.ChangeScoreAsync(achievement.UserId, -approvals.Sum(a => a.AwardedPoints));
+        _context.AchievementApproves.RemoveRange(approvals);
 
         var pendingRequests = await _context.AchievementVerificationRequests
             .Where(r => r.AchievementId == achievementId &&

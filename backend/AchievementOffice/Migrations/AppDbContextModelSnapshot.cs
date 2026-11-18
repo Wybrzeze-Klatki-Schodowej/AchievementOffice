@@ -86,6 +86,10 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("approved_at");
 
+                    b.Property<decimal>("AwardedPoints")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("awarded_points");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
@@ -323,6 +327,10 @@ namespace AchievementOffice.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<decimal>("AwardedPoints")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("awarded_points");
+
                     b.Property<int>("Reaction")
                         .HasColumnType("integer")
                         .HasColumnName("reaction");
@@ -423,12 +431,57 @@ namespace AchievementOffice.Migrations
                     b.ToTable("Ranks", (string)null);
                 });
 
+            modelBuilder.Entity("AchievementOffice.Entities.RankingConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("AchievementApprovedBasePoints")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("DisapprovalPoints")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("ReactionShoutOutPoints")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<decimal>("ShoutoutBase")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RankingConfiguration", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RankingConfiguration_Points", "\"ShoutoutBase\" >= 0 AND \"ReactionShoutOutPoints\" >= 0 AND \"AchievementApprovedBasePoints\" >= 0 AND \"DisapprovalPoints\" <= 0");
+
+                            t.HasCheckConstraint("CK_RankingConfiguration_Singleton", "\"Id\" = 1");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AchievementApprovedBasePoints = 50m,
+                            DisapprovalPoints = -20m,
+                            ReactionShoutOutPoints = 2m,
+                            ShoutoutBase = 10m
+                        });
+                });
+
             modelBuilder.Entity("AchievementOffice.Entities.Shoutout", b =>
                 {
                     b.Property<Guid>("ShoutoutId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("shoutout_id");
+
+                    b.Property<decimal>("AwardedPoints")
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("awarded_points");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()

@@ -10,6 +10,10 @@ public class AchievementApproveConfiguration : IEntityTypeConfiguration<Achievem
     {
         builder.ToTable("AchievementApprove");
 
+        builder.Property(e => e.AwardedPoints)
+            .HasColumnName("awarded_points")
+            .HasColumnType("numeric(18,2)");
+
         builder.HasKey(a => a.AchievementApproveId);
 
         builder.Property(a => a.AchievementApproveId)

@@ -11,6 +11,7 @@ namespace AchievementOffice.Entities
 
         [Column("user_id")]
         public Guid UserId { get; set; }
+        public decimal AwardedPoints { get; set; }
         public User User { get; set; } = null!;
 
         [Column("reaction")]

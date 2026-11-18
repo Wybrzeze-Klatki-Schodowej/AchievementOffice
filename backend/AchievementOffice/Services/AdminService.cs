@@ -149,6 +149,9 @@ public class AdminService : IAdminService
             .FirstOrDefaultAsync(s => s.ShoutoutId == shoutoutId && s.DeletedAt == null);
         if (shoutout == null)
             return Result.Fail("Shoutout not found");
+        var receiver = await _context.Users.SingleAsync(u => u.Id == shoutout.ReceiverId);
+        receiver.RankingPoints -= shoutout.AwardedPoints;
+        shoutout.AwardedPoints = 0m;
         shoutout.DeletedAt = DateTime.UtcNow;
         shoutout.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
